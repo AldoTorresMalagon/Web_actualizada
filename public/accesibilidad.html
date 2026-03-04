@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accesibilidad - Cafetería ITH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/pages/accesibilidad.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="header"></div>
+    <div id="navbar"></div>
+    <div id="sidebar"></div>
+
+    <main class="container my-5 flex-grow-1 fade-in">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <div class="text-center mb-5">
+                    <h2 class="display-4 mb-3">
+                        <i class="bi bi-universal-access me-3"></i>Opciones de Accesibilidad
+                    </h2>
+                    <p class="lead text-muted">
+                        Personaliza tu experiencia en nuestro sitio web según tus necesidades
+                    </p>
+                </div>
+
+                <!-- Panel de información -->
+                <div class="card shadow border-0 mb-5">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="card-title mb-3">Haciendo nuestro sitio accesible para todos</h4>
+                                <p class="card-text text-muted">
+                                    En Cafetería ITH nos preocupamos por brindar una experiencia inclusiva.
+                                    Utiliza estas herramientas para adaptar el sitio web a tus necesidades visuales y de
+                                    lectura.
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <i class="bi bi-heart-fill text-primary icon-feature"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opciones -->
+                <div class="row">
+
+                    <!-- Tamaño de texto -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow border-0">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-text-paragraph me-2"></i>Tamaño del Texto
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Ajusta el tamaño de la fuente según tu comodidad visual</p>
+                                <div class="btn-opcion-grupo">
+                                    <button class="btn btn-opcion" data-opcion="tamano_fuente" data-valor="pequeno">
+                                        A <small>(Pequeño)</small>
+                                    </button>
+                                    <button class="btn btn-opcion activo" data-opcion="tamano_fuente"
+                                        data-valor="normal">
+                                        A <small>(Normal)</small>
+                                    </button>
+                                    <button class="btn btn-opcion" data-opcion="tamano_fuente" data-valor="grande">
+                                        A <small>(Grande)</small>
+                                    </button>
+                                    <button class="btn btn-opcion" data-opcion="tamano_fuente" data-valor="muy_grande">
+                                        A <small>(Muy Grande)</small>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contraste -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow border-0">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-brightness-high me-2"></i>Contraste
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Activa el modo de alto contraste para mejor visibilidad</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Alto Contraste</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="toggleContraste">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modo lectura -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow border-0">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-book me-2"></i>Modo Lectura
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Optimiza la visualización para una lectura prolongada</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Activar Modo Lectura</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="toggleLectura">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fuente legible -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow border-0">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-fonts me-2"></i>Fuente Legible
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Cambia a una fuente más fácil de leer</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Fuente de Dislexia</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="toggleFuente">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Subrayar enlaces -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow border-0">
+                            <div class="card-header bg-secondary text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-link me-2"></i>Enlaces
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Subraya todos los enlaces para mejor identificación</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Subrayar Enlaces</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="toggleEnlaces">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Animaciones -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card h-100 shadow border-0">
+                            <div class="card-header bg-dark text-white">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-play-circle me-2"></i>Animaciones
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">Desactiva las animaciones si te causan molestias</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Desactivar Animaciones</span>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="toggleAnimaciones">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="text-center mt-3 mb-5">
+                    <button class="btn btn-primary btn-lg me-3" id="btnAplicarTodo">
+                        <i class="bi bi-check-circle me-2"></i>Aplicar Configuraciones
+                    </button>
+                    <button class="btn btn-outline-secondary btn-lg" id="btnResetear">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Restablecer Valores
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Botón flotante -->
+    <button class="btn-accesibilidad-flotante" id="btnAbrirPanel" title="Panel de accesibilidad">
+        <i class="bi bi-universal-access"></i>
+    </button>
+
+    <!-- Panel flotante de accesibilidad -->
+    <div class="panel-accesibilidad" id="panelAccesibilidad">
+        <div class="panel-header">
+            <h5 class="mb-0"><i class="bi bi-universal-access me-2"></i>Accesibilidad</h5>
+            <button class="btn btn-sm btn-light" id="btnCerrarPanel">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="panel-body">
+
+            <div class="opcion-accesibilidad">
+                <h6>Tamaño del Texto</h6>
+                <div class="btn-opcion-grupo">
+                    <button class="btn btn-opcion btn-sm" data-opcion="tamano_fuente" data-valor="pequeno">A-</button>
+                    <button class="btn btn-opcion btn-sm activo" data-opcion="tamano_fuente"
+                        data-valor="normal">A</button>
+                    <button class="btn btn-opcion btn-sm" data-opcion="tamano_fuente" data-valor="grande">A+</button>
+                    <button class="btn btn-opcion btn-sm" data-opcion="tamano_fuente"
+                        data-valor="muy_grande">A++</button>
+                </div>
+            </div>
+
+            <div class="opcion-accesibilidad">
+                <h6>Contraste</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Alto Contraste</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggleContrastePanel">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="opcion-accesibilidad">
+                <h6>Modo Lectura</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Activar</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggleLecturaPanel">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="opcion-accesibilidad">
+                <h6>Fuente Legible</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Activar</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggleFuentePanel">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="opcion-accesibilidad">
+                <h6>Enlaces</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Subrayar</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggleEnlacesPanel">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="opcion-accesibilidad">
+                <h6>Animaciones</h6>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>Desactivar</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggleAnimacionesPanel">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-primary" id="btnAplicarPanel">
+                    <i class="bi bi-check-circle me-2"></i>Aplicar
+                </button>
+                <button class="btn btn-outline-secondary" id="btnResetearPanel">
+                    <i class="bi bi-arrow-clockwise me-2"></i>Restablecer
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/components/header.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/footer.js"></script>
+    <!-- La clase GestorAccesibilidad vive aquí, usa localStorage (sin sesión PHP) -->
+    <script src="../assets/js/pages/accesibilidad.js"></script>
+</body>
+
+</html>

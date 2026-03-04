@@ -1,0 +1,109 @@
+/* Estados del carrito */
+.carrito-loading,
+.carrito-vacio,
+.carrito-con-productos {
+    min-height: 300px;
+}
+
+/* Carrito vacío */
+.carrito-vacio {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1rem;
+    text-align: center;
+    color: var(--color-muted);
+}
+
+/* Tabla de items */
+.carrito-item-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+}
+
+.carrito-item-placeholder {
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-blanco);
+    font-size: 1.4rem;
+}
+
+/* Panel resumen / total */
+.carrito-total {
+    background: var(--color-blanco);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    position: sticky;
+    top: calc(var(--header-height) + 80px);
+}
+
+.carrito-total .total-label {
+    font-size: 1rem;
+    color: var(--color-muted);
+}
+
+.monto-pagar {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primario);
+}
+
+/* Selector de cantidad inline */
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.cantidad-control .btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+}
+
+.cantidad-control input {
+    width: 48px;
+    text-align: center;
+    padding: 0.2rem;
+    font-size: 0.9rem;
+}
+
+/* Resumen de pedido */
+.metodo-pago {
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius);
+    padding: 0.6rem 0.85rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.metodo-pago.selected,
+.metodo-pago:hover {
+    border-color: var(--color-primario);
+    background: #eef2ff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .carrito-total {
+        position: static;
+        margin-top: 1.5rem;
+    }
+
+    .monto-pagar {
+        font-size: 1.6rem;
+    }
+}

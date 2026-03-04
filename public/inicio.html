@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Cafetería ITH</title>
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Estilos globales -->
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+
+    <!-- Estilos específicos de esta página -->
+    <link rel="stylesheet" href="../assets/css/pages/inicio.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- HEADER (inyectado por header.js) -->
+    <div id="header"></div>
+
+    <!-- NAVBAR (inyectado por navbar.js) -->
+    <div id="navbar"></div>
+
+    <!-- SIDEBAR OFFCANVAS (inyectado por navbar.js) -->
+    <div id="sidebar"></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container my-5 flex-grow-1 fade-in">
+
+        <!-- Bienvenida -->
+        <section class="text-center mb-5">
+            <h2 class="display-4 fw-bold mb-3">
+                ¡Bienvenido a la Cafetería ITH!
+            </h2>
+            <p class="lead text-muted">
+                Tu lugar favorito para disfrutar comida deliciosa en el campus
+            </p>
+
+            <!-- Alerta para usuarios no autenticados -->
+            <div id="alerta-registro" class="alert alert-info mt-4 d-none">
+                <i class="bi bi-info-circle me-2"></i>
+                <strong>¿Eres nuevo?</strong>
+                <a href="registro.html" class="alert-link">Regístrate aquí</a>
+                para realizar pedidos y acceder a promociones exclusivas.
+            </div>
+        </section>
+
+        <!-- Carrusel -->
+        <section class="mb-5">
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-10">
+                    <h2 class="h3 text-center mb-4">
+                        <i class="bi bi-images me-2"></i>Nuestros Platillos Destacados
+                    </h2>
+
+                    <div class="card shadow-lg border-0 overflow-hidden">
+                        <div class="card-body p-0">
+
+                            <div id="platillosCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel"
+                                data-bs-interval="4000" data-bs-pause="false">
+
+                                <!-- Indicadores (generados por inicio.js) -->
+                                <div class="carousel-indicators" id="carousel-indicators"></div>
+
+                                <!-- Slides (generados por inicio.js desde la API) -->
+                                <div class="carousel-inner" id="carousel-slides">
+                                    <!-- JS inserta los slides aquí -->
+                                    <div class="carousel-item active">
+                                        <div class="carousel-placeholder d-flex align-items-center justify-content-center bg-light"
+                                            class="carousel-img">
+                                            <div class="loading-spinner"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button class="carousel-control-prev" type="button" data-bs-target="#platillosCarousel"
+                                    data-bs-slide="prev">
+                                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Anterior</span>
+                                </button>
+                                <button class="carousel-control-next" type="button" data-bs-target="#platillosCarousel"
+                                    data-bs-slide="next">
+                                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                    <span class="visually-hidden">Siguiente</span>
+                                </button>
+                            </div>
+
+                            <div class="bg-light p-3 text-center">
+                                <p class="mb-0 small text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    El carrusel cambia automáticamente cada 4 segundos
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accesos rápidos -->
+        <section>
+            <h2 class="text-center mb-4">¿Qué te gustaría hacer hoy?</h2>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+
+                <!-- Comidas -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 product-card" onclick="window.location.href='menu.html'">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3 card-icon">
+                                <i class="bi bi-cup-hot text-primary"></i>
+                            </div>
+                            <h3 class="h5 fw-bold mb-2">Ver Comidas</h3>
+                            <p class="text-muted mb-3">Desayunos, comidas y cenas</p>
+                            <a href="menu.html" class="btn btn-primary w-100">
+                                <i class="bi bi-arrow-right-circle me-1"></i>Explorar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 product-card"
+                        onclick="window.location.href='productos.html'">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3 card-icon">
+                                <i class="bi bi-box-seam text-primary"></i>
+                            </div>
+                            <h3 class="h5 fw-bold mb-2">Productos</h3>
+                            <p class="text-muted mb-3">Snacks y antojitos</p>
+                            <a href="productos.html" class="btn btn-primary w-100">
+                                <i class="bi bi-arrow-right-circle me-1"></i>Explorar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bebidas -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 product-card"
+                        onclick="window.location.href='bebidas.html'">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3 card-icon">
+                                <i class="bi bi-cup-straw text-primary"></i>
+                            </div>
+                            <h3 class="h5 fw-bold mb-2">Bebidas</h3>
+                            <p class="text-muted mb-3">Refrescantes y calientes</p>
+                            <a href="bebidas.html" class="btn btn-primary w-100">
+                                <i class="bi bi-arrow-right-circle me-1"></i>Explorar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carrito o Login -->
+                <div class="col" id="card-auth">
+                    <div class="card h-100 shadow-sm border-0 product-card" onclick="window.location.href='login.html'">
+                        <div class="card-body text-center p-4">
+                            <div class="mb-3 card-icon">
+                                <i class="bi bi-person-check text-primary"></i>
+                            </div>
+                            <h3 class="h5 fw-bold mb-2">Iniciar Sesión</h3>
+                            <p class="text-muted mb-3">Accede a tu cuenta</p>
+                            <a href="login.html" class="btn btn-primary w-100">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Ingresar
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <div id="footer"></div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Componentes globales -->
+    <script src="../assets/js/components/header.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/footer.js"></script>
+
+    <!-- Lógica de esta página -->
+    <script src="../assets/js/pages/inicio.js"></script>
+
+</body>
+
+</html>

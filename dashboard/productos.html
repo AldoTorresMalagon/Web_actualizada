@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Productos - Cafetería ITH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="dash-header"></div>
+
+    <div class="d-flex flex-grow-1">
+        <div id="dash-sidebar"></div>
+
+        <main class="dash-main flex-grow-1 p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0"><i class="bi bi-box-seam me-2"></i>Gestión de Productos</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarProductoModal">
+                    <i class="bi bi-plus-circle me-1"></i>Agregar Producto
+                </button>
+            </div>
+
+            <!-- Tarjetas de estadísticas -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-primary h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Productos</h5>
+                            <h3 class="mb-0" id="stat-total">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-success h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Productos Activos</h5>
+                            <h3 class="mb-0" id="stat-activos">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-warning h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Stock Bajo</h5>
+                            <h3 class="mb-0" id="stat-stock-bajo">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-danger h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Sin Stock</h5>
+                            <h3 class="mb-0" id="stat-sin-stock">--</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de productos -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h5 class="mb-0">Listado de Productos</h5>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <input type="text" id="buscador-productos" class="form-control form-control-sm"
+                                placeholder="Buscar producto...">
+                            <select id="filtro-categoria" class="form-select form-select-sm">
+                                <option value="">Todas las categorías</option>
+                            </select>
+                            <select id="filtro-estado" class="form-select form-select-sm">
+                                <option value="">Todos</option>
+                                <option value="1">Activos</option>
+                                <option value="0">Inactivos</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-productos">
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">Cargando productos...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Agregar Producto -->
+    <div class="modal fade" id="agregarProductoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Agregar Nuevo Producto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre *</label>
+                            <input type="text" id="agregar-nombre" class="form-control"
+                                placeholder="Nombre del producto">
+                            <div class="invalid-feedback" id="agregar-nombre-error"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Código</label>
+                            <input type="text" id="agregar-codigo" class="form-control" placeholder="Código único">
+                            <div class="invalid-feedback" id="agregar-codigo-error"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descripción</label>
+                            <textarea id="agregar-descripcion" class="form-control" rows="2"
+                                placeholder="Descripción del producto"></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Precio Venta *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" id="agregar-precio-venta" class="form-control" min="0" step="0.01"
+                                    placeholder="0.00">
+                            </div>
+                            <div class="invalid-feedback" id="agregar-precio-error"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Precio Compra</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" id="agregar-precio-compra" class="form-control" min="0" step="0.01"
+                                    placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Stock Inicial *</label>
+                            <input type="number" id="agregar-stock" class="form-control" min="0" placeholder="0">
+                            <div class="invalid-feedback" id="agregar-stock-error"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Categoría *</label>
+                            <select id="agregar-categoria" class="form-select">
+                                <option value="">Seleccionar categoría</option>
+                            </select>
+                            <div class="invalid-feedback" id="agregar-categoria-error"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Proveedor</label>
+                            <select id="agregar-proveedor" class="form-select">
+                                <option value="">Seleccionar proveedor</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Imagen</label>
+                            <input type="file" id="agregar-imagen" class="form-control" accept="image/*">
+                            <div class="mt-2">
+                                <img id="agregar-imagen-preview" src="" class="img-thumbnail d-none img-preview">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="agregar-estado" checked>
+                                <label class="form-check-label" for="agregar-estado">Producto activo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar-producto">
+                        <i class="bi bi-floppy me-1"></i>Guardar Producto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editar Producto -->
+    <div class="modal fade" id="editarProductoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editar-id">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre *</label>
+                            <input type="text" id="editar-nombre" class="form-control">
+                            <div class="invalid-feedback" id="editar-nombre-error"></div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Código</label>
+                            <input type="text" id="editar-codigo" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descripción</label>
+                            <textarea id="editar-descripcion" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Precio Venta *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" id="editar-precio-venta" class="form-control" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Precio Compra</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" id="editar-precio-compra" class="form-control" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Stock</label>
+                            <input type="number" id="editar-stock" class="form-control" min="0" readonly>
+                            <small class="text-muted">Usa "Ajustar Stock" para modificar</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Categoría *</label>
+                            <select id="editar-categoria" class="form-select">
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Proveedor</label>
+                            <select id="editar-proveedor" class="form-select">
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Imagen</label>
+                            <div class="mb-2">
+                                <img id="editar-imagen-actual" src="" class="img-thumbnail d-none img-preview-sm">
+                            </div>
+                            <input type="file" id="editar-imagen" class="form-control" accept="image/*">
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editar-estado">
+                                <label class="form-check-label" for="editar-estado">Producto activo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" id="btn-actualizar-producto">
+                        <i class="bi bi-floppy me-1"></i>Actualizar Producto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ajustar Stock -->
+    <div class="modal fade" id="ajustarStockModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title"><i class="bi bi-boxes me-2"></i>Ajustar Stock</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="stock-producto-id">
+                    <p>Producto: <strong id="stock-producto-nombre"></strong></p>
+                    <p>Stock actual: <strong id="stock-actual"></strong></p>
+                    <div class="mb-3">
+                        <label class="form-label">Tipo de ajuste</label>
+                        <select id="stock-tipo" class="form-select">
+                            <option value="entrada">Entrada (agregar)</option>
+                            <option value="salida">Salida (reducir)</option>
+                            <option value="ajuste">Ajuste directo</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cantidad *</label>
+                        <input type="number" id="stock-cantidad" class="form-control" min="1" placeholder="0">
+                        <div class="invalid-feedback" id="stock-cantidad-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Motivo</label>
+                        <input type="text" id="stock-motivo" class="form-control" placeholder="Motivo del ajuste...">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-info text-white" id="btn-confirmar-stock">
+                        <i class="bi bi-check-circle me-1"></i>Aplicar Ajuste
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/components/dash-header.js"></script>
+    <script src="../assets/js/components/dash-sidebar.js"></script>
+    <script src="../assets/js/pages/dashboard/productos.js"></script>
+</body>
+
+</html>

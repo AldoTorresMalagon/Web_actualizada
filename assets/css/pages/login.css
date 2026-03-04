@@ -1,0 +1,74 @@
+/* Wrapper centrado de login */
+.login-wrapper {
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #eef2ff 0%, var(--color-fondo) 100%);
+}
+
+/* Card de login */
+.login-card {
+    width: 100%;
+    max-width: 440px;
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.login-header {
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%);
+    color: var(--color-blanco);
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+}
+
+.login-header .login-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.login-header h2 {
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.login-header p {
+    opacity: 0.85;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.login-card .card-body {
+    padding: 2rem 1.75rem;
+}
+
+/* Alertas de formulario */
+.alerta-login,
+.alerta-registro {
+    display: none;
+}
+
+/*  Toggle password  */
+.toggle-password {
+    cursor: pointer;
+    color: var(--color-muted);
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: var(--color-primario);
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .login-card {
+        border-radius: var(--radius);
+    }
+
+    .login-card .card-body {
+        padding: 1.5rem 1.25rem;
+    }
+}

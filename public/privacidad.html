@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad - Cafetería ITH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="header"></div>
+    <div id="navbar"></div>
+    <div id="sidebar"></div>
+
+    <main class="container my-5 flex-grow-1 fade-in">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+
+                        <h2 class="text-center mb-4">
+                            <i class="bi bi-shield-lock me-2"></i>Política de Privacidad
+                        </h2>
+
+                        <!-- JS inyecta aquí el contenido si viene de la BD -->
+                        <div id="politica-contenido-dinamico" class="d-none">
+                            <!-- contenido dinámico -->
+                        </div>
+
+                        <!-- Contenido estático por defecto -->
+                        <div id="politica-contenido-default" class="policy-content">
+
+                            <h5>Política de Privacidad</h5>
+                            <p>En Cafetería ITH nos comprometemos a proteger tu privacidad. Esta política describe cómo
+                                recopilamos, usamos y protegemos tu información personal.</p>
+
+                            <h6><i class="bi bi-collection me-2"></i>Información que recopilamos</h6>
+                            <ul>
+                                <li>Datos personales (nombre, email, teléfono)</li>
+                                <li>Información de pedidos y preferencias</li>
+                                <li>Datos de navegación y uso del sitio</li>
+                                <li>Información de contacto en formularios</li>
+                            </ul>
+
+                            <h6><i class="bi bi-gear me-2"></i>Uso de la información</h6>
+                            <p>Utilizamos tu información para:</p>
+                            <ul>
+                                <li>Procesar tus pedidos y transacciones</li>
+                                <li>Mejorar nuestros servicios y productos</li>
+                                <li>Enviar comunicaciones importantes sobre tu cuenta</li>
+                                <li>Personalizar tu experiencia en nuestra plataforma</li>
+                                <li>Cumplir con obligaciones legales y regulatorias</li>
+                            </ul>
+
+                            <h6><i class="bi bi-shield-check me-2"></i>Protección de datos</h6>
+                            <p>Implementamos medidas de seguridad técnicas y organizativas para proteger tu información
+                                contra acceso no autorizado, alteración, divulgación o destrucción:</p>
+                            <ul>
+                                <li>Cifrado de datos sensibles</li>
+                                <li>Control de acceso basado en roles</li>
+                                <li>Monitoreo regular de seguridad</li>
+                                <li>Capacitación en protección de datos para nuestro personal</li>
+                            </ul>
+
+                            <h6><i class="bi bi-share me-2"></i>Compartición de información</h6>
+                            <p>No vendemos, comerciamos ni transferimos tu información personal a terceros sin tu
+                                consentimiento, excepto cuando sea necesario para:</p>
+                            <ul>
+                                <li>Cumplir con la ley o procesos legales</li>
+                                <li>Proteger nuestros derechos o propiedad</li>
+                                <li>Proveer servicios a través de proveedores de confianza</li>
+                            </ul>
+
+                            <h6><i class="bi bi-cookie me-2"></i>Cookies</h6>
+                            <p>Utilizamos cookies para mejorar tu experiencia de navegación. Puedes controlar el uso de
+                                cookies a través de la configuración de tu navegador.</p>
+
+                            <h6><i class="bi bi-person-check me-2"></i>Tus derechos</h6>
+                            <ul>
+                                <li>Acceder a tu información personal</li>
+                                <li>Corregir datos inexactos</li>
+                                <li>Solicitar la eliminación de tus datos</li>
+                                <li>Oponerte al procesamiento de tus datos</li>
+                                <li>Portar tus datos a otro servicio</li>
+                            </ul>
+
+                            <h6><i class="bi bi-envelope me-2"></i>Contacto</h6>
+                            <ul>
+                                <li>Email: privacidad@cafeteriaith.edu.mx</li>
+                                <li>Teléfono: 771-717-0000</li>
+                                <li>Dirección: Cafetería ITH, Campus Tecnológico</li>
+                            </ul>
+
+                            <div class="alert alert-info mt-4">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>Nota:</strong> Esta política puede actualizarse periódicamente. Te recomendamos
+                                revisarla regularmente.
+                            </div>
+
+                        </div>
+
+                        <div class="text-center mt-5">
+                            <a href="inicio.html" class="btn btn-primary btn-lg">
+                                <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/components/header.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/footer.js"></script>
+    <script src="../assets/js/pages/privacidad.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Cafetería ITH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="dash-header"></div>
+
+    <div class="d-flex flex-grow-1">
+        <div id="dash-sidebar"></div>
+
+        <main class="dash-main flex-grow-1 p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Reportes</h2>
+                <div class="btn-toolbar gap-2">
+                    <button class="btn btn-outline-secondary btn-sm" id="btn-exportar-pdf">
+                        <i class="bi bi-file-pdf me-1"></i>PDF
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" id="btn-exportar-excel">
+                        <i class="bi bi-file-excel me-1"></i>Excel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros de período -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-3">
+                            <label class="form-label">Tipo de Reporte</label>
+                            <select id="filtro-tipo" class="form-select">
+                                <option value="ventas_dia">Ventas por Día</option>
+                                <option value="ventas_mes">Ventas por Mes</option>
+                                <option value="productos_mas_vendidos">Productos más Vendidos</option>
+                                <option value="inventario">Estado de Inventario</option>
+                                <option value="usuarios">Usuarios Registrados</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Fecha Inicio</label>
+                            <input type="date" id="filtro-fecha-inicio" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Fecha Fin</label>
+                            <input type="date" id="filtro-fecha-fin" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100" id="btn-generar-reporte">
+                                <i class="bi bi-search me-1"></i>Generar Reporte
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjetas de resumen -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-receipt text-primary mb-2 icon-reporte"></i>
+                            <h6 class="text-muted">Total Ventas</h6>
+                            <h3 class="mb-0" id="stat-total-ventas">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-currency-dollar text-success mb-2 icon-reporte"></i>
+                            <h6 class="text-muted">Ingresos Totales</h6>
+                            <h3 class="mb-0" id="stat-ingresos">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-graph-up text-warning mb-2 icon-reporte"></i>
+                            <h6 class="text-muted">Promedio por Venta</h6>
+                            <h3 class="mb-0" id="stat-promedio">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-trophy text-danger mb-2 icon-reporte"></i>
+                            <h6 class="text-muted">Producto Estrella</h6>
+                            <h5 class="mb-0" id="stat-producto-estrella">--</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfica -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i><span id="grafica-titulo">Gráfica de
+                            Ventas</span></h5>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-secondary active" id="btn-grafica-barras" title="Barras">
+                            <i class="bi bi-bar-chart"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" id="btn-grafica-lineas" title="Líneas">
+                            <i class="bi bi-graph-up"></i>
+                        </button>
+                        <button class="btn btn-outline-secondary" id="btn-grafica-dona" title="Dona">
+                            <i class="bi bi-pie-chart"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="reporteChart" height="100"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabla de detalle -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-table me-2"></i>Detalle del Reporte</h5>
+                    <input type="text" id="buscador-reporte" class="form-control form-control-sm filter-search"
+                        placeholder="Buscar en el reporte...">
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead class="table-dark" id="tabla-reporte-head">
+                                <tr>
+                                    <th colspan="5" class="text-center text-muted fw-normal py-3">Genera un reporte para
+                                        ver los datos</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-reporte-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="../assets/js/components/dash-header.js"></script>
+    <script src="../assets/js/components/dash-sidebar.js"></script>
+    <script src="../assets/js/pages/dashboard/reportes.js"></script>
+</body>
+
+</html>

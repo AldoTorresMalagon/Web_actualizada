@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ventas - Cafetería ITH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="dash-header"></div>
+
+    <div class="d-flex flex-grow-1">
+        <div id="dash-sidebar"></div>
+
+        <main class="dash-main flex-grow-1 p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0"><i class="bi bi-receipt me-2"></i>Ventas</h2>
+                <div class="btn-toolbar gap-2">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#nuevaVentaModal">
+                        <i class="bi bi-plus-circle me-1"></i>Nueva Venta
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjetas de estadísticas -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-primary h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Ventas Hoy</h5>
+                            <h3 class="mb-0" id="stat-ventas-hoy">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-success h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Ventas del Mes</h5>
+                            <h3 class="mb-0" id="stat-ventas-mes">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-warning h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Venta Promedio</h5>
+                            <h3 class="mb-0" id="stat-venta-promedio">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-info h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Total General</h5>
+                            <h3 class="mb-0" id="stat-total-general">--</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de ventas -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Historial de Ventas</h5>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="buscador-ventas" class="form-control form-control-sm"
+                                placeholder="Buscar...">
+                            <select id="filtro-estado" class="form-select form-select-sm">
+                                <option value="">Todos los estados</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="completado">Completado</option>
+                                <option value="cancelado">Cancelado</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#Pedido</th>
+                                    <th>Cliente</th>
+                                    <th>Productos</th>
+                                    <th>Total</th>
+                                    <th>Método Pago</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-ventas">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted">Cargando ventas...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Nueva Venta -->
+    <div class="modal fade" id="nuevaVentaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-cart-plus me-2"></i>Nueva Venta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                        <!-- Búsqueda de productos -->
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Agregar Productos</h6>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" id="buscar-producto-venta" class="form-control"
+                                    placeholder="Buscar producto...">
+                            </div>
+                            <div class="table-responsive" class="modal-scroll">
+                                <table class="table table-sm table-hover">
+                                    <thead class="table-light sticky-top">
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Precio</th>
+                                            <th>Stock</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-productos-venta">
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">Cargando...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Carrito de venta -->
+                        <div class="col-md-6">
+                            <h6 class="mb-3">Carrito</h6>
+                            <div class="table-responsive mb-3" class="modal-scroll-sm">
+                                <table class="table table-sm">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Cant.</th>
+                                            <th>Subtotal</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-carrito-venta">
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">Sin productos</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="border-top pt-2 mb-3">
+                                <div class="d-flex justify-content-between fw-bold fs-5">
+                                    <span>Total:</span>
+                                    <span id="venta-total">$0.00</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Método de Pago</label>
+                                <select id="metodo-pago-venta" class="form-select">
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="tarjeta">Tarjeta</option>
+                                    <option value="transferencia">Transferencia</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Notas (opcional)</label>
+                                <textarea id="notas-venta" class="form-control" rows="2"
+                                    placeholder="Notas del pedido..."></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btn-confirmar-venta">
+                        <i class="bi bi-check-circle me-1"></i>Confirmar Venta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ver Detalle de Venta -->
+    <div class="modal fade" id="detalleVentaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-receipt me-2"></i>Detalle de Venta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="detalle-venta-body">
+                    <!-- JS inyecta el contenido -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmar Cancelación -->
+    <div class="modal fade" id="cancelarVentaModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Cancelar Venta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas cancelar la venta <strong id="cancelar-venta-id"></strong>?</p>
+                    <p class="text-muted small">Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, volver</button>
+                    <button type="button" class="btn btn-danger" id="btn-confirmar-cancelar">
+                        Sí, cancelar venta
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/components/dash-header.js"></script>
+    <script src="../assets/js/components/dash-sidebar.js"></script>
+    <script src="../assets/js/pages/dashboard/ventas.js"></script>
+</body>
+
+</html>

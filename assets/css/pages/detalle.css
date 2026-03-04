@@ -1,0 +1,36 @@
+/* Card principal */
+.detalle-card {
+    border: none;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+/* Columna de imagen */
+.detalle-card .col-md-6:first-child {
+    overflow: hidden;
+}
+
+/* Botón agregar al carrito */
+.btn-add-cart {
+    font-size: 1.1rem;
+    padding: 0.7rem 1rem;
+}
+
+/* Tabla de info adicional */
+.detalle-info-table td:first-child {
+    width: 130px;
+    white-space: nowrap;
+}
+
+/* Bloque de login para no autenticados */
+.bloque-no-autenticado .alert {
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .detalle-info-table td:first-child {
+        width: auto;
+    }
+}

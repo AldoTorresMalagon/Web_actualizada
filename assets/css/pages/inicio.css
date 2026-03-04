@@ -1,0 +1,64 @@
+/* Carousel */
+.carousel-img {
+    height: 400px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.carousel-placeholder {
+    height: 400px;
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-blanco);
+    text-align: center;
+}
+
+.carousel-slides {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Grid de productos destacados */
+.productos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+}
+
+/* Sección hero / bienvenida */
+.hero-section {
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-acento) 100%);
+    color: var(--color-blanco);
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.hero-section h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.hero-section p {
+    font-size: 1.15rem;
+    opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    .carousel-img,
+    .carousel-placeholder {
+        height: 220px;
+    }
+
+    .hero-section h1 {
+        font-size: 1.75rem;
+    }
+
+    .productos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    }
+}

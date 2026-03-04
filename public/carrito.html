@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Cafetería ITH</title>
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Estilos globales -->
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/pages/carrito.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- HEADER -->
+    <div id="header"></div>
+    <!-- NAVBAR -->
+    <div id="navbar"></div>
+    <!-- SIDEBAR -->
+    <div id="sidebar"></div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="container my-5 flex-grow-1 fade-in">
+        <div class="row">
+            <div class="col-12">
+
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-cart me-2"></i>Mi Carrito de Compras
+                </h2>
+
+                <!-- Alerta de éxito -->
+                <div id="alerta-success" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+                    <span id="alerta-success-msg"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Alerta de error -->
+                <div id="alerta-error" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                    <span id="alerta-error-msg"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- CARRITO CON PRODUCTOS -->
+                <div id="carrito-con-productos" class="d-none">
+
+                    <div class="card shadow border-0">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-custom">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Precio Unitario</th>
+                                            <th>Cantidad</th>
+                                            <th>Subtotal</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <!-- JS inserta las filas aquí -->
+                                    <tbody id="carrito-tbody"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-end fw-bold">Total:</td>
+                                            <td colspan="2" class="fw-bold text-primary" id="carrito-total">$0.00</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+
+                        <!-- Botones de acción -->
+                        <div class="col-md-6 mb-3">
+                            <button type="button" id="btn-actualizar" class="btn btn-primary me-2">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Actualizar Carrito
+                            </button>
+                            <button type="button" id="btn-vaciar" class="btn btn-outline-danger">
+                                <i class="bi bi-trash me-2"></i>Vaciar Carrito
+                            </button>
+                        </div>
+
+                        <!-- Sección de pago -->
+                        <div class="col-md-6">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Información de Pago</h6>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Monto a Pagar</label>
+                                                <input type="text" class="form-control" id="monto-pagar" readonly>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label">Método de Pago</label>
+                                                <select class="form-select" id="metodo-pago">
+                                                    <option value="efectivo">Efectivo</option>
+                                                    <option value="tarjeta">Tarjeta</option>
+                                                    <option value="transferencia">Transferencia</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <a href="productos.html" class="btn btn-outline-primary">
+                                            <i class="bi bi-arrow-left me-2"></i>Seguir Comprando
+                                        </a>
+                                        <button type="button" id="btn-confirmar-pedido" class="btn btn-success btn-lg">
+                                            <i class="bi bi-check-circle me-2"></i>Confirmar Pedido
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- CARRITO VACÍO -->
+                <div id="carrito-vacio" class="d-none">
+                    <div class="text-center py-5">
+                        <i class="bi bi-cart-x icon-empty-state"></i>
+                        <h3 class="text-muted mt-3">Tu carrito está vacío</h3>
+                        <p class="text-muted">Agrega algunos productos para comenzar</p>
+                        <a href="productos.html" class="btn btn-primary mt-3">
+                            <i class="bi bi-box-seam me-2"></i>Explorar Productos
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Estado de carga inicial -->
+                <div id="carrito-loading" class="text-center py-5">
+                    <div class="loading-spinner mx-auto mb-3"></div>
+                    <p class="text-muted">Cargando carrito...</p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <div id="footer"></div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Componentes globales -->
+    <script src="../assets/js/components/header.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/footer.js"></script>
+
+    <!-- Lógica de esta página -->
+    <script src="../assets/js/pages/carrito.js"></script>
+
+</body>
+
+</html>

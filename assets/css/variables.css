@@ -1,0 +1,46 @@
+:root {
+    /* Marca */
+    --color-primario: #0b265c;
+    --color-secundario: #081a42;
+    --color-acento: #1e40af;
+
+    /* Texto y fondos */
+    --color-texto: #333333;
+    --color-muted: #6c757d;
+    --color-fondo: #f8fafc;
+    --color-blanco: #ffffff;
+
+    /* Estados */
+    --color-success: #198754;
+    --color-warning: #ffc107;
+    --color-danger: #dc3545;
+    --color-info: #0dcaf0;
+
+    /* Stat cards dashboard */
+    --stat-ventas: linear-gradient(135deg, #0b265c, #1e40af);
+    --stat-ingresos: linear-gradient(135deg, #198754, #20c997);
+    --stat-usuarios: linear-gradient(135deg, #0891b2, #0dcaf0);
+    --stat-stock: linear-gradient(135deg, #dc3545, #f97316);
+
+    /* Tipografía */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    /* Bordes */
+    --radius-sm: 6px;
+    --radius: 10px;
+    --radius-lg: 15px;
+    --border-color: #e2e8f0;
+
+    /* Sombras */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, .08);
+    --shadow: 0 4px 8px rgba(0, 0, 0, .10);
+    --shadow-lg: 0 8px 20px rgba(0, 0, 0, .15);
+    --shadow-blue: 0 4px 8px rgba(11, 38, 92, .30);
+
+    /* Transición */
+    --transition: all 0.3s ease;
+
+    /* Layout */
+    --header-height: 70px;
+    --sidebar-width: 240px;
+}

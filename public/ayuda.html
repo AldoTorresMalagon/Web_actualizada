@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayuda - Cafetería ITH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="header"></div>
+    <div id="navbar"></div>
+    <div id="sidebar"></div>
+
+    <main class="container my-5 flex-grow-1 fade-in">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <h2 class="text-center mb-2">
+                    <i class="bi bi-question-circle me-2"></i>Centro de Ayuda
+                </h2>
+                <p class="text-center text-muted mb-5">
+                    Encuentra respuestas a tus preguntas más frecuentes o contáctanos para asistencia personalizada
+                </p>
+
+                <!-- Guía Rápida -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightbulb me-2"></i>Guía Rápida
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+
+                            <div class="col-md-4">
+                                <div class="support-info">
+                                    <h6><i class="bi bi-cart me-2"></i>Realizar un Pedido</h6>
+                                    <p class="mb-0 small">
+                                        1. Navega por el menú<br>
+                                        2. Agrega productos al carrito<br>
+                                        3. Procede al checkout<br>
+                                        4. Confirma tu pedido
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="support-info">
+                                    <h6><i class="bi bi-credit-card me-2"></i>Métodos de Pago</h6>
+                                    <p class="mb-0 small">
+                                        • Efectivo en ventanilla<br>
+                                        • Tarjetas débito/crédito<br>
+                                        • Transferencias bancarias<br>
+                                        • Pagos móviles
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="support-info">
+                                    <h6><i class="bi bi-clock-history me-2"></i>Tiempos de Entrega</h6>
+                                    <p class="mb-0 small">
+                                        • Comidas: 15-20 min<br>
+                                        • Bebidas: 5-10 min<br>
+                                        • Snacks: 2-5 min<br>
+                                        • Retiro en ventanilla
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preguntas Frecuentes -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-chat-question me-2"></i>Preguntas Frecuentes
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="accordion" id="faqAccordion">
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faq1">
+                                        <i class="bi bi-cart4 me-2"></i>¿Cómo realizo un pedido?
+                                    </button>
+                                </h2>
+                                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <ol>
+                                            <li>Navega por nuestro menú (comidas, productos o bebidas)</li>
+                                            <li>Selecciona los productos que deseas</li>
+                                            <li>Agrégalos al carrito haciendo clic en "Agregar al Carrito"</li>
+                                            <li>Ve a tu carrito haciendo clic en "Mi Carrito" en la barra de navegación
+                                            </li>
+                                            <li>Revisa tu pedido y procede al checkout</li>
+                                            <li>Si no tienes cuenta, se te pedirá que inicies sesión o te registres</li>
+                                            <li>Confirma tu pedido y método de pago</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faq2">
+                                        <i class="bi bi-credit-card-2-front me-2"></i>¿Qué métodos de pago aceptan?
+                                    </button>
+                                </h2>
+                                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><strong>Efectivo:</strong> Al momento de recoger tu pedido en la
+                                                cafetería</li>
+                                            <li><strong>Tarjetas de débito y crédito:</strong> Visa, MasterCard,
+                                                American Express</li>
+                                            <li><strong>Transferencias bancarias:</strong> A través de nuestra cuenta
+                                                bancaria</li>
+                                            <li><strong>Pagos móviles:</strong> Apple Pay, Google Pay</li>
+                                        </ul>
+                                        <p class="mb-0"><em>Nota: Algunos métodos pueden no estar disponibles en todas
+                                                las ubicaciones.</em></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faq3">
+                                        <i class="bi bi-clock me-2"></i>¿Cuáles son los horarios de servicio?
+                                    </button>
+                                </h2>
+                                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><strong>Horario:</strong> <span id="faq-horario">Ver página de
+                                                    contacto</span></li>
+                                            <li><strong>Días de servicio:</strong> <span id="faq-dias">Ver página de
+                                                    contacto</span></li>
+                                            <li><strong>Entrega de pedidos:</strong> Durante todo el horario de servicio
+                                            </li>
+                                            <li><strong>Retiro en ventanilla:</strong> Disponible en cualquier momento
+                                                dentro del horario</li>
+                                        </ul>
+                                        <p class="mb-0"><em>Los horarios pueden variar durante periodos vacacionales o
+                                                días festivos.</em></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faq4">
+                                        <i class="bi bi-truck me-2"></i>¿Realizan entregas a domicilio?
+                                    </button>
+                                </h2>
+                                <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><strong>Retiro en ventanilla:</strong> Puedes recoger tu pedido
+                                                directamente en la cafetería</li>
+                                            <li><strong>Entrega en campus:</strong> Entregamos a diferentes puntos
+                                                dentro del campus tecnológico</li>
+                                            <li><strong>Pedidos para llevar:</strong> Preparamos tu pedido para que lo
+                                                recojas</li>
+                                        </ul>
+                                        <p class="mb-0">Estamos trabajando para implementar servicio de entrega a
+                                            domicilio en el futuro.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#faq5">
+                                        <i class="bi bi-arrow-counterclockwise me-2"></i>¿Puedo cancelar o modificar mi
+                                        pedido?
+                                    </button>
+                                </h2>
+                                <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body">
+                                        <ul>
+                                            <li><strong>Modificaciones:</strong> Puedes modificar tu pedido antes de que
+                                                comience su preparación</li>
+                                            <li><strong>Cancelaciones:</strong> Puedes cancelar tu pedido dentro de los
+                                                primeros 5 minutos</li>
+                                            <li><strong>Reembolsos:</strong> Si pagaste por adelantado, se procesará en
+                                                3-5 días hábiles</li>
+                                            <li><strong>Pedidos en preparación:</strong> No se pueden cancelar una vez
+                                                iniciada la preparación</li>
+                                        </ul>
+                                        <p class="mb-0">Para cancelar o modificar un pedido, contáctanos inmediatamente
+                                            por teléfono.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contacto de Soporte -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-headset me-2"></i>Contacto de Soporte
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <h6><i class="bi bi-telephone me-2"></i>Teléfono</h6>
+                                    <p class="mb-1" id="soporte-telefono">Cargando...</p>
+                                    <small class="text-muted">Disponible durante horarios de servicio</small>
+                                </div>
+                                <div class="mb-4">
+                                    <h6><i class="bi bi-envelope me-2"></i>Email</h6>
+                                    <p class="mb-1" id="soporte-email">Cargando...</p>
+                                    <small class="text-muted">Respuesta en 24-48 horas</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <h6><i class="bi bi-geo-alt me-2"></i>Ubicación</h6>
+                                    <p class="mb-1" id="soporte-direccion">Cargando...</p>
+                                    <small class="text-muted">Ventanilla de atención a clientes</small>
+                                </div>
+                                <div class="mb-4">
+                                    <h6><i class="bi bi-clock-history me-2"></i>Horarios de atención</h6>
+                                    <p class="mb-1" id="soporte-horario">Cargando...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>¿No encuentras lo que buscas?</strong> Contáctanos directamente y nuestro equipo de
+                            soporte te ayudará.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <a href="inicio.html" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/components/header.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/footer.js"></script>
+    <script src="../assets/js/pages/ayuda.js"></script>
+</body>
+
+</html>

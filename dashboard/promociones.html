@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promociones - Cafetería ITH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="dash-header"></div>
+
+    <div class="d-flex flex-grow-1">
+        <div id="dash-sidebar"></div>
+
+        <main class="dash-main flex-grow-1 p-4">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0"><i class="bi bi-tag me-2"></i>Gestión de Promociones</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarPromocionModal">
+                    <i class="bi bi-plus-circle me-1"></i>Nueva Promoción
+                </button>
+            </div>
+
+            <!-- Alertas -->
+            <div id="alerta-success" class="alert alert-success alert-dismissible fade show d-none">
+                <i class="bi bi-check-circle me-2"></i><span id="alerta-success-texto"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div id="alerta-error" class="alert alert-danger alert-dismissible fade show d-none">
+                <i class="bi bi-exclamation-triangle me-2"></i><span id="alerta-error-texto"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Tarjetas de estadísticas -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-primary h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Promociones</h5>
+                            <h3 class="mb-0" id="stat-total">--</h3>
+                            <p class="mb-0 small text-white-50">En el sistema</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-success h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Activas</h5>
+                            <h3 class="mb-0" id="stat-activas">--</h3>
+                            <p class="mb-0 small text-white-50">Vigentes actualmente</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-warning h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Próximas</h5>
+                            <h3 class="mb-0" id="stat-proximas">--</h3>
+                            <p class="mb-0 small text-white-50">Por iniciar</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card text-white bg-info h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Expiradas</h5>
+                            <h3 class="mb-0" id="stat-expiradas">--</h3>
+                            <p class="mb-0 small text-white-50">Finalizadas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de promociones -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h5 class="mb-0">Listado de Promociones</h5>
+                        <div class="d-flex gap-2">
+                            <input type="text" id="buscador-promociones" class="form-control form-control-sm"
+                                placeholder="Buscar promoción..." class="filter-search">
+                            <select id="filtro-estado" class="form-select form-select-sm">
+                                <option value="">Todos los estados</option>
+                                <option value="activa">Activa</option>
+                                <option value="proxima">Próxima</option>
+                                <option value="expirada">Expirada</option>
+                                <option value="inactiva">Inactiva</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Título</th>
+                                    <th>Descripción</th>
+                                    <th>Descuento</th>
+                                    <th>Productos</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Fin</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-promociones">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4 text-muted">Cargando promociones...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Agregar Promoción -->
+    <div class="modal fade" id="agregarPromocionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="bi bi-plus-circle me-2"></i>Nueva Promoción</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Título *</label>
+                            <input type="text" id="agregar-titulo" class="form-control"
+                                placeholder="Ej. 2x1 en bebidas">
+                            <div class="invalid-feedback" id="agregar-titulo-error"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descripción *</label>
+                            <textarea id="agregar-descripcion" class="form-control" rows="3"
+                                placeholder="Descripción de la promoción..."></textarea>
+                            <div class="invalid-feedback" id="agregar-desc-error"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Porcentaje de Descuento *</label>
+                            <div class="input-group">
+                                <input type="number" id="agregar-porcentaje" class="form-control" min="1" max="100"
+                                    step="0.01" placeholder="0">
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <div class="invalid-feedback" id="agregar-porcentaje-error"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha de Inicio *</label>
+                            <input type="datetime-local" id="agregar-fecha-inicio" class="form-control">
+                            <div class="invalid-feedback" id="agregar-inicio-error"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha de Fin *</label>
+                            <input type="datetime-local" id="agregar-fecha-fin" class="form-control">
+                            <div class="invalid-feedback" id="agregar-fin-error"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Productos Incluidos</label>
+                            <div class="border rounded p-3" class="modal-scroll-sm" id="agregar-productos-lista">
+                                <p class="text-muted text-center mb-0">Cargando productos...</p>
+                            </div>
+                            <small class="text-muted">Si no seleccionas ninguno, aplica a todos los productos
+                                activos.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar-promocion">
+                        <i class="bi bi-floppy me-1"></i>Guardar Promoción
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editar Promoción -->
+    <div class="modal fade" id="editarPromocionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square me-2"></i>Editar Promoción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editar-id">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Título *</label>
+                            <input type="text" id="editar-titulo" class="form-control">
+                            <div class="invalid-feedback" id="editar-titulo-error"></div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Descripción *</label>
+                            <textarea id="editar-descripcion" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Porcentaje de Descuento *</label>
+                            <div class="input-group">
+                                <input type="number" id="editar-porcentaje" class="form-control" min="1" max="100"
+                                    step="0.01">
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha de Inicio *</label>
+                            <input type="datetime-local" id="editar-fecha-inicio" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Fecha de Fin *</label>
+                            <input type="datetime-local" id="editar-fecha-fin" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Productos Incluidos</label>
+                            <!-- JS puebla los checkboxes y marca los que ya pertenecen a la promoción -->
+                            <div class="border rounded p-3" class="modal-scroll-sm" id="editar-productos-lista">
+                                <p class="text-muted text-center mb-0">Cargando productos...</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="editar-activo">
+                                <label class="form-check-label" for="editar-activo">Promoción activa</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" id="btn-actualizar-promocion">
+                        <i class="bi bi-floppy me-1"></i>Actualizar Promoción
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmar Eliminar -->
+    <div class="modal fade" id="eliminarPromocionModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title"><i class="bi bi-trash me-2"></i>Eliminar Promoción</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar la promoción <strong
+                            id="eliminar-promocion-titulo"></strong>?</p>
+                    <p class="text-muted small">Esta acción eliminará también la asociación con sus productos y no se
+                        puede deshacer.</p>
+                </div>
+                <div class="modal-footer">
+                    <input type="hidden" id="eliminar-promocion-id">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-confirmar-eliminar">
+                        <i class="bi bi-trash me-1"></i>Sí, eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/components/dash-header.js"></script>
+    <script src="../assets/js/components/dash-sidebar.js"></script>
+    <script src="../assets/js/pages/dashboard/promociones.js"></script>
+</body>
+
+</html>

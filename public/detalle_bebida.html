@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de la Bebida - Cafetería ITH</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/pages/detalle.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="header"></div>
+    <div id="navbar"></div>
+    <div id="sidebar"></div>
+
+    <main class="container my-5 flex-grow-1 fade-in">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <a href="javascript:history.back()" class="btn btn-outline-primary mb-4">
+                    <i class="bi bi-arrow-left me-1"></i>Volver Atrás
+                </a>
+
+                <!-- Alertas -->
+                <div id="alerta-success" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span id="alerta-success-texto"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div id="alerta-error" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span id="alerta-error-texto"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- Estado: cargando -->
+                <div id="detalle-loading" class="text-center py-5">
+                    <div class="loading-spinner mx-auto mb-3"></div>
+                    <p class="text-muted">Cargando bebida...</p>
+                </div>
+
+                <!-- Estado: no encontrado -->
+                <div id="detalle-no-encontrado" class="d-none text-center py-5">
+                    <i class="bi bi-exclamation-circle text-muted icon-empty-state"></i>
+                    <h4 class="mt-3">Bebida no encontrada</h4>
+                    <a href="bebidas.html" class="btn btn-primary mt-3">
+                        <i class="bi bi-arrow-left me-2"></i>Volver a Bebidas
+                    </a>
+                </div>
+
+                <!-- Tarjeta de detalle -->
+                <div id="detalle-contenido" class="d-none">
+                    <div class="card shadow border-0">
+                        <div class="row g-0">
+
+                            <!-- Imagen -->
+                            <div class="col-md-6">
+                                <img id="producto-imagen" class="product-image d-none" alt="Imagen de la bebida"
+                                    onerror="this.classList.add('d-none'); document.getElementById('producto-placeholder').classList.remove('d-none');">
+                                <!-- El JS asigna el gradiente y el ícono según idCategoria -->
+                                <div id="producto-placeholder" class="image-placeholder">
+                                    <div class="text-center text-white">
+                                        <i id="placeholder-icono" class="bi bi-cup-straw icon-placeholder"></i>
+                                        <p class="mt-2" id="placeholder-nombre"></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Info -->
+                            <div class="col-md-6">
+                                <div class="product-details d-flex flex-column h-100">
+
+                                    <div class="mb-3">
+                                        <span class="category-badge">
+                                            <i class="bi bi-tag me-1"></i>
+                                            <span id="producto-categoria"></span>
+                                        </span>
+                                    </div>
+
+                                    <h1 class="card-title h2 mb-3" id="producto-nombre"></h1>
+                                    <p class="card-text text-muted mb-4 flex-grow-1" id="producto-descripcion"></p>
+
+                                    <div class="mb-4">
+                                        <span class="price-tag" id="producto-precio"></span>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <table class="table table-sm table-borderless">
+                                            <tr>
+                                                <td width="120"><strong><i
+                                                            class="bi bi-upc-scan me-1"></i>Código:</strong></td>
+                                                <td id="producto-codigo"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong><i class="bi bi-truck me-1"></i>Proveedor:</strong></td>
+                                                <td id="producto-proveedor"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong><i class="bi bi-box-seam me-1"></i>Stock:</strong></td>
+                                                <td><span id="producto-stock" class="badge fs-6"></span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong><i class="bi bi-info-circle me-1"></i>Estado:</strong></td>
+                                                <td><span id="producto-estado" class="badge"></span></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+
+                                    <!-- Bloque autenticado -->
+                                    <div id="bloque-autenticado" class="mt-auto d-none">
+                                        <div class="row g-3 align-items-center">
+                                            <div class="col-md-4">
+                                                <label class="form-label"><strong>Cantidad:</strong></label>
+                                                <select id="select-cantidad" class="form-select"></select>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <button type="button" id="btn-agregar-carrito"
+                                                    class="btn btn-primary w-100 py-2 btn-add-cart">
+                                                    <i class="bi bi-cart-plus me-2"></i>Agregar al Carrito
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="aviso-agotado" class="mt-2 text-center d-none">
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock-history me-1"></i>Próximamente disponible
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <!-- Bloque no autenticado -->
+                                    <div id="bloque-no-autenticado" class="mt-auto d-none">
+                                        <div class="alert alert-info mb-3">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            <strong>¿Quieres comprar esta bebida?</strong>
+                                            <a id="link-login-info" href="login.html" class="alert-link">Inicia
+                                                sesión</a>
+                                            para agregarla al carrito.
+                                        </div>
+                                        <a id="btn-login-comprar" href="login.html" class="btn btn-primary w-100 py-2">
+                                            <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión para Comprar
+                                        </a>
+                                    </div>
+
+                                    <!-- Acciones adicionales -->
+                                    <div class="mt-3 pt-3 border-top">
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <a href="bebidas.html" class="btn btn-outline-secondary w-100">
+                                                    <i class="bi bi-grid me-1"></i>Ver más bebidas
+                                                </a>
+                                            </div>
+                                            <div class="col-6">
+                                                <a id="link-carrito" href="carrito.html"
+                                                    class="btn btn-outline-primary w-100">
+                                                    <i class="bi bi-cart-check me-1"></i>Ver carrito
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Garantía de calidad -->
+                    <div class="mt-4">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title"><i class="bi bi-shield-check me-2"></i>Garantía de Calidad</h5>
+                                <p class="card-text text-muted mb-0">
+                                    Todas nuestras bebidas están preparadas con ingredientes frescos y de la más alta
+                                    calidad.
+                                    Si no está satisfecho, le devolvemos su dinero.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /detalle-contenido -->
+
+            </div>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/components/header.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/footer.js"></script>
+    <script src="../assets/js/pages/detalle_bebida.js"></script>
+</body>
+
+</html>
