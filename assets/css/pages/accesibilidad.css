@@ -1,0 +1,12 @@
+.icon-feature {
+    font-size: 4rem;
+    opacity: 0.15;
+}
+
+.card-section {
+    transition: transform 0.2s;
+}
+
+.card-section:hover {
+    transform: translateY(-2px);
+}

@@ -5,11 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Cafetería ITH</title>
+
+    <!-- Accesibilidad -->
+    <script src="../assets/js/config/accesibilidad.init.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
     <link rel="stylesheet" href="../assets/css/variables.css">
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/accesibilidad.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
 </head>
 
@@ -17,15 +23,17 @@
 
     <div id="dash-header"></div>
 
-    <div class="d-flex flex-grow-1">
+    <div class="dash-wrapper">
         <div id="dash-sidebar"></div>
 
         <main class="dash-main flex-grow-1 p-4">
 
-            <!-- Encabezado de página -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
-                <div class="btn-toolbar gap-2">
+            <!-- Encabezado: título centrado + botones a la derecha -->
+            <div class="position-relative d-flex align-items-center mb-4">
+                <h2 class="mb-0 w-100 text-center">
+                    <i class="bi bi-speedometer2 me-2"></i>Panel de Control
+                </h2>
+                <div class="position-absolute end-0 d-flex gap-2">
                     <button class="btn btn-outline-secondary btn-sm" id="btn-actualizar">
                         <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
                     </button>
@@ -114,9 +122,9 @@
                 </div>
             </div>
 
-            <div class="row g-4">
+            <!-- Pedidos recientes + Más vendidos -->
+            <div class="row g-4 mb-4">
 
-                <!-- Pedidos recientes -->
                 <div class="col-lg-7">
                     <div class="card shadow-sm border-0 h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -137,7 +145,9 @@
                                     </thead>
                                     <tbody id="tabla-pedidos-recientes">
                                         <tr>
-                                            <td colspan="5" class="text-center py-3 text-muted">Cargando...</td>
+                                            <td colspan="5" class="text-center py-3 text-muted">
+                                                <span class="spinner-border spinner-border-sm me-2"></span>Cargando...
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -146,7 +156,6 @@
                     </div>
                 </div>
 
-                <!-- Productos más vendidos -->
                 <div class="col-lg-5">
                     <div class="card shadow-sm border-0 h-100">
                         <div class="card-header d-flex justify-content-between align-items-center">
@@ -164,7 +173,9 @@
                                     </thead>
                                     <tbody id="tabla-productos-populares">
                                         <tr>
-                                            <td colspan="2" class="text-center py-3 text-muted">Cargando...</td>
+                                            <td colspan="2" class="text-center py-3 text-muted">
+                                                <span class="spinner-border spinner-border-sm me-2"></span>Cargando...
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -175,34 +186,119 @@
 
             </div>
 
+            <!-- Información del sistema -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Información del Sistema</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light">
+                                <i class="bi bi-calendar-date text-primary fs-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Fecha actual</small>
+                                    <strong id="sys-fecha">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light">
+                                <i class="bi bi-clock text-success fs-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Hora actual</small>
+                                    <strong id="sys-hora">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light">
+                                <i class="bi bi-person-circle text-info fs-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Usuario activo</small>
+                                    <strong id="sys-usuario">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light">
+                                <i class="bi bi-shield-check text-warning fs-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Rol / Permisos</small>
+                                    <strong id="sys-rol">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light">
+                                <i class="bi bi-server text-danger fs-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Estado API</small>
+                                    <strong id="sys-api-status">
+                                        <span class="spinner-border spinner-border-sm"></span>
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light">
+                                <i class="bi bi-tag text-secondary fs-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Versión del sistema</small>
+                                    <strong id="sys-version">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light">
+                                <i class="bi bi-browser-chrome text-primary fs-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Navegador</small>
+                                    <strong id="sys-browser">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="d-flex align-items-center gap-3 p-3 rounded-3 bg-light">
+                                <i class="bi bi-hdd-network text-success fs-3"></i>
+                                <div>
+                                    <small class="text-muted d-block">Entorno</small>
+                                    <strong id="sys-entorno">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- Cerrar Sesión -->
-    <div class="modal fade" id="logoutModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Estás seguro de que deseas cerrar sesión?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="btn-confirmar-logout">
-                        <i class="bi bi-box-arrow-right me-1"></i>Cerrar Sesión
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="../assets/js/config/api.config.js"></script>
+    <script src="../assets/js/utils/auth.utils.js"></script>
+    <script src="../assets/js/utils/toast.utils.js"></script>
+    <script src="../assets/js/utils/format.utils.js"></script>
+
     <script src="../assets/js/components/dash-header.js"></script>
     <script src="../assets/js/components/dash-sidebar.js"></script>
+    <script src="../assets/js/services/productos.service.js"></script>
+    <script src="../assets/js/services/carrito.service.js"></script>
+    <script src="../assets/js/services/auth.service.js"></script>
     <script src="../assets/js/pages/dashboard/index.js"></script>
+
+    <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>
 
 </html>

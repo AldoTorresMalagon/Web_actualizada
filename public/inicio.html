@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - Cafetería ITH</title>
 
+    <!-- Accesibilidad -->
+    <script src="../assets/js/config/accesibilidad.init.js"></script>
+
     <!-- Bootstrap 5.3 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
@@ -14,6 +17,7 @@
     <link rel="stylesheet" href="../assets/css/variables.css">
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/accesibilidad.css">
 
     <!-- Estilos específicos de esta página -->
     <link rel="stylesheet" href="../assets/css/pages/inicio.css">
@@ -187,14 +191,23 @@
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Config y utils — ANTES que inicio.js -->
+    <script src="../assets/js/config/api.config.js"></script>
+    <script src="../assets/js/utils/auth.utils.js"></script>
+    <script src="../assets/js/utils/toast.utils.js"></script>
+    <script src="../assets/js/utils/format.utils.js"></script>
+
     <!-- Componentes globales -->
     <script src="../assets/js/components/header.js"></script>
     <script src="../assets/js/components/navbar.js"></script>
     <script src="../assets/js/components/footer.js"></script>
 
+
     <!-- Lógica de esta página -->
+    <script src="../assets/js/services/productos.service.js"></script>
     <script src="../assets/js/pages/inicio.js"></script>
 
+    <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>
 
 </html>

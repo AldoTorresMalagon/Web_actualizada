@@ -122,6 +122,13 @@ body {
     transform: scale(1.1);
 }
 
+/* Spacer cuando no hay botón hamburguesa (login/registro) */
+.header-menu-spacer {
+    width: 2rem;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
 /* Navbar del sitio público */
 .site-nav {
     background: var(--color-blanco);

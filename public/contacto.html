@@ -5,11 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contacto - Cafetería ITH</title>
+
+    <!-- Accesibilidad -->
+    <script src="../assets/js/config/accesibilidad.init.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/variables.css">
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/accesibilidad.css">
+    <link rel="stylesheet" href="../assets/css/pages/contacto.css">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -19,101 +25,183 @@
     <div id="sidebar"></div>
 
     <main class="container my-5 flex-grow-1 fade-in">
-        <div class="row">
-            <div class="col-12">
 
-                <h2 class="text-center mb-2">
-                    <i class="bi bi-telephone me-2"></i>Contáctanos
-                </h2>
-                <p class="text-center text-muted mb-5">
-                    Estamos aquí para atenderte. No dudes en contactarnos
-                </p>
+        <!-- Encabezado -->
+        <div class="text-center mb-5">
+            <h2 class="display-5 mb-2">
+                <i class="bi bi-telephone me-2"></i>Contáctanos
+            </h2>
+            <p class="text-muted">Estamos aquí para atenderte. No dudes en escribirnos.</p>
+        </div>
 
-                <!-- Teléfono, Email, WhatsApp -->
-                <div class="row g-4 mb-5">
+        <!-- Cards de contacto -->
+        <div class="row g-4 mb-5">
 
-                    <div class="col-md-4">
-                        <div class="card h-100 text-center contact-card">
-                            <div class="card-body">
-                                <div class="contact-icon text-primary">
-                                    <i class="bi bi-telephone-fill"></i>
-                                </div>
-                                <h5 class="card-title">Teléfono</h5>
-                                <p class="card-text" id="info-telefono">Cargando...</p>
-                            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center contact-card">
+                    <div class="card-body py-4">
+                        <div class="contact-icon text-primary">
+                            <i class="bi bi-telephone-fill"></i>
                         </div>
+                        <h5 class="card-title">Teléfono</h5>
+                        <p class="card-text" id="info-telefono">
+                            <span class="placeholder col-6"></span>
+                        </p>
                     </div>
-
-                    <div class="col-md-4">
-                        <div class="card h-100 text-center contact-card">
-                            <div class="card-body">
-                                <div class="contact-icon text-primary">
-                                    <i class="bi bi-envelope-fill"></i>
-                                </div>
-                                <h5 class="card-title">Email</h5>
-                                <p class="card-text" id="info-email">Cargando...</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card h-100 text-center contact-card">
-                            <div class="card-body">
-                                <div class="contact-icon text-primary">
-                                    <i class="bi bi-whatsapp"></i>
-                                </div>
-                                <h5 class="card-title">WhatsApp</h5>
-                                <p class="card-text" id="info-whatsapp">Cargando...</p>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
+            </div>
 
-                <!-- Ubicación -->
-                <div class="card shadow-sm mb-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center contact-card">
+                    <div class="card-body py-4">
+                        <div class="contact-icon text-primary">
+                            <i class="bi bi-envelope-fill"></i>
+                        </div>
+                        <h5 class="card-title">Email</h5>
+                        <p class="card-text" id="info-email">
+                            <span class="placeholder col-6"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card h-100 text-center contact-card">
+                    <div class="card-body py-4">
+                        <div class="contact-icon text-success">
+                            <i class="bi bi-whatsapp"></i>
+                        </div>
+                        <h5 class="card-title">WhatsApp</h5>
+                        <p class="card-text" id="info-whatsapp">
+                            <span class="placeholder col-6"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Dirección y Horario -->
+        <div class="row g-4 mb-5">
+
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0">
                     <div class="card-body">
-                        <h4 class="card-title mb-3">
-                            <i class="bi bi-geo-alt-fill me-2"></i>Ubicación
-                        </h4>
-                        <p class="card-text" id="info-direccion">Cargando...</p>
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-geo-alt-fill text-primary me-2"></i>Ubicación
+                        </h5>
+                        <p class="card-text" id="info-direccion">
+                            <span class="placeholder col-8"></span>
+                        </p>
+                        <a href="ubicacion.html" class="btn btn-outline-primary btn-sm mt-2">
+                            <i class="bi bi-map me-1"></i>Ver en el mapa
+                        </a>
                     </div>
                 </div>
+            </div>
 
-                <!-- Horarios -->
-                <div class="card shadow-sm mb-4">
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-0">
                     <div class="card-body">
-                        <h4 class="card-title mb-3">
-                            <i class="bi bi-clock-fill me-2"></i>Horarios de Atención
-                        </h4>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>Horario:</strong> <span id="info-horario">Cargando...</span></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Días de servicio:</strong> <span id="info-dias">Cargando...</span></p>
-                            </div>
-                        </div>
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-clock-fill text-primary me-2"></i>Horarios de Atención
+                        </h5>
+                        <p class="mb-1">
+                            <i class="bi bi-calendar3 me-2 text-muted"></i>
+                            <strong>Días:</strong> <span id="info-dias"><span class="placeholder col-4"></span></span>
+                        </p>
+                        <p class="mb-0">
+                            <i class="bi bi-clock me-2 text-muted"></i>
+                            <strong>Horario:</strong> <span id="info-horario"><span
+                                    class="placeholder col-4"></span></span>
+                        </p>
                     </div>
                 </div>
+            </div>
 
-                <div class="text-center mt-5">
-                    <a href="inicio.html" class="btn btn-primary btn-lg">
-                        <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
-                    </a>
+        </div>
+
+        <!-- Formulario de contacto -->
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="form-contact">
+                    <h4 class="mb-1"><i class="bi bi-chat-dots-fill text-primary me-2"></i>Envíanos un mensaje</h4>
+                    <p class="text-muted mb-4 small">Te responderemos a la brevedad posible</p>
+
+                    <form id="form-contacto" novalidate>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label for="campo-nombre" class="form-label">Nombre completo</label>
+                                <input type="text" class="form-control" id="campo-nombre" placeholder="Ej. Juan Pérez"
+                                    required minlength="3">
+                                <div class="invalid-feedback">Ingresa tu nombre (mín. 3 caracteres).</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="campo-email" class="form-label">Correo electrónico</label>
+                                <input type="email" class="form-control" id="campo-email"
+                                    placeholder="correo@ejemplo.com" required>
+                                <div class="invalid-feedback">Ingresa un correo válido.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="campo-asunto" class="form-label">Asunto</label>
+                                <input type="text" class="form-control" id="campo-asunto"
+                                    placeholder="¿En qué te podemos ayudar?" required minlength="5">
+                                <div class="invalid-feedback">Describe brevemente el asunto.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="campo-mensaje" class="form-label">Mensaje</label>
+                                <textarea class="form-control" id="campo-mensaje" rows="5"
+                                    placeholder="Escribe tu mensaje aquí..." required minlength="20"></textarea>
+                                <div class="invalid-feedback">El mensaje debe tener al menos 20 caracteres.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg w-100" id="btn-enviar">
+                                    <i class="bi bi-send me-2"></i>Enviar mensaje
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                    <!-- Confirmación -->
+                    <div id="msg-enviado" class="text-center py-4">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size:3rem;"></i>
+                        <h5 class="mt-3 mb-1">¡Mensaje enviado!</h5>
+                        <p class="text-muted">Gracias por contactarnos. Te responderemos pronto.</p>
+                        <a href="inicio.html" class="btn btn-outline-primary mt-2">
+                            <i class="bi bi-house me-2"></i>Volver al inicio
+                        </a>
+                    </div>
+
                 </div>
 
             </div>
         </div>
+
     </main>
 
     <div id="footer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="../assets/js/config/api.config.js"></script>
+    <script src="../assets/js/utils/toast.utils.js"></script>
+    <script src="../assets/js/utils/auth.utils.js"></script>
+
     <script src="../assets/js/components/header.js"></script>
     <script src="../assets/js/components/navbar.js"></script>
     <script src="../assets/js/components/footer.js"></script>
+    <script src="../assets/js/services/acerca.service.js"></script>
     <script src="../assets/js/pages/contacto.js"></script>
+    <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>
 
 </html>

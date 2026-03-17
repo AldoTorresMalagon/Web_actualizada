@@ -5,11 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Política de Privacidad - Cafetería ITH</title>
+
+    <!-- Accesibilidad -->
+    <script src="../assets/js/config/accesibilidad.init.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
     <link rel="stylesheet" href="../assets/css/variables.css">
     <link rel="stylesheet" href="../assets/css/main.css">
     <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/accesibilidad.css">
+    <link rel="stylesheet" href="../assets/css/pages/privacidad.css">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -20,112 +27,165 @@
 
     <main class="container my-5 flex-grow-1 fade-in">
         <div class="row justify-content-center">
-            <div class="col-lg-10">
 
+            <!-- Índice lateral -->
+            <div class="col-lg-3 d-none d-lg-block">
+                <div class="policy-toc">
+                    <h6><i class="bi bi-list-ul me-2"></i>Contenido</h6>
+                    <a href="#sec-recopilacion">Información que recopilamos</a>
+                    <a href="#sec-uso">Uso de la información</a>
+                    <a href="#sec-proteccion">Protección de datos</a>
+                    <a href="#sec-comparticion">Compartición</a>
+                    <a href="#sec-cookies">Cookies</a>
+                    <a href="#sec-derechos">Tus derechos</a>
+                    <a href="#sec-contacto">Contacto</a>
+                </div>
+            </div>
+
+            <!-- Contenido principal -->
+            <div class="col-lg-9">
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-4 p-md-5">
 
-                        <h2 class="text-center mb-4">
-                            <i class="bi bi-shield-lock me-2"></i>Política de Privacidad
-                        </h2>
-
-                        <!-- JS inyecta aquí el contenido si viene de la BD -->
-                        <div id="politica-contenido-dinamico" class="d-none">
-                            <!-- contenido dinámico -->
+                        <!-- Encabezado -->
+                        <div class="text-center mb-4">
+                            <i class="bi bi-shield-lock text-primary" style="font-size:3rem;"></i>
+                            <h2 class="mt-3 mb-1">Política de Privacidad</h2>
+                            <p class="fecha-actualizacion">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                Última actualización: enero 2025
+                            </p>
                         </div>
 
-                        <!-- Contenido estático por defecto -->
-                        <div id="politica-contenido-default" class="policy-content">
+                        <p class="lead text-muted mb-4">
+                            En <strong>Cafetería ITH</strong> nos comprometemos a proteger tu privacidad.
+                            Esta política describe cómo recopilamos, usamos y protegemos tu información personal.
+                        </p>
 
-                            <h5>Política de Privacidad</h5>
-                            <p>En Cafetería ITH nos comprometemos a proteger tu privacidad. Esta política describe cómo
-                                recopilamos, usamos y protegemos tu información personal.</p>
+                        <div class="policy-content">
 
-                            <h6><i class="bi bi-collection me-2"></i>Información que recopilamos</h6>
+                            <!-- 1 -->
+                            <h6 id="sec-recopilacion">
+                                <i class="bi bi-collection me-2"></i>Información que recopilamos
+                            </h6>
+                            <p>Para brindarte nuestros servicios recopilamos la siguiente información:</p>
                             <ul>
-                                <li>Datos personales (nombre, email, teléfono)</li>
-                                <li>Información de pedidos y preferencias</li>
-                                <li>Datos de navegación y uso del sitio</li>
-                                <li>Información de contacto en formularios</li>
+                                <li>Datos personales: nombre, correo electrónico y número de teléfono</li>
+                                <li>Información de pedidos, preferencias y historial de compras</li>
+                                <li>Datos de navegación y uso del sitio (páginas visitadas, tiempo de sesión)</li>
+                                <li>Información proporcionada en formularios de contacto o registro</li>
                             </ul>
 
-                            <h6><i class="bi bi-gear me-2"></i>Uso de la información</h6>
-                            <p>Utilizamos tu información para:</p>
+                            <!-- 2 -->
+                            <h6 id="sec-uso">
+                                <i class="bi bi-gear me-2"></i>Uso de la información
+                            </h6>
+                            <p>Utilizamos tu información exclusivamente para:</p>
                             <ul>
-                                <li>Procesar tus pedidos y transacciones</li>
-                                <li>Mejorar nuestros servicios y productos</li>
-                                <li>Enviar comunicaciones importantes sobre tu cuenta</li>
-                                <li>Personalizar tu experiencia en nuestra plataforma</li>
-                                <li>Cumplir con obligaciones legales y regulatorias</li>
+                                <li>Procesar tus pedidos y gestionar transacciones</li>
+                                <li>Mejorar continuamente nuestros servicios y productos</li>
+                                <li>Enviarte comunicaciones importantes relacionadas con tu cuenta</li>
+                                <li>Personalizar tu experiencia dentro de nuestra plataforma</li>
+                                <li>Cumplir con obligaciones legales y regulatorias aplicables</li>
                             </ul>
 
-                            <h6><i class="bi bi-shield-check me-2"></i>Protección de datos</h6>
-                            <p>Implementamos medidas de seguridad técnicas y organizativas para proteger tu información
-                                contra acceso no autorizado, alteración, divulgación o destrucción:</p>
+                            <!-- 3 -->
+                            <h6 id="sec-proteccion">
+                                <i class="bi bi-shield-check me-2"></i>Protección de datos
+                            </h6>
+                            <p>Implementamos medidas técnicas y organizativas para proteger tu información
+                                contra acceso no autorizado, alteración o destrucción:</p>
                             <ul>
-                                <li>Cifrado de datos sensibles</li>
-                                <li>Control de acceso basado en roles</li>
-                                <li>Monitoreo regular de seguridad</li>
-                                <li>Capacitación en protección de datos para nuestro personal</li>
+                                <li>Cifrado de datos sensibles en tránsito y en reposo</li>
+                                <li>Control de acceso basado en roles (solo personal autorizado)</li>
+                                <li>Monitoreo y auditorías regulares de seguridad</li>
+                                <li>Capacitación continua en protección de datos para nuestro equipo</li>
                             </ul>
 
-                            <h6><i class="bi bi-share me-2"></i>Compartición de información</h6>
-                            <p>No vendemos, comerciamos ni transferimos tu información personal a terceros sin tu
-                                consentimiento, excepto cuando sea necesario para:</p>
+                            <!-- 4 -->
+                            <h6 id="sec-comparticion">
+                                <i class="bi bi-share me-2"></i>Compartición de información
+                            </h6>
+                            <p>No vendemos ni transferimos tu información personal a terceros sin tu
+                                consentimiento, salvo cuando sea estrictamente necesario para:</p>
                             <ul>
-                                <li>Cumplir con la ley o procesos legales</li>
-                                <li>Proteger nuestros derechos o propiedad</li>
-                                <li>Proveer servicios a través de proveedores de confianza</li>
+                                <li>Cumplir con la ley o procesos legales vigentes</li>
+                                <li>Proteger nuestros derechos, propiedad o seguridad</li>
+                                <li>Proveer servicios a través de proveedores de confianza bajo acuerdo de
+                                    confidencialidad</li>
                             </ul>
 
-                            <h6><i class="bi bi-cookie me-2"></i>Cookies</h6>
-                            <p>Utilizamos cookies para mejorar tu experiencia de navegación. Puedes controlar el uso de
-                                cookies a través de la configuración de tu navegador.</p>
+                            <!-- 5 -->
+                            <h6 id="sec-cookies">
+                                <i class="bi bi-cookie me-2"></i>Cookies
+                            </h6>
+                            <p>Utilizamos cookies propias para mejorar tu experiencia de navegación,
+                                recordar tus preferencias de accesibilidad y mantener tu sesión activa.
+                                Puedes controlar o desactivar las cookies desde la configuración de tu navegador,
+                                aunque algunas funcionalidades del sitio podrían verse afectadas.</p>
 
-                            <h6><i class="bi bi-person-check me-2"></i>Tus derechos</h6>
+                            <!-- 6 -->
+                            <h6 id="sec-derechos">
+                                <i class="bi bi-person-check me-2"></i>Tus derechos
+                            </h6>
+                            <p>Como titular de tus datos personales tienes derecho a:</p>
                             <ul>
-                                <li>Acceder a tu información personal</li>
-                                <li>Corregir datos inexactos</li>
-                                <li>Solicitar la eliminación de tus datos</li>
-                                <li>Oponerte al procesamiento de tus datos</li>
-                                <li>Portar tus datos a otro servicio</li>
+                                <li><strong>Acceso:</strong> consultar qué información personal tenemos sobre ti</li>
+                                <li><strong>Rectificación:</strong> corregir datos inexactos o incompletos</li>
+                                <li><strong>Cancelación:</strong> solicitar la eliminación de tus datos</li>
+                                <li><strong>Oposición:</strong> oponerte al tratamiento de tus datos personales</li>
+                                <li><strong>Portabilidad:</strong> recibir tus datos en formato electrónico</li>
                             </ul>
 
-                            <h6><i class="bi bi-envelope me-2"></i>Contacto</h6>
+                            <!-- 7 -->
+                            <h6 id="sec-contacto">
+                                <i class="bi bi-envelope me-2"></i>Contacto
+                            </h6>
+                            <p>Para ejercer tus derechos o resolver dudas sobre esta política, contáctanos:</p>
                             <ul>
-                                <li>Email: privacidad@cafeteriaith.edu.mx</li>
-                                <li>Teléfono: 771-717-0000</li>
-                                <li>Dirección: Cafetería ITH, Campus Tecnológico</li>
+                                <li><strong>Email:</strong> cafeteria@ith.mx</li>
+                                <li><strong>Teléfono:</strong> 664-123-4567</li>
+                                <li><strong>Dirección:</strong> Cafetería ITH, Instituto Tecnológico de Huejutla,
+                                    Hidalgo</li>
                             </ul>
 
-                            <div class="alert alert-info mt-4">
+                            <div class="alert alert-info mt-4 mb-0">
                                 <i class="bi bi-info-circle me-2"></i>
-                                <strong>Nota:</strong> Esta política puede actualizarse periódicamente. Te recomendamos
-                                revisarla regularmente.
+                                <strong>Nota:</strong> Esta política puede actualizarse periódicamente.
+                                Te recomendamos revisarla con regularidad para estar al tanto de cualquier cambio.
                             </div>
 
                         </div>
 
                         <div class="text-center mt-5">
-                            <a href="inicio.html" class="btn btn-primary btn-lg">
-                                <i class="bi bi-arrow-left me-2"></i>Volver al Inicio
+                            <a href="inicio.html" class="btn btn-primary me-2">
+                                <i class="bi bi-house me-2"></i>Inicio
+                            </a>
+                            <a href="contacto.html" class="btn btn-outline-primary">
+                                <i class="bi bi-envelope me-2"></i>Contáctanos
                             </a>
                         </div>
 
                     </div>
                 </div>
-
             </div>
+
         </div>
     </main>
 
     <div id="footer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="../assets/js/config/api.config.js"></script>
+    <script src="../assets/js/utils/toast.utils.js"></script>
+    <script src="../assets/js/utils/auth.utils.js"></script>
+
     <script src="../assets/js/components/header.js"></script>
     <script src="../assets/js/components/navbar.js"></script>
     <script src="../assets/js/components/footer.js"></script>
     <script src="../assets/js/pages/privacidad.js"></script>
+    <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>
 
 </html>

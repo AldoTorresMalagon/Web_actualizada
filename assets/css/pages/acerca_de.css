@@ -1,0 +1,62 @@
+.icon-container {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: #fff;
+    box-shadow: var(--shadow-blue);
+}
+
+.info-card {
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.team-member-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--color-primario);
+    margin: 0 auto 0.75rem;
+    transition: var(--transition);
+}
+
+.team-member-icon:hover {
+    background: var(--color-primario);
+    color: #fff;
+}
+
+.stat-acerca {
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    text-align: center;
+    color: #fff;
+}
+
+.stat-acerca .stat-num {
+    font-size: 2.2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-acerca .stat-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-top: 0.25rem;
+}

@@ -1,0 +1,1067 @@
+/* Accesibilidad */
+.opcion-accesibilidad {
+    border: none;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition);
+    height: 100%;
+}
+
+.opcion-accesibilidad:hover {
+    box-shadow: var(--shadow);
+}
+
+.opcion-accesibilidad.activo {
+    border: 2px solid var(--color-primario);
+    background: #eef2ff;
+}
+
+/* Toggle switch accesibilidad */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 28px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+    background-color: #ccc;
+    border-radius: 28px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.toggle-slider::before {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background: var(--color-blanco);
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.toggle-switch input:checked+.toggle-slider {
+    background-color: var(--color-primario);
+}
+
+.toggle-switch input:checked+.toggle-slider::before {
+    transform: translateX(24px);
+}
+
+/* Botones de opción múltiple (tamaño fuente, saturación) */
+.btn-opcion-grupo {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.btn-opcion {
+    border: 2px solid #dee2e6;
+    background: #fff;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #495057;
+}
+
+.btn-opcion:hover {
+    border-color: #0dcaf0;
+    background: #e8f8fc;
+    color: #0a9ab8;
+}
+
+.btn-opcion.activo {
+    border-color: #0dcaf0;
+    background: #0dcaf0;
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Panel flotante accesibilidad */
+.btn-accesibilidad-flotante {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1050;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background-color: #0dcaf0;
+    color: #fff;
+    border: none;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-accesibilidad-flotante:hover {
+    background-color: #0aa2c0;
+    transform: scale(1.1);
+}
+
+.panel-accesibilidad {
+    position: fixed;
+    bottom: 4.5rem;
+    right: 1.5rem;
+    z-index: 1049;
+    width: 320px;
+    background: var(--color-blanco);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    display: none;
+}
+
+.panel-accesibilidad.show,
+.panel-accesibilidad.panel-visible {
+    display: block;
+    animation: fadeIn 0.2s ease;
+}
+
+.panel-header {
+    background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+    color: var(--color-blanco);
+    padding: 0.6rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.panel-body {
+    padding: 0.75rem;
+    max-height: 65vh;
+    overflow-y: auto;
+}
+
+/* Secciones del panel */
+.acc-seccion {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.acc-seccion-titulo {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.acc-seccion-titulo.mt-2 {
+    margin-top: 0.6rem !important;
+}
+
+/* Grid de 2 columnas para toggles */
+.acc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem;
+}
+
+.acc-toggle-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 0.4rem 0.5rem;
+}
+
+.acc-toggle-label {
+    font-size: 0.72rem;
+    color: #495057;
+    line-height: 1.2;
+}
+
+.acc-toggle-label i {
+    color: var(--color-primario);
+}
+
+/* Footer del panel */
+.acc-footer {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* CLASES GLOBALES DE ACCESIBILIDAD */
+
+/* Tamaño de fuente */
+[data-font-size="pequeno"] {
+    font-size: 13px;
+}
+
+[data-font-size="grande"] {
+    font-size: 18px;
+}
+
+[data-font-size="muy_grande"] {
+    font-size: 22px;
+}
+
+[data-font-size="pequeno"] *,
+[data-font-size="grande"] *,
+[data-font-size="muy_grande"] * {
+    font-size: inherit !important;
+}
+
+/* Alto contraste */
+html.alto-contraste {
+    filter: contrast(1.6) brightness(1.05);
+}
+
+/* Modo oscuro — cubre body, header, navbar, footer, cards, tabla, formularios */
+html.modo-oscuro body {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .site-header {
+    background: #1a1a2e !important;
+    color: #e0e0e0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+}
+
+html.modo-oscuro .header-title,
+html.modo-oscuro .site-header * {
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .site-nav {
+    background-color: #16213e !important;
+    border-color: #333 !important;
+}
+
+html.modo-oscuro .site-nav .btn {
+    color: #ccc !important;
+    border-color: #555 !important;
+    background-color: transparent !important;
+}
+
+html.modo-oscuro .site-nav .btn:hover {
+    background-color: #2a2a4a !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .footer-top {
+    background-color: #0d0d1a !important;
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .footer-top * {
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .footer-links {
+    background-color: #1a1a1a !important;
+}
+
+html.modo-oscuro .footer-links a,
+html.modo-oscuro .footer-col-title {
+    color: #bbb !important;
+}
+
+html.modo-oscuro .footer-bottom {
+    background-color: #111 !important;
+    border-color: #333 !important;
+    color: #999 !important;
+}
+
+html.modo-oscuro .card,
+html.modo-oscuro .modal-content,
+html.modo-oscuro .acc-seccion {
+    background: #252525 !important;
+    border-color: #333 !important;
+}
+
+html.modo-oscuro .acc-seccion-titulo {
+    color: #888 !important;
+}
+
+html.modo-oscuro .acc-toggle-item {
+    background: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+html.modo-oscuro .acc-toggle-label {
+    color: #ccc !important;
+}
+
+html.modo-oscuro .acc-footer {
+    border-color: #333 !important;
+}
+
+html.modo-oscuro .panel-accesibilidad {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #333 !important;
+}
+
+html.modo-oscuro .card-header {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    border-color: #444 !important;
+}
+
+html.modo-oscuro .card-header * {
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .list-group-item {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #333 !important;
+}
+
+html.modo-oscuro .table,
+html.modo-oscuro .table td,
+html.modo-oscuro .table th {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #333 !important;
+}
+
+html.modo-oscuro input,
+html.modo-oscuro select,
+html.modo-oscuro textarea,
+html.modo-oscuro .form-control,
+html.modo-oscuro .form-select {
+    background-color: #2a2a2a !important;
+    color: #e0e0e0 !important;
+    border-color: #444 !important;
+}
+
+html.modo-oscuro input::placeholder,
+html.modo-oscuro textarea::placeholder {
+    color: #777 !important;
+    opacity: 1 !important;
+}
+
+html.modo-oscuro .form-label,
+html.modo-oscuro label {
+    color: #ccc !important;
+}
+
+html.modo-oscuro .form-text {
+    color: #888 !important;
+}
+
+html.modo-oscuro .card-body {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .card-body p,
+html.modo-oscuro .card-body span:not(.badge) {
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .input-group-text {
+    background-color: #2a2a2a !important;
+    color: #ccc !important;
+    border-color: #444 !important;
+}
+
+html.modo-oscuro .btn-outline-primary,
+html.modo-oscuro .btn-outline-secondary {
+    color: #aaa !important;
+    border-color: #555 !important;
+}
+
+html.modo-oscuro .bg-white,
+html.modo-oscuro .bg-light {
+    background-color: #1e1e1e !important;
+}
+
+html.modo-oscuro .text-muted {
+    color: #999 !important;
+}
+
+html.modo-oscuro .text-dark {
+    color: #ddd !important;
+}
+
+html.modo-oscuro .border {
+    border-color: #444 !important;
+}
+
+html.modo-oscuro hr {
+    border-color: #444 !important;
+}
+
+/* Modo oscuro: variables redefenidas para contraste */
+html.modo-oscuro {
+    --color-primario: #5b9bd5;
+    --color-secundario: #4a8bc4;
+    --color-acento: #7eb8e8;
+    --color-texto: #e0e0e0;
+    --color-muted: #999;
+    --color-fondo: #121212;
+    --color-blanco: #1e1e1e;
+    --border-color: #444;
+    --shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.6);
+}
+
+/* Botones primarios: azul claro legible */
+html.modo-oscuro .btn-primary {
+    background-color: #3a7fd4 !important;
+    border-color: #3a7fd4 !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .btn-primary:hover,
+html.modo-oscuro .btn-primary:focus {
+    background-color: #5b9bd5 !important;
+    border-color: #5b9bd5 !important;
+}
+
+/* Botones outline */
+html.modo-oscuro .btn-outline-primary {
+    color: #7eb8e8 !important;
+    border-color: #7eb8e8 !important;
+    background: transparent !important;
+}
+
+html.modo-oscuro .btn-outline-primary:hover {
+    background-color: #3a7fd4 !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .btn-outline-secondary {
+    color: #bbb !important;
+    border-color: #666 !important;
+}
+
+html.modo-oscuro .btn-outline-secondary:hover {
+    background-color: #444 !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .btn-success {
+    background-color: #1a7a4a !important;
+    border-color: #1a7a4a !important;
+}
+
+html.modo-oscuro .btn-outline-success {
+    color: #4caf7d !important;
+    border-color: #4caf7d !important;
+}
+
+html.modo-oscuro .btn-light {
+    background-color: #333 !important;
+    border-color: #555 !important;
+    color: #ddd !important;
+}
+
+/* Links y texto con color primario */
+html.modo-oscuro a,
+html.modo-oscuro .nav-link {
+    color: #7eb8e8 !important;
+}
+
+html.modo-oscuro a:hover {
+    color: #aad4f5 !important;
+}
+
+html.modo-oscuro .text-primary {
+    color: #7eb8e8 !important;
+}
+
+html.modo-oscuro .text-success {
+    color: #4caf7d !important;
+}
+
+html.modo-oscuro .text-warning {
+    color: #ffc107 !important;
+}
+
+html.modo-oscuro .text-danger {
+    color: #f87171 !important;
+}
+
+html.modo-oscuro .text-info {
+    color: #67e8f9 !important;
+}
+
+/* Íconos Bootstrap (bi) heredan el color del padre */
+html.modo-oscuro .bi {
+    color: inherit;
+}
+
+/* Badges */
+html.modo-oscuro .badge.bg-primary {
+    background-color: #3a7fd4 !important;
+}
+
+html.modo-oscuro .badge.bg-success {
+    background-color: #1a7a4a !important;
+}
+
+html.modo-oscuro .badge.bg-secondary {
+    background-color: #555 !important;
+}
+
+html.modo-oscuro .badge.bg-danger {
+    background-color: #b91c1c !important;
+}
+
+html.modo-oscuro .badge.bg-warning {
+    background-color: #b45309 !important;
+    color: #fff !important;
+}
+
+/* Alerts */
+html.modo-oscuro .alert-primary {
+    background-color: #1e3a5f !important;
+    border-color: #3a7fd4 !important;
+    color: #aad4f5 !important;
+}
+
+html.modo-oscuro .alert-success {
+    background-color: #14532d !important;
+    border-color: #4caf7d !important;
+    color: #86efac !important;
+}
+
+html.modo-oscuro .alert-danger {
+    background-color: #450a0a !important;
+    border-color: #f87171 !important;
+    color: #fca5a5 !important;
+}
+
+html.modo-oscuro .alert-warning {
+    background-color: #451a03 !important;
+    border-color: #fbbf24 !important;
+    color: #fde68a !important;
+}
+
+/* Nav pills / tabs */
+html.modo-oscuro .nav-pills .nav-link.active,
+html.modo-oscuro .nav-tabs .nav-link.active {
+    background-color: #3a7fd4 !important;
+    border-color: #3a7fd4 !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .nav-tabs .nav-link {
+    color: #aaa !important;
+}
+
+html.modo-oscuro .nav-tabs {
+    border-color: #444 !important;
+}
+
+/* Dropdown */
+html.modo-oscuro .dropdown-menu {
+    background-color: #1e1e1e !important;
+    border-color: #444 !important;
+}
+
+html.modo-oscuro .dropdown-item {
+    color: #ddd !important;
+}
+
+html.modo-oscuro .dropdown-item:hover {
+    background-color: #2a2a2a !important;
+    color: #fff !important;
+}
+
+/* Card headers con gradiente */
+html.modo-oscuro .card-header.bg-primary {
+    background-color: #1e3a5f !important;
+    color: #aad4f5 !important;
+}
+
+/* Stat cards dashboard — colores vivos para modo oscuro */
+html.modo-oscuro .stat-card.bg-ventas {
+    background: linear-gradient(135deg, rgba(11, 38, 92, 0.75), rgba(30, 64, 175, 0.75)) !important;
+}
+
+html.modo-oscuro .stat-card.bg-ingresos {
+    background: linear-gradient(135deg, rgba(25, 135, 84, 0.75), rgba(32, 201, 151, 0.75)) !important;
+}
+
+html.modo-oscuro .stat-card.bg-usuarios {
+    background: linear-gradient(135deg, rgba(8, 145, 178, 0.75), rgba(13, 202, 240, 0.75)) !important;
+}
+
+html.modo-oscuro .stat-card.bg-stock {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.75), rgba(249, 115, 22, 0.75)) !important;
+}
+
+html.modo-oscuro .stat-card .text-white,
+html.modo-oscuro .stat-card .text-white-50 {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* Stat cards Bootstrap (bg-primary, bg-success, etc.) en modo oscuro */
+html.modo-oscuro .card.bg-primary,
+html.modo-oscuro .card.text-white.bg-primary {
+    background-color: #1a3a7a !important;
+    color: #ffffff !important;
+}
+
+html.modo-oscuro .card.bg-success,
+html.modo-oscuro .card.text-white.bg-success {
+    background-color: #1a6640 !important;
+    color: #ffffff !important;
+}
+
+html.modo-oscuro .card.bg-warning,
+html.modo-oscuro .card.text-white.bg-warning {
+    background-color: #7a5500 !important;
+    color: #ffffff !important;
+}
+
+html.modo-oscuro .card.bg-danger,
+html.modo-oscuro .card.text-white.bg-danger {
+    background-color: #8a1a25 !important;
+    color: #ffffff !important;
+}
+
+html.modo-oscuro .card.bg-info,
+html.modo-oscuro .card.text-white.bg-info {
+    background-color: #0a5a7a !important;
+    color: #ffffff !important;
+}
+
+html.modo-oscuro .card.bg-primary *,
+html.modo-oscuro .card.bg-success *,
+html.modo-oscuro .card.bg-warning *,
+html.modo-oscuro .card.bg-danger *,
+html.modo-oscuro .card.bg-info * {
+    color: #ffffff !important;
+}
+
+/* Botones sólidos del dashboard en modo oscuro — más brillantes */
+html.modo-oscuro .dash-main .btn-primary {
+    background-color: #2d5abf !important;
+    border-color: #2d5abf !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .dash-main .btn-success {
+    background-color: #1a9e70 !important;
+    border-color: #1a9e70 !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .dash-main .btn-warning {
+    background-color: #c08000 !important;
+    border-color: #c08000 !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .dash-main .btn-info {
+    background-color: #0aaab8 !important;
+    border-color: #0aaab8 !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .dash-main .btn-secondary {
+    background-color: #555 !important;
+    border-color: #555 !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .dash-main .btn-danger {
+    background-color: #c02030 !important;
+    border-color: #c02030 !important;
+    color: #fff !important;
+}
+
+/* Placeholders / imágenes fallback */
+html.modo-oscuro .image-placeholder {
+    background-color: #2a2a2a !important;
+    color: #666 !important;
+}
+
+/* Footer links que tenían color primario oscuro */
+html.modo-oscuro .footer-col-title {
+    color: #7eb8e8 !important;
+}
+
+html.modo-oscuro .footer-social-btn {
+    background: #2a2a2a !important;
+    color: #7eb8e8 !important;
+}
+
+html.modo-oscuro .footer-social-btn:hover {
+    background: #3a7fd4 !important;
+    color: #fff !important;
+}
+
+/* Modo lectura */
+html.modo-lectura body {
+    background: #fdf6e3 !important;
+    color: #3c3c3c !important;
+}
+
+html.modo-lectura .site-header {
+    background: #c8a96e !important;
+}
+
+html.modo-lectura .footer-links,
+html.modo-lectura .footer-bottom {
+    background: #f5edda !important;
+}
+
+html.modo-lectura .card,
+html.modo-lectura .bg-white,
+html.modo-lectura .bg-light {
+    background: #fffef5 !important;
+}
+
+/* Fuente para dislexia (OpenDyslexic) */
+html.fuente-dislexia,
+html.fuente-dislexia * {
+    font-family: 'OpenDyslexic', Arial, sans-serif !important;
+    letter-spacing: 0.05em;
+    word-spacing: 0.15em;
+    line-height: 1.75;
+}
+
+/* Subrayar enlaces */
+html.subrayar-enlaces a {
+    text-decoration: underline !important;
+    text-underline-offset: 3px;
+}
+
+/* Reducir movimiento */
+html.reducir-movimiento *,
+html.reducir-movimiento *::before,
+html.reducir-movimiento *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+}
+
+/* Cursor grande */
+html.cursor-grande,
+html.cursor-grande * {
+    cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M8 2 L8 26 L13 21 L17 30 L20 29 L16 20 L23 20 Z' fill='black' stroke='white' stroke-width='1.5'/%3E%3C/svg%3E") 8 2, auto !important;
+}
+
+/* Resaltar focus (navegación por teclado) */
+html.resaltar-focus *:focus,
+html.resaltar-focus *:focus-visible {
+    outline: 3px solid #f59e0b !important;
+    outline-offset: 3px !important;
+    box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* MODO OSCURO — Dashboard */
+
+/* Fondo general del dashboard */
+html.modo-oscuro .dash-main {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+/* Header del dashboard */
+html.modo-oscuro .dash-header {
+    background: linear-gradient(135deg, #0d1b3e 0%, #0a1628 100%) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Sidebar — mantiene azul oscuro pero más profundo */
+html.modo-oscuro .dash-sidebar {
+    background: linear-gradient(180deg, #0a1628 0%, #060e1c 100%) !important;
+}
+
+html.modo-oscuro .dash-sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.70) !important;
+}
+
+html.modo-oscuro .dash-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+
+html.modo-oscuro .dash-sidebar .nav-link.active {
+    background: rgba(59, 130, 246, 0.40) !important;
+    color: #fff !important;
+    border-left-color: #60a5fa !important;
+}
+
+html.modo-oscuro .dash-sidebar-nombre {
+    color: #fff !important;
+}
+
+html.modo-oscuro .dash-sidebar-rol {
+    color: rgba(255, 255, 255, 0.55) !important;
+}
+
+html.modo-oscuro .dash-sidebar-footer {
+    border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+html.modo-oscuro .sidebar-divider {
+    border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+/* Tarjetas stat — mantienen sus gradientes pero más oscuros */
+html.modo-oscuro .stat-card.bg-ventas {
+    background: linear-gradient(135deg, #091a3e, #0f2460) !important;
+}
+
+html.modo-oscuro .stat-card.bg-ingresos {
+    background: linear-gradient(135deg, #0a3d24, #0d5c35) !important;
+}
+
+html.modo-oscuro .stat-card.bg-usuarios {
+    background: linear-gradient(135deg, #0a3a4a, #0d5068) !important;
+}
+
+html.modo-oscuro .stat-card.bg-stock {
+    background: linear-gradient(135deg, #5a0a0a, #7a1515) !important;
+}
+
+/* Información del sistema — tarjetas bg-light */
+html.modo-oscuro .dash-main .bg-light {
+    background-color: #1e1e2e !important;
+    color: #e0e0e0 !important;
+}
+
+/* MODO OSCURO — Alto contraste en dashboard */
+html.alto-contraste .dash-sidebar {
+    filter: contrast(1.3) brightness(1.1);
+}
+
+html.alto-contraste .dash-header {
+    filter: contrast(1.2) brightness(1.1);
+}
+
+/* MODO LECTURA — Dashboard (fondo cálido) */
+html.modo-lectura .dash-main {
+    background-color: #fdf6e3 !important;
+    color: #333 !important;
+}
+
+html.modo-lectura .dash-main .card {
+    background-color: #fffdf5 !important;
+    border-color: #e8dcc8 !important;
+}
+
+html.modo-lectura .dash-main .card-header {
+    background-color: #f5ead0 !important;
+    border-color: #e8dcc8 !important;
+}
+
+html.modo-lectura .dash-main .bg-light {
+    background-color: #f5ead0 !important;
+}
+
+/* FUENTE DISLEXIA — Dashboard */
+html.fuente-dislexia .dash-sidebar,
+html.fuente-dislexia .dash-header,
+html.fuente-dislexia .dash-main {
+    font-family: 'OpenDyslexic', Arial, sans-serif !important;
+}
+
+/* REDUCIR MOVIMIENTO — Dashboard */
+html.reducir-movimiento .stat-card,
+html.reducir-movimiento .stat-card:hover {
+    transition: none !important;
+    transform: none !important;
+}
+
+/* Modo oscuro: inputs readonly/disabled (perfil) */
+html.modo-oscuro .form-control:disabled,
+html.modo-oscuro .form-control[readonly],
+html.modo-oscuro input:disabled,
+html.modo-oscuro input[readonly] {
+    background-color: #1a1a1a !important;
+    color: #aaa !important;
+    border-color: #333 !important;
+    opacity: 1 !important;
+}
+
+/* Modo oscuro: offcanvas / menú lateral público */
+html.modo-oscuro .offcanvas {
+    background-color: #1a1a2e !important;
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .offcanvas-header {
+    background-color: #0d0d1a !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+html.modo-oscuro .offcanvas-title {
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .offcanvas .nav-link {
+    color: #ccc !important;
+}
+
+html.modo-oscuro .offcanvas .nav-link:hover {
+    color: #fff !important;
+    background-color: #2a2a4a !important;
+    border-radius: 6px;
+}
+
+html.modo-oscuro .offcanvas .nav-link.text-danger {
+    color: #ff6b6b !important;
+}
+
+html.modo-oscuro .offcanvas .nav-link.text-success {
+    color: #69db7c !important;
+}
+
+html.modo-oscuro .offcanvas .sidebar-section-label {
+    color: #888 !important;
+}
+
+html.modo-oscuro .offcanvas hr {
+    border-color: #333 !important;
+}
+
+html.modo-oscuro .offcanvas .btn-close {
+    filter: invert(1) !important;
+}
+
+/* Modo oscuro: readonly-field (perfil) */
+
+html.modo-oscuro .readonly-field {
+    background-color: #1a1a1a !important;
+    color: #aaa !important;
+    border-color: #333 !important;
+}
+
+/* Responsive panel accesibilidad */
+@media (max-width: 576px) {
+    .panel-accesibilidad {
+        width: 280px;
+        max-width: calc(100vw - 2rem);
+        right: 1rem;
+        left: auto;
+        bottom: 88px;
+        max-height: 65vh;
+    }
+
+    .panel-accesibilidad .panel-body {
+        max-height: calc(65vh - 52px);
+        overflow-y: auto;
+    }
+
+}
+
+/* Modo oscuro: páginas de detalle de producto */
+html.modo-oscuro .product-image {
+    background-color: #1e1e1e !important;
+}
+
+html.modo-oscuro .product-details {
+    background-color: var(--bs-card-bg, #2a2a2a);
+}
+
+html.modo-oscuro .category-badge {
+    background-color: #2d3748 !important;
+    color: #a0aec0 !important;
+}
+
+html.modo-oscuro .price-tag {
+    color: #5b9bd5 !important;
+}
+
+html.modo-oscuro .table-borderless td,
+html.modo-oscuro .table-borderless th,
+html.modo-oscuro .table-borderless strong {
+    color: #e0e0e0 !important;
+    background-color: transparent !important;
+}
+
+html.modo-oscuro .border-top {
+    border-color: #333 !important;
+}
+
+html.modo-oscuro #bloque-no-autenticado .alert-info {
+    background-color: #0a2a3a !important;
+    border-color: #0a6a8a !important;
+    color: #7dd3f0 !important;
+}
+
+html.modo-oscuro #bloque-no-autenticado .alert-info .alert-link {
+    color: #0aaab8 !important;
+}
+
+/* Sección QR 3D */
+html.modo-oscuro .qr-3d-section {
+    background-color: #1a1a2e !important;
+    border-color: #333 !important;
+}
+
+html.modo-oscuro .qr-3d-title {
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .qr-3d-info {
+    background-color: #1e1e2e !important;
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .qr-3d-info h5,
+html.modo-oscuro .qr-3d-info li,
+html.modo-oscuro .qr-3d-info strong {
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro .qr-image-container {
+    background-color: #1a1a2e !important;
+}
+
+html.modo-oscuro #qr-no-configurado h5,
+html.modo-oscuro #qr-no-configurado p {
+    color: #aaa !important;
+}
+
+/* ── Modo oscuro: card principal de detalle ── */
+html.modo-oscuro #detalle-contenido .card {
+    background-color: #1e1e1e !important;
+    border-color: #333 !important;
+}
+
+html.modo-oscuro #detalle-contenido .card .col-md-6 {
+    background-color: #1e1e1e !important;
+}
+
+html.modo-oscuro #detalle-contenido .product-details {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+html.modo-oscuro #detalle-contenido .card-title,
+html.modo-oscuro #detalle-contenido .card-text {
+    color: #e0e0e0 !important;
+}

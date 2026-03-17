@@ -1,0 +1,374 @@
+/* Layout base */
+
+/* Wrapper del layout principal — evita scroll de página completa */
+.dash-wrapper {
+    height: calc(100vh - var(--header-height));
+    overflow: hidden;
+    display: flex;
+    flex: 1;
+}
+
+.dash-main {
+    height: calc(100vh - var(--header-height));
+    overflow-y: auto;
+    background-color: var(--color-fondo);
+    padding: 1.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+/* HEADER */
+.dash-header {
+    background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
+    color: var(--color-blanco);
+    height: var(--header-height);
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+.dash-header-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    min-width: 160px;
+    /* evita que el título central se corra */
+}
+
+.dash-header-logo img {
+    height: 44px;
+    object-fit: contain;
+}
+
+/* Título centrado — posición absoluta para no afectar el flex */
+.dash-header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    pointer-events: none;
+    /* no interfiere con clics */
+}
+
+/* Usuario (derecha del header) */
+.dash-header-user {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 0.9rem;
+    min-width: 160px;
+    /* mismo ancho que el logo para centrar bien el título */
+    justify-content: flex-end;
+}
+
+.dash-header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    border: 2px solid rgba(255, 255, 255, .4);
+    flex-shrink: 0;
+}
+
+.dash-header-user-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    text-align: right;
+}
+
+.dash-header-nombre {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.dash-header-rol {
+    font-size: 0.73rem;
+    color: rgba(255, 255, 255, .65);
+    text-transform: capitalize;
+}
+
+/* SIDEBAR */
+.dash-sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    height: calc(100vh - var(--header-height));
+    background: linear-gradient(180deg, var(--color-primario) 0%, var(--color-secundario) 100%);
+    color: var(--color-blanco);
+    flex-shrink: 0;
+    position: sticky;
+    top: var(--header-height);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Avatar y datos del usuario en sidebar */
+.dash-sidebar-user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, .15);
+    margin-bottom: 0.25rem;
+}
+
+.dash-sidebar-avatar {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, .85);
+    margin-bottom: 0.4rem;
+    line-height: 1;
+}
+
+.dash-sidebar-nombre {
+    display: block;
+    color: var(--color-blanco);
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.dash-sidebar-rol {
+    color: rgba(255, 255, 255, .65);
+    font-size: 0.78rem;
+    text-transform: capitalize;
+    text-align: center;
+}
+
+/* Nav del sidebar */
+.dash-sidebar .sidebar-nav {
+    padding: 0.5rem 0;
+    flex: 1;
+}
+
+.dash-sidebar .sidebar-section {
+    padding: 0.5rem 1rem 0.2rem;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, .45);
+}
+
+.dash-sidebar .sidebar-divider {
+    border-color: rgba(255, 255, 255, .12);
+    margin: 0.4rem 0;
+}
+
+.dash-sidebar .nav-link {
+    color: rgba(255, 255, 255, .80);
+    padding: 0.65rem 1.25rem;
+    border-radius: 0;
+    border-left: 3px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.dash-sidebar .nav-link:hover {
+    background: rgba(255, 255, 255, .10);
+    color: var(--color-blanco);
+    border-left-color: rgba(255, 255, 255, .4);
+}
+
+.dash-sidebar .nav-link.active {
+    background: rgba(59, 130, 246, .30);
+    color: var(--color-blanco);
+    border-left-color: #3b82f6;
+    font-weight: 600;
+}
+
+.dash-sidebar .nav-link i {
+    width: 1.1rem;
+    text-align: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+/* Footer del sidebar (Mi Perfil, Ver Sitio, Cerrar Sesión) */
+.dash-sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, .15);
+    padding: 0.5rem 0;
+    margin-top: auto;
+}
+
+/* ENCABEZADO DE PÁGINA (dentro del dash-main) */
+.dash-page-header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+}
+
+.dash-page-header h2 {
+    color: var(--color-primario);
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+/* STAT CARDS */
+.stat-card {
+    border: none;
+    border-radius: var(--radius-lg);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card.bg-ventas {
+    background: var(--stat-ventas) !important;
+}
+
+.stat-card.bg-ingresos {
+    background: var(--stat-ingresos) !important;
+}
+
+.stat-card.bg-usuarios {
+    background: var(--stat-usuarios) !important;
+}
+
+.stat-card.bg-stock {
+    background: var(--stat-stock) !important;
+}
+
+.icon-stat-dash {
+    font-size: 2.5rem;
+}
+
+.icon-reporte {
+    font-size: 2rem;
+}
+
+/* TABLAS */
+.dash-main .table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    white-space: nowrap;
+}
+
+.dash-main .table td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.dash-main .table-hover tbody tr:hover {
+    background-color: #f0f4ff;
+}
+
+/* Toolbar: búsqueda + ordenamiento + botón nuevo */
+.dash-table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.dash-table-toolbar .input-busqueda {
+    flex: 1;
+    min-width: 180px;
+    max-width: 300px;
+}
+
+/* Empuja el botón "Nuevo" al extremo derecho */
+.dash-table-toolbar .ms-auto {
+    margin-left: auto !important;
+}
+
+/* Paginación */
+.dash-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+}
+
+/* CARDS GENERALES */
+.dash-main .card {
+    border-radius: var(--radius-lg);
+    border: none;
+}
+
+.dash-main .card-header {
+    background: var(--color-blanco);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+    padding: 0.85rem 1.25rem;
+}
+
+/* Botones de acción en tabla */
+.dash-main .btn-group-sm .btn {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.8rem;
+}
+
+/* Acciones rápidas */
+.dash-main .quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+    .dash-sidebar {
+        display: none;
+    }
+
+    .dash-main {
+        padding: 1rem;
+    }
+
+    /* En móvil el título del header ya no necesita posición absoluta */
+    .dash-header-title {
+        position: static;
+        transform: none;
+        font-size: 1rem;
+    }
+
+    .dash-header-user-info {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .stat-card .card-body {
+        padding: 0.85rem;
+    }
+
+    .icon-stat-dash {
+        font-size: 1.75rem;
+    }
+
+    .dash-table-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dash-table-toolbar .input-busqueda {
+        max-width: 100%;
+    }
+}

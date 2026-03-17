@@ -1,0 +1,10 @@
+/* Separación reCAPTCHA / botón accesibilidad */
+.grecaptcha-badge {
+    position: fixed !important;
+    bottom: 5rem !important;
+    z-index: 1051 !important;
+}
+
+.btn-accesibilidad-flotante {
+    bottom: 1.5rem !important;
+}

@@ -1,0 +1,87 @@
+.policy-content h5 {
+    color: var(--color-primario);
+    font-weight: 700;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #eef2ff;
+}
+
+.policy-content h6 {
+    color: var(--color-primario);
+    font-weight: 600;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.policy-content p,
+.policy-content li {
+    color: var(--color-texto);
+    line-height: 1.8;
+}
+
+.policy-content ul {
+    padding-left: 1.5rem;
+}
+
+.policy-content ul li {
+    margin-bottom: 0.25rem;
+}
+
+/* Índice lateral */
+.policy-toc {
+    position: sticky;
+    top: 1.5rem;
+    background: #f8fafc;
+    border-radius: var(--radius-lg);
+    padding: 1.25rem;
+    border-left: 3px solid var(--color-primario);
+}
+
+.policy-toc h6 {
+    font-weight: 700;
+    color: var(--color-primario);
+    margin-bottom: 0.75rem;
+}
+
+.policy-toc a {
+    display: block;
+    color: var(--color-texto);
+    text-decoration: none;
+    font-size: 0.875rem;
+    padding: 0.25rem 0;
+    transition: var(--transition);
+}
+
+.policy-toc a:hover {
+    color: var(--color-primario);
+    padding-left: 0.5rem;
+}
+
+.fecha-actualizacion {
+    font-size: 0.8rem;
+    color: var(--color-muted);
+}
+
+/* ── Modo oscuro ── */
+.modo-oscuro .policy-toc {
+    background: #1e293b;
+    border-left-color: #5b9bd5;
+}
+
+.modo-oscuro .policy-toc h6 {
+    color: #5b9bd5;
+}
+
+.modo-oscuro .policy-toc a {
+    color: #cbd5e1;
+}
+
+.modo-oscuro .policy-toc a:hover,
+.modo-oscuro .policy-toc a.fw-bold {
+    color: #5b9bd5;
+}
+
+.modo-oscuro .policy-content h6 {
+    color: #5b9bd5;
+}
