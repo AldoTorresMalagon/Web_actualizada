@@ -23,7 +23,7 @@ async function cargarCarrusel() {
   if (!indicadores || !slides) return;
 
   try {
-    const platillosData = await ProductosService.getPlatillos();
+    const platillosData = await ProductosService.getPlatillosRecientes();
     const json = { success: true, data: platillosData };
 
     if (!json.data?.length) {
@@ -37,7 +37,7 @@ async function cargarCarrusel() {
       return;
     }
 
-    const platillos = json.data.slice(0, 8); // máximo 8 en el carrusel
+    const platillos = json.data; // vista v_platillos_recientes ya devuelve LIMIT 8
     indicadores.innerHTML = '';
     slides.innerHTML = '';
 
@@ -110,8 +110,8 @@ async function cargarDestacados() {
 
   try {
     const [bebidasData, snacksData] = await Promise.all([
-        ProductosService.getBebidas(),
-        ProductosService.getLimit(4),
+      ProductosService.getBebidas(),
+      ProductosService.getLimit(4),
     ]);
 
     const bebidas = bebidasData.slice(0, 2);
@@ -181,37 +181,118 @@ async function cargarDestacados() {
   }
 }
 
-/* Promociones activas */
+/* Promociones activas — Slider */
 async function cargarPromociones() {
-  const contenedor = document.getElementById('promociones-banner');
-  if (!contenedor) return;
+  const seccion = document.getElementById('seccion-promociones');
+  const track = document.getElementById('promociones-grid');
+  const dotsEl = document.getElementById('promo-dots');
+  const countBadge = document.getElementById('promo-count');
+  const btnPrev = document.getElementById('promo-prev');
+  const btnNext = document.getElementById('promo-next');
+
+  if (!seccion || !track) return;
 
   try {
-    const promoData = await ProductosService.getPromocionesActivas();
-    const json = { success: true, data: promoData };
+    const promos = await ProductosService.getPromocionesActivas();
 
-    if (!json.data?.length) {
-      contenedor.closest('section')?.classList.add('d-none');
-      return;
+    if (!promos.length) { seccion.style.display = 'none'; return; }
+
+    seccion.style.display = '';
+    if (countBadge)
+      countBadge.textContent = `${promos.length} activa${promos.length > 1 ? 's' : ''}`;
+
+    /* Renderizar tarjetas */
+    track.innerHTML = promos.map(p => {
+      const tieneImgPromo = !!p.imagen_promocion;
+      const tieneImg1 = !!p.img_producto_1;
+      const tieneImg2 = !!p.img_producto_2;
+
+      let imgHtml = '';
+      if (tieneImgPromo) {
+        imgHtml = `<img src="${p.imagen_promocion}" class="promo-card-img" alt="${p.titulo}"
+                        onerror="this.src='${FormatUtils.imagenFallback(p.titulo)}'">`;
+      } else if (tieneImg1 && tieneImg2) {
+        imgHtml = `
+          <div class="promo-mosaic">
+            <img src="${p.img_producto_1}" class="promo-mosaic-img" alt=""
+                 onerror="this.style.display='none'">
+            <img src="${p.img_producto_2}" class="promo-mosaic-img" alt=""
+                 onerror="this.style.display='none'">
+          </div>`;
+      } else if (tieneImg1) {
+        imgHtml = `<img src="${p.img_producto_1}" class="promo-card-img" alt="${p.titulo}"
+                        onerror="this.src='${FormatUtils.imagenFallback(p.titulo)}'">`;
+      } else {
+        imgHtml = `
+          <div class="promo-card-img d-flex align-items-center justify-content-center bg-light">
+            <i class="bi bi-tag fs-1 text-warning opacity-50"></i>
+          </div>`;
+      }
+
+      return `
+        <div class="promo-slide">
+          <div class="promo-card h-100">
+            <div class="promo-card-img-wrap position-relative">
+              ${imgHtml}
+              <span class="promo-descuento-badge">-${p.porcentaje_descuento}% OFF</span>
+            </div>
+            <div class="promo-card-body">
+              <h3 class="promo-card-titulo">${p.titulo}</h3>
+              <p class="promo-card-desc">${FormatUtils.truncar(p.descripcion, 70)}</p>
+              <div class="d-flex align-items-center justify-content-between mt-auto pt-2">
+                <small class="text-muted">
+                  <i class="bi bi-clock me-1"></i>Hasta ${FormatUtils.fechaCorta(p.fecha_fin)}
+                </small>
+                <a href="detalle_promocion.html?id=${p.id_promocion}"
+                   class="btn btn-warning btn-sm fw-semibold">
+                  Ver oferta <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+
+    /* Dots */
+    if (dotsEl) {
+      dotsEl.innerHTML = promos.map((_, i) =>
+        `<button class="promo-dot ${i === 0 ? 'active' : ''}"
+                 data-index="${i}" aria-label="Promoción ${i + 1}"></button>`
+      ).join('');
     }
 
-    const promos = json.data;
-    if (!promos.length) {
-      contenedor.closest('section')?.classList.add('d-none');
-      return;
+    /* Lógica del slider */
+    let current = 0;
+    const slides = track.querySelectorAll('.promo-slide');
+    const dots = dotsEl ? dotsEl.querySelectorAll('.promo-dot') : [];
+    const total = slides.length;
+
+    function irA(n) {
+      current = (n + total) % total;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === current));
     }
 
-    contenedor.innerHTML = promos.slice(0, 3).map(p => `
-      <div class="promo-chip">
-        <i class="bi bi-tag-fill me-1"></i>
-        <strong>${p.titulo}</strong>
-        ${p.porcentaje_descuento ? `— ${p.porcentaje_descuento}% OFF` : ''}
-      </div>`).join('');
+    if (btnPrev) btnPrev.addEventListener('click', () => irA(current - 1));
+    if (btnNext) btnNext.addEventListener('click', () => irA(current + 1));
+    dots.forEach(d => d.addEventListener('click', () => irA(parseInt(d.dataset.index))));
+
+    /* Ocultar controles si solo hay 1 promoción */
+    if (total <= 1) {
+      if (btnPrev) btnPrev.style.display = 'none';
+      if (btnNext) btnNext.style.display = 'none';
+      if (dotsEl) dotsEl.style.display = 'none';
+    }
+
+    /* Auto-avance cada 5s */
+    if (total > 1) setInterval(() => irA(current + 1), 5000);
 
   } catch (err) {
-    contenedor.closest('section')?.classList.add('d-none');
+    console.error('Error cargando promociones:', err);
+    seccion.style.display = 'none';
   }
 }
+
 
 /* Card de auth (4° acceso rápido) */
 function actualizarCardAuth() {

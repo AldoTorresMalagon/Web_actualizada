@@ -1,0 +1,66 @@
+/* Header de la promoción */
+.promo-header {
+    background: linear-gradient(135deg, var(--color-primario), var(--color-acento));
+    color: #fff;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.promo-badge-descuento {
+    background: #f59e0b;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 800;
+    padding: 0.5rem 1.5rem;
+    border-radius: 50px;
+    display: inline-block;
+}
+
+.promo-fecha {
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+/* Tarjetas de productos dentro de la promo */
+.producto-promo-card {
+    border: 0;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, .08);
+    transition: transform .25s, box-shadow .25s;
+    overflow: hidden;
+}
+
+.producto-promo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .13);
+}
+
+.producto-promo-img {
+    height: 180px;
+    object-fit: cover;
+    width: 100%;
+    background: #f1f5f9;
+}
+
+/* Precios */
+.precio-original {
+    text-decoration: line-through;
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.precio-descuento {
+    color: #16a34a;
+    font-weight: 700;
+    font-size: 1.15rem;
+}
+
+.badge-ahorro {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+}

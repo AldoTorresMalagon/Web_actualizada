@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Promoción - Cafetería ITH</title>
+
+    <!-- Accesibilidad -->
+    <script src="../assets/js/config/accesibilidad.init.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/accesibilidad.css">
+    <link rel="stylesheet" href="../assets/css/pages/detalle.css">
+    <link rel="stylesheet" href="../assets/css/pages/promocion.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="header"></div>
+    <div id="navbar"></div>
+    <div id="sidebar"></div>
+
+    <main class="container my-5 flex-grow-1 fade-in">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+
+                <a href="javascript:history.back()" class="btn btn-outline-primary mb-4">
+                    <i class="bi bi-arrow-left me-1"></i>Volver Atrás
+                </a>
+
+                <!-- Cargando -->
+                <div id="detalle-loading" class="text-center py-5">
+                    <div class="loading-spinner mx-auto mb-3"></div>
+                    <p class="text-muted">Cargando promoción...</p>
+                </div>
+
+                <!-- No encontrado -->
+                <div id="detalle-no-encontrado" class="d-none text-center py-5">
+                    <i class="bi bi-tag-x display-4 text-muted mb-3 d-block"></i>
+                    <h3 class="text-muted">Promoción no encontrada</h3>
+                    <p class="text-muted">La promoción que buscas no existe o ya no está disponible.</p>
+                    <a href="inicio.html" class="btn btn-primary mt-2">
+                        <i class="bi bi-house me-1"></i>Ir al Inicio
+                    </a>
+                </div>
+
+                <!-- Contenido -->
+                <div id="detalle-contenido" class="d-none">
+
+                    <!-- Header de la promo -->
+                    <div class="promo-header">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-tag-fill fs-4"></i>
+                                    <span class="badge bg-white bg-opacity-25 text-white">Promoción Activa</span>
+                                </div>
+                                <h1 class="fw-bold mb-1 fs-3" id="promo-titulo">—</h1>
+                                <p class="mb-2 opacity-90" id="promo-descripcion">—</p>
+                                <span class="promo-fecha">
+                                    <i class="bi bi-calendar3 me-1"></i>
+                                    Válida hasta: <strong id="promo-fecha-fin">—</strong>
+                                </span>
+                            </div>
+                            <div class="text-center">
+                                <div class="promo-badge-descuento" id="promo-descuento">—</div>
+                                <div class="mt-1 text-white opacity-90 small">de descuento</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productos incluidos -->
+                    <h2 class="fw-bold mb-4">
+                        <i class="bi bi-basket2 me-2 text-primary"></i>
+                        Productos incluidos
+                        <span class="badge bg-primary fs-6 ms-2" id="promo-total-productos">0</span>
+                    </h2>
+
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4" id="promo-productos-grid">
+                        <!-- Renderizado por JS -->
+                    </div>
+
+                    <!-- Sin productos -->
+                    <div id="promo-sin-productos" class="d-none text-center py-4 text-muted">
+                        <i class="bi bi-basket display-5 mb-3 d-block opacity-50"></i>
+                        <p>Esta promoción aún no tiene productos asignados.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="../assets/js/config/api.config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/components/header.js"></script>
+    <script src="../assets/js/components/navbar.js"></script>
+    <script src="../assets/js/components/footer.js"></script>
+    <script src="../assets/js/utils/toast.utils.js"></script>
+    <script src="../assets/js/utils/format.utils.js"></script>
+    <script src="../assets/js/utils/auth.utils.js"></script>
+    <script src="../assets/js/services/productos.service.js"></script>
+    <script src="../assets/js/pages/detalle_promocion.js"></script>
+    <script src="../assets/js/components/accesibilidad.panel.js"></script>
+</body>
+</html>

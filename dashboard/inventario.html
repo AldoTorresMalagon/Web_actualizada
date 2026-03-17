@@ -28,9 +28,11 @@
 
         <main class="dash-main flex-grow-1 p-4">
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Inventario</h2>
-                <div class="btn-toolbar gap-2">
+            <div class="position-relative d-flex align-items-center mb-4">
+                <h2 class="mb-0 w-100 text-center">
+                    <i class="bi bi-clipboard-check me-2"></i>Inventario
+                </h2>
+                <div class="position-absolute end-0 d-flex gap-2">
                     <button class="btn btn-outline-secondary btn-sm" id="btn-exportar">
                         <i class="bi bi-download me-1"></i>Exportar
                     </button>
@@ -79,20 +81,17 @@
             <!-- Tabla de inventario -->
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                        <h5 class="mb-0"><i class="bi bi-table me-2"></i>Historial de Movimientos</h5>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <select id="filtro-stock" class="form-select form-select-sm" style="max-width:150px;">
+                    <div class="mb-3">
+                        <h5 class="mb-3 text-center"><i class="bi bi-table me-2"></i>Historial de Movimientos</h5>
+                        <div class="d-flex gap-2 flex-wrap justify-content-center">
+                            <select id="filtro-stock" class="form-select form-select-sm" style="max-width:160px;">
                                 <option value="">Todos</option>
                                 <option value="bajo">Stock bajo</option>
                                 <option value="sin">Sin stock</option>
                                 <option value="normal">Stock normal</option>
                             </select>
-                            <select id="filtro-categoria" class="form-select form-select-sm" style="max-width:180px;">
-                                <option value="">Todas las categorías</option>
-                            </select>
-                            <input type="text" id="buscador-inventario" class="form-control form-select-sm"
-                                placeholder="Buscar producto...">
+                            <input type="text" id="buscador-inventario" class="form-control form-control-sm"
+                                placeholder="Buscar producto..." style="max-width:220px;">
                         </div>
                     </div>
                     <div class="table-responsive">

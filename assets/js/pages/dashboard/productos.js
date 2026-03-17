@@ -407,17 +407,12 @@ async function confirmarAjusteStock() {
     setBtnLoading('btn-confirmar-stock', true, '<i class="bi bi-check-circle me-1"></i>Aplicar Ajuste');
 
     try {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/inventario`, {
-            method: 'POST', headers: AuthUtils.getHeaders(),
-            body: JSON.stringify({
-                idProducto: parseInt(id),
-                cantidad,
-                idTipoMovimiento: tipoMap[tipo],
-                observaciones: motivo || `Ajuste manual desde dashboard`,
-            }),
-        });
-        const json = await res.json();
-        if (!res.ok || !json.success) throw new Error(json.message || 'Error al ajustar stock');
+        await InventarioService.registrarMovimiento({
+            idProducto: parseInt(id),
+            cantidad,
+            idTipoMovimiento: tipoMap[tipo],
+            observaciones: motivo || 'Ajuste manual desde dashboard',
+        }, AuthUtils.getHeaders());
 
         bootstrap.Modal.getInstance(document.getElementById('ajustarStockModal'))?.hide();
         Toast?.success('Stock actualizado correctamente');

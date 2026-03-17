@@ -44,13 +44,13 @@ async function cargarProductos() {
 
 /* Cargar promociones */
 async function cargarPromociones() {
-    setLoading('tabla-promociones', 6);
+    setLoading('tabla-promociones', 8);
     try {
         todasLasPromociones = await ProductosService.getPromociones(AuthUtils.getHeaders());
         actualizarEstadisticas();
         aplicarFiltrosYRenderizar();
     } catch (err) {
-        setError('tabla-promociones', 6, 'Error al cargar promociones');
+        setError('tabla-promociones', 8, 'Error al cargar promociones');
         console.error(err);
     }
 }
@@ -99,7 +99,7 @@ function aplicarFiltrosYRenderizar() {
 function renderTabla(lista) {
     const tbody = document.getElementById('tabla-promociones');
     if (!lista.length) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">
             <i class="bi bi-search me-2"></i>No se encontraron promociones</td></tr>`;
         return;
     }
@@ -108,7 +108,9 @@ function renderTabla(lista) {
             <td class="fw-semibold">${p.titulo}</td>
             <td>${FormatUtils.truncar(p.descripcion || '—', 50)}</td>
             <td><span class="badge bg-warning text-dark">${p.porcentaje_descuento || 0}%</span></td>
-            <td>${FormatUtils.fechaCorta(p.fecha_inicio)} – ${FormatUtils.fechaCorta(p.fecha_fin)}</td>
+            <td class="text-center">${p.total_productos || 0}</td>
+            <td>${FormatUtils.fechaCorta(p.fecha_inicio)}</td>
+            <td>${FormatUtils.fechaCorta(p.fecha_fin)}</td>
             <td>${FormatUtils.badgeEstado(p.activo === 'si', 'Activa', 'Inactiva')}</td>
             <td>
                 <div class="btn-group btn-group-sm">
@@ -144,7 +146,21 @@ async function guardarPromocion() {
             fechaFin: document.getElementById('agregar-fecha-fin')?.value || '',
         };
 
-        await ProductosService.crearPromocion(payload, AuthUtils.getHeaders());
+        const nuevaPromo = await ProductosService.crearPromocion(payload, AuthUtils.getHeaders());
+        const nuevoId = nuevaPromo?.data?.id || nuevaPromo?.id;
+
+        // Guardar productos seleccionados si hay alguno marcado
+        if (nuevoId) {
+            const checkboxes = document.querySelectorAll('#agregar-productos-lista input[type="checkbox"]:checked');
+            const seleccionados = [...checkboxes].map(cb => parseInt(cb.value));
+            await Promise.allSettled(
+                seleccionados.map(idP => fetch(`${API_CONFIG.BASE_URL}/promociones/${nuevoId}/productos`, {
+                    method: 'POST', headers: AuthUtils.getHeaders(),
+                    body: JSON.stringify({ idProducto: idP })
+                }))
+            );
+        }
+
         bootstrap.Modal.getInstance(document.getElementById('agregarPromocionModal'))?.hide();
         Toast?.success('Promoción creada exitosamente');
         await cargarPromociones();
@@ -156,7 +172,7 @@ async function guardarPromocion() {
 }
 
 /* Abrir edición */
-window.abrirEditar = function (id) {
+window.abrirEditar = async function (id) {
     const p = todasLasPromociones.find(x => x.id_promocion === id);
     if (!p) return;
 
@@ -166,8 +182,22 @@ window.abrirEditar = function (id) {
     document.getElementById('editar-porcentaje').value = p.porcentaje_descuento || 0;
     document.getElementById('editar-fecha-inicio').value = p.fecha_inicio?.split('T')[0] || '';
     document.getElementById('editar-fecha-fin').value = p.fecha_fin?.split('T')[0] || '';
-    // activo: 'si'/'no' → valor del select
-    document.getElementById('editar-activo').value = p.activo || 'si';
+    document.getElementById('editar-activo').checked = (p.activo === 'si');
+
+    // Cargar y marcar los productos ya asignados a esta promoción
+    try {
+        const res = await fetch(`${API_CONFIG.BASE_URL}/promociones/${id}`, { headers: AuthUtils.getHeaders() });
+        const json = await res.json();
+        if (json.success && json.data?.productos) {
+            const idsAsignados = json.data.productos.map(pr => pr.idProducto);
+            const lista = document.getElementById('editar-productos-lista');
+            if (lista) {
+                lista.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                    cb.checked = idsAsignados.includes(parseInt(cb.value));
+                });
+            }
+        }
+    } catch { /* no crítico */ }
 
     new bootstrap.Modal(document.getElementById('editarPromocionModal')).show();
 };
@@ -184,7 +214,7 @@ async function actualizarPromocion() {
 
     setBtnLoading('btn-actualizar-promocion', true, '<i class="bi bi-floppy me-1"></i>Actualizar');
     try {
-        const activoVal = document.getElementById('editar-activo').value; // 'si' o 'no'
+        const activoVal = document.getElementById('editar-activo').checked ? 'si' : 'no';
         const payload = {
             titulo,
             descripcion: document.getElementById('editar-descripcion').value.trim(),
@@ -196,6 +226,31 @@ async function actualizarPromocion() {
         };
 
         await ProductosService.actualizarPromocion(id, payload, AuthUtils.getHeaders());
+
+        // Sincronizar productos seleccionados
+        const checkboxes = document.querySelectorAll('#editar-productos-lista input[type="checkbox"]');
+        const seleccionados = [...checkboxes].filter(cb => cb.checked).map(cb => parseInt(cb.value));
+
+        // Obtener productos actuales de la promo
+        const resActual = await fetch(`${API_CONFIG.BASE_URL}/promociones/${id}`, { headers: AuthUtils.getHeaders() });
+        const jActual = await resActual.json();
+        const actuales = (jActual.data?.productos || []).map(pr => pr.idProducto);
+
+        // Agregar los nuevos
+        const agregar = seleccionados.filter(x => !actuales.includes(x));
+        // Quitar los desmarcados
+        const quitar = actuales.filter(x => !seleccionados.includes(x));
+
+        await Promise.allSettled([
+            ...agregar.map(idP => fetch(`${API_CONFIG.BASE_URL}/promociones/${id}/productos`, {
+                method: 'POST', headers: AuthUtils.getHeaders(),
+                body: JSON.stringify({ idProducto: idP })
+            })),
+            ...quitar.map(idP => fetch(`${API_CONFIG.BASE_URL}/promociones/${id}/productos/${idP}`, {
+                method: 'DELETE', headers: AuthUtils.getHeaders(),
+            })),
+        ]);
+
         bootstrap.Modal.getInstance(document.getElementById('editarPromocionModal'))?.hide();
         Toast?.success('Promoción actualizada exitosamente');
         await cargarPromociones();

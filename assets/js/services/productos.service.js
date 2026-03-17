@@ -26,6 +26,14 @@ const ProductosService = {
         return data.data || [];
     },
 
+    /* GET /api/productos/platillos/recientes (usa vista v_platillos_recientes) — más nuevos primero */
+    async getPlatillosRecientes() {
+        const res = await fetch(`${API_CONFIG.BASE_URL}/productos/platillos/recientes`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Error al cargar platillos recientes');
+        return data.data || [];
+    },
+
     /* GET /api/productos/bebidas */
     async getBebidas() {
         const res = await fetch(`${API_CONFIG.BASE_URL}/productos/bebidas`);
@@ -190,14 +198,11 @@ const ProductosService = {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Error al crear promoción');
-        return data;
+        return data; // data.data.id contiene el id de la nueva promoción
     },
 
     /*
-     * PUT /api/promociones/:id
-     * payload: { titulo, descripcion, porcentajeDescuento, fechaInicio, fechaFin, activo, estado, imagen? }
-     * activo: 'si' | 'no'   estado: 'activa' | 'inactiva'
-     */
+     * PUT /api/promociones/:id */
     async actualizarPromocion(id, payload, headers) {
         const res = await fetch(`${API_CONFIG.BASE_URL}/promociones/${id}`, {
             method: 'PUT',

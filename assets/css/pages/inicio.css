@@ -344,3 +344,210 @@
         font-size: 1.15rem;
     }
 }
+
+/* Tarjetas de promociones en inicio */
+.producto-promo-card-inicio {
+    border-radius: var(--radius-lg) !important;
+    transition: transform .25s, box-shadow .25s;
+    cursor: pointer;
+}
+
+.producto-promo-card-inicio:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(11, 38, 92, .18) !important;
+}
+
+/* ══════════════════════════════════════════════════════
+   SLIDER DE PROMOCIONES ACTIVAS
+   ══════════════════════════════════════════════════════ */
+
+/* Wrapper exterior con overflow oculto */
+.promo-slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.promo-slider-track-outer {
+    flex: 1;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+}
+
+/* Track que se mueve con transform */
+.promo-slider-track {
+    display: flex;
+    transition: transform 0.45s cubic-bezier(.4, 0, .2, 1);
+    will-change: transform;
+}
+
+/* Cada slide ocupa el 100% del outer */
+.promo-slide {
+    min-width: 100%;
+    padding: 0 0.25rem;
+    box-sizing: border-box;
+}
+
+/* Tarjeta de promoción */
+.promo-card {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .10);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-width: 520px;
+    margin: 0 auto;
+    transition: box-shadow .25s;
+}
+
+.promo-card:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .15);
+}
+
+/* Wrapper de imagen — necesita altura fija para que no colapse */
+.promo-card-img-wrap {
+    position: relative;
+    overflow: hidden;
+    height: 200px;
+    flex-shrink: 0;
+}
+
+/* Imagen de la promo — única */
+.promo-card-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Mosaico de 2 imágenes lado a lado */
+.promo-mosaic {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 200px;
+    gap: 2px;
+}
+
+.promo-mosaic-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Badge de descuento sobre la imagen */
+.promo-descuento-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: #f59e0b;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 50px;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, .45);
+    letter-spacing: 0.02em;
+}
+
+/* Cuerpo de la tarjeta */
+.promo-card-body {
+    padding: 1.1rem 1.25rem 1.25rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.promo-card-titulo {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    margin-bottom: 0.35rem;
+}
+
+.promo-card-desc {
+    font-size: 0.88rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+    flex: 1;
+}
+
+/* Botones de flecha */
+.promo-slider-btn {
+    background: #fff;
+    border: 2px solid var(--color-primario);
+    color: var(--color-primario);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background .2s, color .2s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .10);
+}
+
+.promo-slider-btn:hover {
+    background: var(--color-primario);
+    color: #fff;
+}
+
+/* Dots indicadores */
+.promo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #d1d5db;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background .2s, transform .2s;
+}
+
+.promo-dot.active {
+    background: var(--color-primario);
+    transform: scale(1.3);
+}
+
+/* Modo oscuro */
+html.modo-oscuro .promo-card {
+    background: #1e1e2e;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, .35);
+}
+
+html.modo-oscuro .promo-card-titulo {
+    color: #e0e0e0;
+}
+
+html.modo-oscuro .promo-card-desc {
+    color: #9ca3af;
+}
+
+html.modo-oscuro .promo-slider-btn {
+    background: #1e1e2e;
+    border-color: #3b82f6;
+    color: #3b82f6;
+}
+
+html.modo-oscuro .promo-slider-btn:hover {
+    background: #3b82f6;
+    color: #fff;
+}
+
+/* Responsive — en móvil las flechas van sobre la tarjeta */
+@media (max-width: 576px) {
+    .promo-slider-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 0.85rem;
+    }
+
+    .promo-mosaic,
+    .promo-card-img {
+        height: 160px;
+    }
+}

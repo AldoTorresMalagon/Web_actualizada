@@ -1065,3 +1065,111 @@ html.modo-oscuro #detalle-contenido .card-title,
 html.modo-oscuro #detalle-contenido .card-text {
     color: #e0e0e0 !important;
 }
+
+/* MODO OSCURO — Dashboard header */
+html.modo-oscuro .dash-header {
+    background: linear-gradient(135deg, #060e1c 0%, #040a14 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+html.modo-oscuro .dash-header-title {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+html.modo-oscuro .dash-header-nombre {
+    color: #ffffff !important;
+}
+
+html.modo-oscuro .dash-header-rol {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* MODO OSCURO — Sección Promociones (inicio.html) */
+
+html.modo-oscuro .producto-promo-card-inicio {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+}
+
+html.modo-oscuro .producto-promo-card-inicio .card-body p,
+html.modo-oscuro .producto-promo-card-inicio .card-footer {
+    background-color: transparent !important;
+    color: var(--text-secondary) !important;
+}
+
+html.modo-oscuro .producto-promo-card-inicio .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+/* MODO OSCURO — detalle_promocion.html */
+
+html.modo-oscuro .promo-header {
+    background: linear-gradient(135deg, #1e3a6e, #2d5aa0) !important;
+}
+
+html.modo-oscuro .producto-promo-card {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+}
+
+html.modo-oscuro .producto-promo-card .card-body {
+    background-color: var(--bg-card) !important;
+}
+
+html.modo-oscuro .precio-original {
+    color: #6b7280 !important;
+}
+
+html.modo-oscuro .precio-descuento {
+    color: #4ade80 !important;
+}
+
+html.modo-oscuro .badge-ahorro {
+    background: rgba(245, 158, 11, .2) !important;
+    color: #fbbf24 !important;
+}
+
+html.modo-oscuro .producto-promo-img {
+    background-color: #1e293b !important;
+}
+
+/* ALTO CONTRASTE — Promociones */
+
+html.alto-contraste .producto-promo-card-inicio,
+html.alto-contraste .producto-promo-card {
+    border: 2px solid #fff !important;
+    background: #000 !important;
+    color: #fff !important;
+}
+
+html.alto-contraste .promo-header {
+    background: #000 !important;
+    border: 2px solid #fff !important;
+    color: #fff !important;
+}
+
+html.alto-contraste .promo-badge-descuento {
+    background: #ff0 !important;
+    color: #000 !important;
+}
+
+html.alto-contraste .precio-descuento {
+    color: #0f0 !important;
+}
+
+html.alto-contraste .precio-original {
+    color: #aaa !important;
+}
+
+html.alto-contraste .badge-ahorro {
+    background: #ff0 !important;
+    color: #000 !important;
+}
+
+html.alto-contraste .btn-warning {
+    background: #ff0 !important;
+    color: #000 !important;
+    border-color: #ff0 !important;
+}

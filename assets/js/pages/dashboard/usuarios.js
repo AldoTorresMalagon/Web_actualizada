@@ -32,7 +32,7 @@ async function cargarCarreras() {
             if (!sel) return;
             sel.innerHTML = '<option value="">Sin carrera</option>';
             carreras.forEach(c => {
-                sel.innerHTML += `<option value="${c.idCarrera}">${c.Nombre}</option>`;
+                sel.innerHTML += `<option value="${c.id_carrera}">${c.nombre_carrera}</option>`;
             });
         });
     } catch { /* no crítico */ }
@@ -76,14 +76,12 @@ function aplicarFiltrosYRenderizar() {
             u.Correo?.toLowerCase().includes(termino) ||
             u.nombre_usuario?.toLowerCase().includes(termino) ||
             u.matricula?.toLowerCase().includes(termino);
-        const coincideRol = !rolFiltro || u.rol?.toLowerCase().includes(
-            rolFiltro === '1' ? 'trabajador' : rolFiltro === '2' ? 'administrador' : 'estudiante'
-        );
+        const coincideRol = !rolFiltro || u.rol?.toLowerCase() === rolFiltro;
         const coincideEstado = !estadoFiltro || u.estado === estadoFiltro;
         return coincideBusqueda && coincideRol && coincideEstado;
     });
-    if (orden === 'nombre-asc') lista.sort((a, b) => (a.Nombre||'').localeCompare(b.Nombre||''));
-    else if (orden === 'nombre-desc') lista.sort((a, b) => (b.Nombre||'').localeCompare(a.Nombre||''));
+    if (orden === 'nombre-asc') lista.sort((a, b) => (a.Nombre || '').localeCompare(b.Nombre || ''));
+    else if (orden === 'nombre-desc') lista.sort((a, b) => (b.Nombre || '').localeCompare(a.Nombre || ''));
     const total = lista.length;
     const totalPags = Math.ceil(total / POR_PAGINA) || 1;
     if (paginaActual > totalPags) paginaActual = totalPags;
@@ -173,8 +171,8 @@ async function guardarUsuario() {
 }
 
 /* Abrir edición */
-window.abrirEditar = async function(id) {
-    const u = todosLosUsuarios.find(x => x.idUsuario === id);
+window.abrirEditar = async function (id) {
+    const u = todosLosUsuarios.find(x => x.intidusuario === id);
     if (!u) return;
     document.getElementById('editar-id').value = u.intidusuario;
     document.getElementById('editar-nombre').value = u.Nombre || '';
@@ -183,6 +181,23 @@ window.abrirEditar = async function(id) {
     document.getElementById('editar-correo').value = u.Correo || '';
     document.getElementById('editar-username').value = u.nombre_usuario || '';
     document.getElementById('editar-telefono').value = u.Telefono || '';
+
+    // Preseleccionar rol — buscar el option cuyo texto coincida con el rol del usuario
+    setTimeout(() => {
+        const selRol = document.getElementById('editar-rol');
+        if (selRol && u.rol) {
+            const rolNombre = u.rol.toLowerCase();
+            const map = { administrador: '2', trabajador: '1', estudiante: '3', empleado: '4' };
+            if (map[rolNombre]) selRol.value = map[rolNombre];
+        }
+        // Preseleccionar carrera — buscar el option cuyo texto coincida
+        const selCarrera = document.getElementById('editar-carrera');
+        if (selCarrera && u.carrera) {
+            const opt = [...selCarrera.options].find(o => o.text === u.carrera);
+            if (opt) selCarrera.value = opt.value;
+        }
+    }, 50);
+
     new bootstrap.Modal(document.getElementById('editarUsuarioModal')).show();
 };
 
@@ -197,7 +212,7 @@ async function actualizarUsuario() {
             apellidoMaterno: document.getElementById('editar-apellido-materno').value.trim(),
             correo: document.getElementById('editar-correo').value.trim(),
             nombreUsuario: document.getElementById('editar-username').value.trim(),
-            idRol: parseInt(document.getElementById('editar-rol').value),
+            idRol: parseInt(document.getElementById('editar-rol').value) || null,
             idCarrera: parseInt(document.getElementById('editar-carrera').value) || null,
             telefono: document.getElementById('editar-telefono').value.trim(),
         };
@@ -256,7 +271,7 @@ function renderPaginacion(total, totalPags) {
         </div>`;
 }
 
-window.irAPaginaUsuarios = function(n) {
+window.irAPaginaUsuarios = function (n) {
     const totalPags = Math.ceil(todosLosUsuarios.length / POR_PAGINA) || 1;
     if (n < 1 || n > totalPags) return;
     paginaActual = n;

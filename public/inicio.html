@@ -108,6 +108,40 @@
             </div>
         </section>
 
+
+        <!-- Sección de Promociones Activas — Slider -->
+        <section class="mb-5" id="seccion-promociones" style="display:none;">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h2 class="section-title mb-0">
+                    <i class="bi bi-tag-fill me-2 text-warning"></i>Promociones Activas
+                </h2>
+                <span class="badge bg-warning text-dark" id="promo-count" style="font-size:.85rem;"></span>
+            </div>
+
+            <!-- Slider wrapper -->
+            <div class="promo-slider-wrapper position-relative">
+                <!-- Flecha izquierda -->
+                <button class="promo-slider-btn promo-slider-prev" id="promo-prev" aria-label="Anterior">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+
+                <!-- Track deslizable -->
+                <div class="promo-slider-track-outer">
+                    <div class="promo-slider-track" id="promociones-grid">
+                        <!-- Tarjetas renderizadas por JS -->
+                    </div>
+                </div>
+
+                <!-- Flecha derecha -->
+                <button class="promo-slider-btn promo-slider-next" id="promo-next" aria-label="Siguiente">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+
+            <!-- Indicadores de puntos -->
+            <div class="promo-dots d-flex justify-content-center gap-2 mt-3" id="promo-dots"></div>
+        </section>
+
         <!-- Accesos rápidos -->
         <section>
             <h2 class="text-center mb-4">¿Qué te gustaría hacer hoy?</h2>
@@ -191,7 +225,7 @@
     <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Config y utils — ANTES que inicio.js -->
+    <!-- Config y utils -->
     <script src="../assets/js/config/api.config.js"></script>
     <script src="../assets/js/utils/auth.utils.js"></script>
     <script src="../assets/js/utils/toast.utils.js"></script>
