@@ -6,11 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proveedores - Cafetería ITH</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/images/favicon/site.webmanifest">
+    <meta name="theme-color" content="#0b265c">
+
     <!-- Accesibilidad -->
     <script src="../assets/js/config/accesibilidad.init.js"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="../assets/js/config/bootstrap.loader.js"></script>
 
     <link rel="stylesheet" href="../assets/css/variables.css">
     <link rel="stylesheet" href="../assets/css/main.css">
@@ -28,11 +35,15 @@
 
         <main class="dash-main flex-grow-1 p-4">
 
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="mb-0"><i class="bi bi-truck me-2"></i>Proveedores</h2>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarProveedorModal">
-                    <i class="bi bi-plus-circle me-1"></i>Agregar Proveedor
-                </button>
+            <div class="position-relative d-flex align-items-center mb-4">
+                <h2 class="mb-0 w-100 text-center">
+                    <i class="bi bi-truck me-2"></i>Proveedores
+                </h2>
+                <div class="position-absolute end-0">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#agregarProveedorModal">
+                        <i class="bi bi-plus-circle me-1"></i>Agregar Proveedor
+                    </button>
+                </div>
             </div>
 
             <!-- Tarjetas de estadísticas -->
@@ -48,16 +59,16 @@
                 <div class="col-sm-4">
                     <div class="card text-white bg-success h-100">
                         <div class="card-body">
-                            <h5 class="card-title">Proveedores Activos</h5>
-                            <h3 class="mb-0" id="stat-activos">--</h3>
+                            <h5 class="card-title">Con Distribuidora</h5>
+                            <h3 class="mb-0" id="stat-con-distribuidora">--</h3>
                         </div>
                     </div>
                 </div>
                 <div class="col-sm-4">
                     <div class="card text-white bg-warning h-100">
                         <div class="card-body">
-                            <h5 class="card-title">Total Productos</h5>
-                            <h3 class="mb-0" id="stat-productos">--</h3>
+                            <h5 class="card-title">Sin Distribuidora</h5>
+                            <h3 class="mb-0" id="stat-sin-distribuidora">--</h3>
                         </div>
                     </div>
                 </div>
@@ -69,7 +80,8 @@
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <h5 class="mb-0">Listado de Proveedores</h5>
                         <div class="d-flex gap-2 flex-wrap">
-                            <select id="ordenar-proveedores" class="form-select form-select-sm" style="max-width:160px;">
+                            <select id="ordenar-proveedores" class="form-select form-select-sm"
+                                style="max-width:160px;">
                                 <option value="nombre-asc">Nombre A→Z</option>
                                 <option value="nombre-desc">Nombre Z→A</option>
                             </select>
@@ -216,9 +228,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="../assets/js/config/api.config.js"></script>
     <script src="../assets/js/utils/auth.utils.js"></script>
     <script src="../assets/js/utils/toast.utils.js"></script>
@@ -227,7 +236,12 @@
     <script src="../assets/js/components/dash-header.js"></script>
     <script src="../assets/js/components/dash-sidebar.js"></script>
     <script src="../assets/js/services/productos.service.js"></script>
+
     <script src="../assets/js/pages/dashboard/proveedores.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/notificaciones.panel.css">
+    <script src="../assets/js/components/notificaciones.panel.js"></script>
+
     <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>
 

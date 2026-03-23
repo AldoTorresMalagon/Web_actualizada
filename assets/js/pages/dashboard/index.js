@@ -113,31 +113,17 @@ async function cargarPedidosRecientes() {
 async function cargarProductosPopulares() {
     const tbody = document.getElementById('tabla-productos-populares');
     try {
-        const ventas = await CarritoService.getTodasVentas(AuthUtils.getHeaders());
-
-        // Contar unidades por producto usando el detalle de las últimas ventas
-        const conteo = {};
-        await Promise.all(ventas.slice(0, 20).map(async v => {
-            try {
-                const detalle = await CarritoService.getVentaById(v.idVenta, AuthUtils.getHeaders());
-                (detalle.detalle || []).forEach(d => {
-                    if (!conteo[d.producto]) conteo[d.producto] = 0;
-                    conteo[d.producto] += d.Cantidad;
-                });
-            } catch { /* ignorar error individual */ }
-        }));
-
-        const top = Object.entries(conteo).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const top = await CarritoService.getTopProductos(AuthUtils.getHeaders(), 5);
 
         if (!top.length) {
             tbody.innerHTML = `<tr><td colspan="2" class="text-center py-3 text-muted">Sin datos de ventas</td></tr>`;
             return;
         }
 
-        tbody.innerHTML = top.map(([nombre, total]) => `
+        tbody.innerHTML = top.map(p => `
             <tr>
-                <td>${nombre}</td>
-                <td><span class="badge bg-success">${total} unidades</span></td>
+                <td>${p.producto}</td>
+                <td><span class="badge bg-success">${p.totalVendido} unidades</span></td>
             </tr>`).join('');
 
     } catch {
@@ -145,7 +131,7 @@ async function cargarProductosPopulares() {
     }
 }
 
-/* ── Init ── */
+/* Init */
 document.addEventListener('DOMContentLoaded', () => {
     if (!AuthUtils.requiereAdmin()) return;
 
@@ -154,10 +140,17 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarPedidosRecientes();
     cargarProductosPopulares();
 
+    // Generar alertas automáticas al abrir el dashboard (solo admin)
+    // No bloqueante — corre en segundo plano
+    fetch(`${API_CONFIG.BASE_URL}/notificaciones/generar-alertas`, {
+        method: 'POST',
+        headers: AuthUtils.getHeaders(),
+    }).catch(() => { /* silencioso */ });
+
     document.getElementById('btn-actualizar')?.addEventListener('click', () => {
         cargarEstadisticas();
         cargarPedidosRecientes();
         cargarProductosPopulares();
-        Toast?.success('Dashboard actualizado');
+        Toast.success('Dashboard actualizado');
     });
 });

@@ -143,6 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
         guardarConfig({ ...DEFAULTS });
         aplicarConfig({ ...DEFAULTS });
         sincronizarUI({ ...DEFAULTS });
-        Toast?.info('Configuración restablecida a valores predeterminados');
+        Toast.info('Configuración restablecida a valores predeterminados');
     });
 });

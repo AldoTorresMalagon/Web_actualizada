@@ -219,7 +219,7 @@ async function guardarCambios() {
 
         document.getElementById('btn-editar').classList.remove('d-none');
         document.getElementById('btns-guardar').classList.add('d-none');
-        Toast?.success('Perfil actualizado correctamente');
+        Toast.success('Perfil actualizado correctamente');
 
     } catch (err) {
         mostrarAlerta('error', err.message);
@@ -235,9 +235,9 @@ async function cambiarPassword() {
     const nueva = document.getElementById('nueva-password')?.value.trim();
     const confirmar = document.getElementById('confirmar-password')?.value.trim();
 
-    if (!actual || !nueva || !confirmar) { Toast?.warning('Completa todos los campos'); return; }
-    if (nueva.length < 6) { Toast?.warning('Mínimo 6 caracteres'); return; }
-    if (nueva !== confirmar) { Toast?.error('Las contraseñas no coinciden'); return; }
+    if (!actual || !nueva || !confirmar) { Toast.warning('Completa todos los campos'); return; }
+    if (nueva.length < 6) { Toast.warning('Mínimo 6 caracteres'); return; }
+    if (nueva !== confirmar) { Toast.error('Las contraseñas no coinciden'); return; }
 
     const btn = document.getElementById('btn-cambiar-password');
     btn.disabled = true;
@@ -257,10 +257,10 @@ async function cambiarPassword() {
 
         ['password-actual', 'nueva-password', 'confirmar-password']
             .forEach(id => document.getElementById(id).value = '');
-        Toast?.success('Contraseña actualizada correctamente');
+        Toast.success('Contraseña actualizada correctamente');
 
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-key me-2"></i>Cambiar Contraseña';
@@ -282,8 +282,7 @@ function initTogglesPassword() {
 
 /* Cargar estadísticas */
 async function cargarEstadisticas() {
-    const BEBIDAS = [1, 4, 5, 8];
-    const PLATILLOS = [9];
+    // #fix7 — usar CategoriaRouting.tipo()
 
     try {
         const ventas = await CarritoService.getMisVentas(AuthUtils.getHeaders());
@@ -295,8 +294,9 @@ async function cargarEstadisticas() {
             try {
                 const jv = await CarritoService.getVentaById(venta.idVenta, AuthUtils.getHeaders());
                 for (const d of (jv?.detalle || [])) {
-                    if (PLATILLOS.includes(d.idCategoria)) comidas += d.Cantidad;
-                    else if (BEBIDAS.includes(d.idCategoria)) bebidas += d.Cantidad;
+                    const tipo = CategoriaRouting.tipo(d.idCategoria);
+                    if (tipo === 'platillo') comidas += d.Cantidad;
+                    else if (tipo === 'bebida') bebidas += d.Cantidad;
                 }
             } catch { /* ignorar error individual */ }
         }

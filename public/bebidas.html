@@ -6,12 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bebidas - Cafetería ITH</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/images/favicon/site.webmanifest">
+    <meta name="theme-color" content="#0b265c">
+
     <!-- Accesibilidad -->
     <script src="../assets/js/config/accesibilidad.init.js"></script>
 
-    <!-- Bootstrap 5.3 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="../assets/js/config/bootstrap.loader.js"></script>
 
     <!-- Estilos globales -->
     <link rel="stylesheet" href="../assets/css/variables.css">
@@ -52,7 +58,7 @@
 
         <!-- Barra de búsqueda y ordenamiento -->
         <div class="row g-3 mb-4 align-items-center">
-            <div class="col-12 col-md-7">
+            <div class="col-12 col-md-5">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0">
                         <i class="bi bi-search text-muted"></i>
@@ -61,7 +67,12 @@
                         autocomplete="off">
                 </div>
             </div>
-            <div class="col-12 col-md-5">
+                        <div class="col-12 col-sm-6 col-md-4">
+                <select id="filtro-subcategoria" class="form-select">
+                    <option value="">Todas las subcategorías</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
                 <select id="ordenamiento" class="form-select">
                     <option value="default">Ordenar por...</option>
                     <option value="nombre-asc">Nombre (A - Z)</option>
@@ -94,9 +105,7 @@
     <!-- FOOTER -->
     <div id="footer"></div>
 
-    <!-- Bootstrap Bundle JS -->
     <script src="../assets/js/config/api.config.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Componentes globales -->
     <script src="../assets/js/components/header.js"></script>
@@ -114,9 +123,13 @@
         window.PAGE_ICON = 'bi-cup-straw';
     </script>
     <script src="../assets/js/services/productos.service.js"></script>
+    <script src="../assets/js/config/categoria.routing.js"></script>
     <script src="../assets/js/pages/menu.js"></script>
 
     <script src="../assets/js/components/accesibilidad.panel.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/notificaciones.panel.css">
+    <script src="../assets/js/components/notificaciones.publica.js"></script>
 </body>
 
 </html>

@@ -1,12 +1,7 @@
-const CATEGORIAS_BEBIDAS_INICIO = [1, 4, 5, 8];
-const CATEGORIAS_PLATILLOS_INICIO = [9];
+/* routing delegado a CategoriaRouting */
+let mapaDescuentosInicio = {}; // { idProducto: { porcentaje } }
 
-function getDetalleUrlInicio(idProducto, idCategoria) {
-  const id = parseInt(idCategoria);
-  if (CATEGORIAS_PLATILLOS_INICIO.includes(id)) return `detalle_producto.html?id=${idProducto}`;
-  if (CATEGORIAS_BEBIDAS_INICIO.includes(id)) return `detalle_bebida.html?id=${idProducto}`;
-  return `detalle_producto_snack.html?id=${idProducto}`;
-}
+const getDetalleUrlInicio = (id, idCat) => CategoriaRouting.getDetalleUrl(id, idCat);
 
 /* Helpers de imagen */
 /* buildImageUrl → FormatUtils.imagenUrl */
@@ -65,7 +60,7 @@ async function cargarCarrusel() {
              </div>`
         }
           <div class="carousel-caption-custom">
-            <span class="carousel-badge">${p.categoria || 'Platillo'}</span>
+            <span class="carousel-badge">${p.subcategoria || p.tipo || 'Platillo'}</span>
             <h3 class="carousel-title">${p.Nombre}</h3>
             ${p.Descripcion ? `<p class="carousel-desc">${p.Descripcion}</p>` : ''}
             <div class="carousel-footer-row">
@@ -152,14 +147,20 @@ async function cargarDestacados() {
               </span>
             </div>
             <div class="card-body d-flex flex-column">
-              <span class="destacado-categoria">${p.categoria || 'Producto'}</span>
+              <span class="destacado-categoria">${p.subcategoria || p.tipo || 'Producto'}</span>
               <h3 class="h6 fw-bold mb-1">${p.Nombre}</h3>
               ${p.Descripcion
           ? `<p class="text-muted small mb-2 flex-grow-1">${p.Descripcion.substring(0, 60)}${p.Descripcion.length > 60 ? '…' : ''}</p>`
           : '<div class="flex-grow-1"></div>'
         }
               <div class="d-flex justify-content-between align-items-center mt-2">
-                <span class="fw-bold text-primary fs-6">$${precio}</span>
+                ${mapaDescuentosInicio[p.idProducto]
+                ? `<div class="precio-original-card">$${precio}</div>
+                   <span class="precio-descuento-card fs-6">
+                     $${(parseFloat(p.PrecioVenta) * (1 - mapaDescuentosInicio[p.idProducto].porcentaje / 100)).toFixed(2)}
+                   </span>`
+                : `<span class="fw-bold text-primary fs-6">$${precio}</span>`
+              }
                 <a href="${getDetalleUrlInicio(p.idProducto, p.idCategoria)}"
                    class="btn btn-primary btn-sm"
                    onclick="event.stopPropagation()">
@@ -293,7 +294,6 @@ async function cargarPromociones() {
   }
 }
 
-
 /* Card de auth (4° acceso rápido) */
 function actualizarCardAuth() {
   const cardAuth = document.getElementById('card-auth');
@@ -344,10 +344,23 @@ function mostrarHorario() {
 }
 
 /* Init */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   actualizarCardAuth();
   mostrarHorario();
   cargarCarrusel();
+  // Cargar mapa de descuentos antes de renderizar productos
+  try {
+    const promos = await ProductosService.getPromocionesActivas();
+    promos.forEach(p => {
+      // La API devuelve productos_ids como array de números
+      (p.productos_ids || []).forEach(idProducto => {
+        if (!mapaDescuentosInicio[idProducto] ||
+            p.porcentaje_descuento > mapaDescuentosInicio[idProducto].porcentaje) {
+          mapaDescuentosInicio[idProducto] = { porcentaje: p.porcentaje_descuento };
+        }
+      });
+    });
+  } catch { /* sin descuentos */ }
   cargarDestacados();
   cargarPromociones();
 });

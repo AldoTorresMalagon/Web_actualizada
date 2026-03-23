@@ -38,6 +38,9 @@
           <a href="categorias.html" class="${linkActivo('categorias.html')}">
             <i class="bi bi-tags"></i><span>Categorías</span>
           </a>
+          <a href="subcategorias.html" class="${linkActivo('subcategorias.html')}">
+            <i class="bi bi-tag"></i><span>Subcategorías</span>
+          </a>
           ${esAdmin ? `
           <a href="proveedores.html" class="${linkActivo('proveedores.html')}">
             <i class="bi bi-truck"></i><span>Proveedores</span>

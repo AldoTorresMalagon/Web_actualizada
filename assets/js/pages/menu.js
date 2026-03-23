@@ -11,26 +11,14 @@ const ENDPOINT = ENDPOINT_MAP[CATEGORY];
 
 /* Estado */
 let todosLosProductos = [];
+let mapaDescuentos = {}; // { idProducto: { porcentaje, idPromocion } }
 
 /* Determinar catálogo según idCategoria */
-const CATEGORIAS_BEBIDAS = [1, 4, 5, 8];
-const CATEGORIAS_PLATILLOS = [9];
+/* routing delegado a CategoriaRouting */
 
-function getCatalogoInfo(idCategoria) {
-    const id = parseInt(idCategoria);
-    if (CATEGORIAS_PLATILLOS.includes(id))
-        return { url: 'menu.html', label: 'Ver más comidas', icon: 'bi-cup-hot' };
-    if (CATEGORIAS_BEBIDAS.includes(id))
-        return { url: 'bebidas.html', label: 'Ver más bebidas', icon: 'bi-cup-straw' };
-    return { url: 'productos.html', label: 'Ver más productos', icon: 'bi-box-seam' };
-}
+const getCatalogoInfo = (id) => CategoriaRouting.getCatalogoInfo(id);
 
-function getDetalleUrl(idProducto, idCategoria) {
-    const id = parseInt(idCategoria);
-    if (CATEGORIAS_PLATILLOS.includes(id)) return `detalle_producto.html?id=${idProducto}`;
-    if (CATEGORIAS_BEBIDAS.includes(id)) return `detalle_bebida.html?id=${idProducto}`;
-    return `detalle_producto_snack.html?id=${idProducto}`;
-}
+const getDetalleUrl = (id, idCat) => CategoriaRouting.getDetalleUrl(id, idCat);
 
 /* Helpers de imagen */
 /* buildImageUrl → FormatUtils.imagenUrl */
@@ -46,6 +34,12 @@ function renderTarjeta(p) {
     const precio = parseFloat(p.PrecioVenta).toFixed(2);
     const stock = p.Stock > 0;
     const estaAutenticado = !!localStorage.getItem('token');
+
+    // Descuento de promoción activa si existe
+    const desc = mapaDescuentos[p.idProducto];
+    const precioDesc = desc
+        ? (parseFloat(p.PrecioVenta) * (1 - desc.porcentaje / 100)).toFixed(2)
+        : null;
 
     return `
     <div class="col">
@@ -65,10 +59,10 @@ function renderTarjeta(p) {
                  <i class="bi bi-image fs-1 opacity-25"></i>
                </div>`
         }
-          <!-- Badge categoría -->
+          <!-- Badge subcategoría -->
           <span class="badge bg-primary position-absolute"
                 style="top:.6rem;left:.6rem;font-size:.7rem;">
-            ${p.categoria || ''}
+            ${p.subcategoria || p.tipo || ''}
           </span>
           <!-- Badge stock -->
           <span class="badge position-absolute"
@@ -76,6 +70,7 @@ function renderTarjeta(p) {
                        background:${stock ? '#dcfce7;color:#15803d' : '#fee2e2;color:#dc2626'}">
             ${stock ? `${p.Stock} disp.` : 'Agotado'}
           </span>
+          ${desc ? `<span style="position:absolute;bottom:.6rem;left:.6rem;background:#f59e0b;color:#fff;font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:50px;box-shadow:0 2px 6px rgba(0,0,0,.2);"><i class='bi bi-tag-fill' style='margin-right:.25rem;'></i>-${desc.porcentaje}%</span>` : ''}
         </div>
 
         <!-- Cuerpo -->
@@ -90,7 +85,13 @@ function renderTarjeta(p) {
         }
 
           <div class="d-flex justify-content-between align-items-center mt-2">
-            <span class="fw-bold text-primary">$${precio} <small class="text-muted fw-normal">MXN</small></span>
+            <div>
+              ${desc
+                ? `<div><small class="text-muted text-decoration-line-through">$${precio}</small></div>
+                   <span class="fw-bold text-success">$${precioDesc} <small class="text-muted fw-normal">MXN</small></span>`
+                : `<span class="fw-bold text-primary">$${precio} <small class="text-muted fw-normal">MXN</small></span>`
+              }
+            </div>
             <a href="${getDetalleUrl(p.idProducto, p.idCategoria)}"
                class="btn btn-outline-primary btn-sm">
               Ver <i class="bi bi-arrow-right ms-1"></i>
@@ -102,7 +103,7 @@ function renderTarjeta(p) {
             ? `<button class="btn btn-primary btn-sm mt-2 w-100 btn-agregar-carrito"
                        data-id="${p.idProducto}"
                        data-nombre="${p.Nombre.replace(/"/g, '&quot;')}"
-                       data-precio="${precio}"
+                       data-precio="${desc ? precioDesc : precio}"
                        data-img="${imgUrl || ''}">
                  <i class="bi bi-cart-plus me-1"></i>Agregar al carrito
                </button>`
@@ -117,6 +118,30 @@ function renderTarjeta(p) {
         </div>
       </div>
     </div>`;
+}
+
+
+
+/* Cargar mapa de descuentos desde promociones activas */
+async function cargarMapaDescuentos() {
+    try {
+        const promos = await ProductosService.getPromocionesActivas();
+        mapaDescuentos = {};
+        promos.forEach(p => {
+            // La API devuelve productos_ids como array de números
+            const ids = p.productos_ids || [];
+            ids.forEach(idProducto => {
+                if (!mapaDescuentos[idProducto] ||
+                    p.porcentaje_descuento > mapaDescuentos[idProducto].porcentaje) {
+                    mapaDescuentos[idProducto] = {
+                        porcentaje: p.porcentaje_descuento,
+                        idPromocion: p.id_promocion,
+                        titulo: p.titulo,
+                    };
+                }
+            });
+        });
+    } catch { /* sin descuentos */ }
 }
 
 /* Mostrar productos en el grid */
@@ -173,22 +198,42 @@ async function cargarProductos() {
 /* Búsqueda y ordenamiento */
 function aplicarFiltros() {
     const termino = document.getElementById('buscador')?.value.toLowerCase().trim() || '';
-    const orden = document.getElementById('ordenamiento')?.value || 'default';
+    const orden   = document.getElementById('ordenamiento')?.value || 'default';
+    const subcat  = document.getElementById('filtro-subcategoria')?.value || '';
 
-    let resultado = todosLosProductos.filter(p =>
-        p.Nombre.toLowerCase().includes(termino) ||
-        (p.Descripcion || '').toLowerCase().includes(termino) ||
-        (p.categoria || '').toLowerCase().includes(termino)
-    );
+    let resultado = todosLosProductos.filter(p => {
+        const coincideTexto = p.Nombre.toLowerCase().includes(termino) ||
+            (p.Descripcion || '').toLowerCase().includes(termino) ||
+            (p.subcategoria || p.tipo || '').toLowerCase().includes(termino);
+        const coincideSubcat = !subcat || String(p.idSubcategoria) === subcat;
+        return coincideTexto && coincideSubcat;
+    });
 
     switch (orden) {
-        case 'nombre-asc': resultado.sort((a, b) => a.Nombre.localeCompare(b.Nombre)); break;
+        case 'nombre-asc':  resultado.sort((a, b) => a.Nombre.localeCompare(b.Nombre)); break;
         case 'nombre-desc': resultado.sort((a, b) => b.Nombre.localeCompare(a.Nombre)); break;
-        case 'precio-asc': resultado.sort((a, b) => a.PrecioVenta - b.PrecioVenta); break;
+        case 'precio-asc':  resultado.sort((a, b) => a.PrecioVenta - b.PrecioVenta); break;
         case 'precio-desc': resultado.sort((a, b) => b.PrecioVenta - a.PrecioVenta); break;
     }
 
     mostrarProductos(resultado);
+}
+
+// Poblar select de subcategorías desde los productos cargados
+function poblarFiltroSubcategorias() {
+    const sel = document.getElementById('filtro-subcategoria');
+    if (!sel) return;
+    const vistos = new Map();
+    todosLosProductos.forEach(p => {
+        if (p.idSubcategoria && p.subcategoria && !vistos.has(p.idSubcategoria)) {
+            vistos.set(p.idSubcategoria, p.subcategoria);
+        }
+    });
+    sel.innerHTML = '<option value="">Todas las subcategorías</option>'
+        + [...vistos.entries()]
+            .sort((a, b) => a[1].localeCompare(b[1]))
+            .map(([id, nombre]) => `<option value="${id}">${nombre}</option>`)
+            .join('');
 }
 
 /* Carrito (localStorage) */
@@ -250,7 +295,7 @@ function mostrarAlertaLogin() {
 /* Init */
 document.addEventListener('DOMContentLoaded', () => {
     mostrarAlertaLogin();
-    cargarProductos();
+    CategoriaRouting.init().then(() => cargarMapaDescuentos().then(cargarProductos));
 
     // Búsqueda con debounce
     let debounce;
@@ -260,4 +305,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('ordenamiento')?.addEventListener('change', aplicarFiltros);
+    document.getElementById('filtro-subcategoria')?.addEventListener('change', aplicarFiltros);
 });

@@ -108,15 +108,24 @@ window.eliminarItem = function (idx) {
     carrito.splice(idx, 1);
     setCarrito(carrito);
     renderCarrito();
-    Toast?.info(`"${nombre}" eliminado del carrito`);
+    Toast.info(`"${nombre}" eliminado del carrito`);
 };
 
 /* Vaciar carrito */
 function vaciarCarrito() {
-    if (!confirm('¿Estás seguro de que quieres vaciar el carrito?')) return;
+    Toast.confirm(
+        {
+            titulo:  'Vaciar carrito',
+            msg:     '¿Estás seguro de que quieres eliminar todos los productos del carrito?',
+            tipo:    'warning',
+            labelOk: 'Sí, vaciar',
+        },
+        () => { vaciarCarrito(); }
+    );
+    return;
     setCarrito([]);
     renderCarrito();
-    Toast?.info('Carrito vaciado');
+    Toast.info('Carrito vaciado');
 }
 
 /* Cargar métodos de pago desde la API */
@@ -204,7 +213,7 @@ async function confirmarPedido() {
         </div>
       </div>`;
 
-        Toast?.success('¡Pedido realizado con éxito!');
+        Toast.success('¡Pedido realizado con éxito!');
 
     } catch (err) {
         mostrarAlerta('error', err.message);

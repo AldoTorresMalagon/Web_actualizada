@@ -36,7 +36,8 @@ const AuthUtils = {
             }
             return true;
         } catch {
-            return !!token; // si no podemos decodificar, confiar en presencia
+            this.cerrarSesion(false);
+            return false;
         }
     },
 
@@ -74,6 +75,17 @@ const AuthUtils = {
         };
     }
 };
+
+
+/* apiFetch — wrapper global que detecta 401 y redirige al login */
+async function apiFetch(url, options = {}) {
+    const res = await fetch(url, options);
+    if (res.status === 401) {
+        AuthUtils.cerrarSesion(true);
+        return res; // nunca llega al caller — la página ya redirigió
+    }
+    return res;
+}
 
 /* Accesibilidad */
 (function aplicarAccesibilidadInicial() {

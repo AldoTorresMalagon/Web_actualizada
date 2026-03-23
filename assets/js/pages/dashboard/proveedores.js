@@ -37,9 +37,16 @@ async function cargarProveedores() {
 
 /* Estadísticas */
 function actualizarEstadisticas() {
-    document.getElementById('stat-total').textContent = todosLosProveedores.length;
-    document.getElementById('stat-activos').textContent = todosLosProveedores.length; // API ya filtra Estado=1
-    document.getElementById('stat-productos').textContent = 0; // No disponible en este endpoint
+    const total = todosLosProveedores.length;
+    const conDistribuidora = todosLosProveedores.filter(p => p.Distribuidora?.trim()).length;
+    const sinDistribuidora = total - conDistribuidora;
+
+    document.getElementById('stat-total')?.textContent !== undefined &&
+        (document.getElementById('stat-total').textContent = total);
+    document.getElementById('stat-con-distribuidora') &&
+        (document.getElementById('stat-con-distribuidora').textContent = conDistribuidora);
+    document.getElementById('stat-sin-distribuidora') &&
+        (document.getElementById('stat-sin-distribuidora').textContent = sinDistribuidora);
 }
 
 /* Filtrar y renderizar */
@@ -117,10 +124,10 @@ async function guardarProveedor() {
         };
         await ProductosService.crearProveedor(payload, AuthUtils.getHeaders());
         bootstrap.Modal.getInstance(document.getElementById('agregarProveedorModal'))?.hide();
-        Toast?.success('Proveedor agregado exitosamente');
+        Toast.success('Proveedor agregado exitosamente');
         await cargarProveedores();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message || 'Error al eliminar');
     } finally {
         setBtnLoading('btn-guardar-proveedor', false, '<i class="bi bi-floppy me-1"></i>Guardar');
     }
@@ -161,10 +168,10 @@ async function actualizarProveedor() {
         };
         await ProductosService.actualizarProveedor(id, payload, AuthUtils.getHeaders());
         bootstrap.Modal.getInstance(document.getElementById('editarProveedorModal'))?.hide();
-        Toast?.success('Proveedor actualizado exitosamente');
+        Toast.success('Proveedor actualizado exitosamente');
         await cargarProveedores();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message || 'Error al eliminar');
     } finally {
         setBtnLoading('btn-actualizar-proveedor', false, '<i class="bi bi-floppy me-1"></i>Actualizar');
     }
@@ -172,17 +179,25 @@ async function actualizarProveedor() {
 
 /* Confirmar eliminar */
 window.confirmarEliminar = function (id, nombre) {
-    if (!confirm(`¿Eliminar el proveedor "${nombre}"?\nNo se puede eliminar si tiene productos activos.`)) return;
-    eliminarProveedor(id);
+    Toast.confirm(
+        {
+            titulo: 'Eliminar proveedor',
+            msg: `¿Eliminar a <strong>"${nombre}"</strong>?<br>
+                      <span style="font-size:.85rem;color:#666;">No se puede eliminar si tiene productos activos.</span>`,
+            tipo: 'danger',
+            labelOk: 'Sí, eliminar',
+        },
+        () => eliminarProveedor(id)
+    );
 };
 
 async function eliminarProveedor(id) {
     try {
         await ProductosService.eliminarProveedor(id, AuthUtils.getHeaders());
-        Toast?.success('Proveedor eliminado');
+        Toast.success('Proveedor eliminado');
         await cargarProveedores();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message || 'Error al eliminar');
     }
 }
 

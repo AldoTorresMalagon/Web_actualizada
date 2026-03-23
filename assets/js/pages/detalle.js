@@ -1,14 +1,27 @@
-/* Categorías para navegación de retorno */
-const CATEGORIAS_BEBIDAS = [1, 4, 5, 8];
-const CATEGORIAS_PLATILLOS = [9];
+/* routing delegado a CategoriaRouting */
+const getCatalogoInfo = (id) => CategoriaRouting.getCatalogoInfo(id);
 
-function getCatalogoInfo(idCategoria) {
-    const id = parseInt(idCategoria);
-    if (CATEGORIAS_PLATILLOS.includes(id))
-        return { url: 'menu.html', label: 'Ver más comidas', icon: 'bi-cup-hot' };
-    if (CATEGORIAS_BEBIDAS.includes(id))
-        return { url: 'bebidas.html', label: 'Ver más bebidas', icon: 'bi-cup-straw' };
-    return { url: 'productos.html', label: 'Ver más productos', icon: 'bi-box-seam' };
+/* Mapa de descuentos — reutiliza la misma lógica que menu.js */
+let mapaDescuentos = {};
+
+async function cargarMapaDescuentos() {
+    try {
+        const promos = await ProductosService.getPromocionesActivas();
+        mapaDescuentos = {};
+        promos.forEach(p => {
+            const ids = p.productos_ids || [];
+            ids.forEach(idProducto => {
+                if (!mapaDescuentos[idProducto] ||
+                    p.porcentaje_descuento > mapaDescuentos[idProducto].porcentaje) {
+                    mapaDescuentos[idProducto] = {
+                        porcentaje:  p.porcentaje_descuento,
+                        idPromocion: p.id_promocion,
+                        titulo:      p.titulo,
+                    };
+                }
+            });
+        });
+    } catch { /* sin descuentos */ }
 }
 
 /* Leer ?id= de la URL */
@@ -40,9 +53,30 @@ function poblarDetalle(p) {
 
     // Campos de texto
     document.getElementById('producto-nombre').textContent = p.Nombre;
-    document.getElementById('producto-categoria').textContent = p.categoria || '—';
+    document.getElementById('producto-categoria').textContent = p.subcategoria || p.tipo || '—';
     document.getElementById('producto-descripcion').textContent = p.Descripcion || 'Sin descripción disponible.';
-    document.getElementById('producto-precio').textContent = FormatUtils.moneda(p.PrecioVenta);
+    // Aplicar descuento si hay promoción activa para este producto
+    const desc = mapaDescuentos[p.idProducto];
+    const precioBase  = parseFloat(p.PrecioVenta);
+    const precioFinal = desc
+        ? +(precioBase * (1 - desc.porcentaje / 100)).toFixed(2)
+        : precioBase;
+
+    const elPrecio = document.getElementById('producto-precio');
+    if (elPrecio) {
+        if (desc) {
+            elPrecio.innerHTML = `
+                <span class="text-muted text-decoration-line-through me-2" style="font-size:.85em;">
+                    ${FormatUtils.moneda(precioBase)}
+                </span>
+                <span class="text-success fw-bold">${FormatUtils.moneda(precioFinal)}</span>
+                <span class="badge ms-2" style="background:#f59e0b;color:#fff;font-size:.75rem;">
+                    <i class="bi bi-tag-fill me-1"></i>-${desc.porcentaje}% ${desc.titulo || ''}
+                </span>`;
+        } else {
+            elPrecio.textContent = FormatUtils.moneda(precioBase);
+        }
+    }
     document.getElementById('producto-codigo').textContent = p.Codigo || '—';
     document.getElementById('producto-proveedor').textContent = p.proveedor || '—';
 
@@ -112,7 +146,12 @@ function poblarDetalle(p) {
     if (btnAgregar) {
         btnAgregar.dataset.id = p.idProducto;
         btnAgregar.dataset.nombre = p.Nombre;
-        btnAgregar.dataset.precio = parseFloat(p.PrecioVenta).toFixed(2); // raw para cálculos
+        // Guardar el precio final (con descuento si aplica) para el carrito
+        btnAgregar.dataset.precio = precioFinal.toFixed(2);
+        if (desc) {
+            btnAgregar.dataset.precioOriginal = precioBase.toFixed(2);
+            btnAgregar.dataset.descuento      = desc.porcentaje;
+        }
         btnAgregar.dataset.img = imgUrl || '';
     }
 }
@@ -170,7 +209,11 @@ async function cargarProducto() {
     }
 
     try {
-        const producto = await ProductosService.getById(id);
+        // Cargar descuentos y producto en paralelo
+        const [producto] = await Promise.all([
+            ProductosService.getById(id),
+            cargarMapaDescuentos(),
+        ]);
 
         loadingEl?.classList.add('d-none');
         contenido?.classList.remove('d-none');
@@ -189,4 +232,4 @@ async function cargarProducto() {
 }
 
 /* Init */
-document.addEventListener('DOMContentLoaded', cargarProducto);
+document.addEventListener('DOMContentLoaded', async () => { await CategoriaRouting.init(); cargarProducto(); });

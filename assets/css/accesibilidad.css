@@ -779,6 +779,77 @@ html.resaltar-focus *:focus-visible {
     box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.3) !important;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACCESIBILIDAD — Overrides específicos del Dashboard (/dashboard/*.html)
+   Estas reglas aplican los modos de accesibilidad a los componentes propios
+   del panel de administración: sidebar, header, stat-cards, badge-modelo, etc.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Modo oscuro — badge modelo */
+html.modo-oscuro .badge-modelo--logistico {
+    background: #1e3a5f; color: #93c5fd; border-color: #2d5282;
+}
+html.modo-oscuro .badge-modelo--movil {
+    background: #14532d; color: #86efac; border-color: #166534;
+}
+html.modo-oscuro .params-logistico {
+    background: #1e2433; border-color: #2d3748; color: #e2e8f0;
+}
+html.modo-oscuro .params-logistico__titulo { color: #93c5fd; }
+html.modo-oscuro .params-logistico__desc   { color: #6b7280; }
+
+/* Tabla exportable */
+#tabla-ventas-detalle th { font-size: .82rem; }
+#tabla-ventas-detalle td { font-size: .85rem; vertical-align: middle; }
+
+/* Stock crítico */
+.stock-badge-agotado { background: #dc3545; color: #fff; }
+.stock-badge-critico { background: #fd7e14; color: #fff; }
+/* Iconos KPI */
+.icon-kpi { font-size: 1.8rem; }
+
+/* Contenedores de gráficas ApexCharts */
+.chart-container { width: 100%; }
+.chart-sm  { min-height: 200px; }
+.chart-md  { min-height: 260px; }
+.chart-lg  { min-height: 280px; }
+.chart-xl  { min-height: 300px; }
+
+/* Anchos máximos utilitarios */
+.mw-140 { max-width: 140px; }
+.mw-150 { max-width: 150px; }
+.mw-200 { max-width: 200px; }
+
+/* Tabla con scroll vertical */
+.tabla-scroll { max-height: 340px; overflow-y: auto; }
+
+/* Imágenes en tabla de productos */
+.img-tabla {
+    width: 48px; height: 48px;
+    min-width: 48px;
+    max-width: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+}
+.img-tabla-placeholder {
+    display: flex; align-items: center; justify-content: center;
+}
+
+/* Input de cantidad en ventas */
+.input-cantidad { width: 100px; }
+
+/* Badge de tipo en categorías */
+.badge-tipo { font-size: .85rem; padding: .4rem .75rem; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ACCESIBILIDAD — Overrides específicos del Dashboard
+   Movido desde accesibilidad.css (aplica solo a /dashboard/)
+   Las clases globales (modo oscuro base, panel flotante, fuente dislexia,
+   reducir movimiento, etc.) siguen en accesibilidad.css porque se usan en
+   todas las páginas, no solo en el dashboard.
+   ═══════════════════════════════════════════════════════════════════════════ */
 /* MODO OSCURO — Dashboard */
 
 /* Fondo general del dashboard */
@@ -1173,3 +1244,24 @@ html.alto-contraste .btn-warning {
     color: #000 !important;
     border-color: #ff0 !important;
 }
+
+/* Modo oscuro — badges y precios de descuento en catálogo */
+html.modo-oscuro .precio-original-card {
+    color: #6b7280 !important;
+}
+
+html.modo-oscuro .precio-descuento-card {
+    color: #4ade80 !important;
+}
+
+html.alto-contraste .precio-descuento-card {
+    color: #0f0 !important;
+}
+
+html.alto-contraste .precio-original-card {
+    color: #aaa !important;
+}
+
+/* PANEL DE NOTIFICACIONES — Compatibilidad con accesibilidad */
+
+/* Modo oscuro */

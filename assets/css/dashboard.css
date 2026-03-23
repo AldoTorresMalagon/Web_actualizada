@@ -1,3 +1,8 @@
+/* dashboard.css — Estilos de diseño y layout del panel de administración.
+   Los overrides de accesibilidad (modo oscuro, alto contraste, etc.)
+   están en assets/css/accesibilidad.css.
+*/
+
 /* Layout base */
 
 /* Wrapper del layout principal — evita scroll de página completa */
@@ -11,8 +16,10 @@
 .dash-main {
     height: calc(100vh - var(--header-height));
     overflow-y: auto;
+    overflow-x: hidden;
     background-color: var(--color-fondo);
     padding: 1.5rem;
+    padding-bottom: 3rem;
     flex: 1;
     min-width: 0;
 }
@@ -372,3 +379,68 @@
         max-width: 100%;
     }
 }
+/* Paginación visible */
+.dash-main .card-body { overflow: visible; }
+.dash-main .table-responsive { overflow-x: auto; overflow-y: visible; }
+
+
+/* Módulo de Reportes */
+/* Selector de período */
+.periodo-btn { border-radius: 20px; font-size: .82rem; padding: .3rem .9rem; }
+.periodo-btn.active { background: var(--color-primario); color: #fff; border-color: var(--color-primario); }
+
+/* KPI cards */
+.kpi-card { border-radius: 12px; border: none; transition: transform .2s; }
+.kpi-card:hover { transform: translateY(-3px); }
+.kpi-variacion { font-size: .78rem; font-weight: 600; }
+.kpi-variacion.positivo { color: #198754; }
+.kpi-variacion.negativo { color: #dc3545; }
+.kpi-variacion.neutro   { color: #6c757d; }
+
+/* Sección predicción */
+.prediccion-aviso {
+    background: #fff8e1; border-left: 4px solid #f59e0b;
+    border-radius: 0 8px 8px 0; padding: .6rem 1rem;
+    font-size: .83rem; color: #7c5400;
+}
+
+/* Badge modelo de predicción */
+.badge-modelo {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .35rem .75rem; border-radius: 20px;
+    font-size: .8rem; font-weight: 600; letter-spacing: .01em;
+}
+.badge-modelo--logistico {
+    background: #e8f0fe; color: #1a56db;
+    border: 1px solid #c3d3fb;
+}
+.badge-modelo--movil {
+    background: #f0fdf4; color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+.badge-modelo__detalle {
+    font-weight: 400; opacity: .8;
+    font-family: 'Courier New', monospace; font-size: .75rem;
+}
+.badge-modelo__dias {
+    background: rgba(0,0,0,.08); border-radius: 10px;
+    padding: .1rem .5rem; font-size: .72rem; font-weight: 500;
+}
+
+/* Parámetros del modelo logístico */
+.params-logistico {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 1rem;
+    background: #f8faff; border: 1px solid #dbe8fd;
+    border-radius: 8px; padding: .55rem 1rem;
+    font-size: .8rem; color: #374151;
+}
+.params-logistico__titulo {
+    font-weight: 600; color: #1a56db;
+}
+.params-logistico__item {
+    display: flex; align-items: center; gap: .3rem;
+}
+.params-logistico__desc {
+    color: #9ca3af; font-size: .75rem;
+}
+

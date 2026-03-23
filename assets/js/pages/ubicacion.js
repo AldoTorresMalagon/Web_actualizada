@@ -104,11 +104,8 @@ function verificarEstado(apertura, cierre, dias) {
 /* Poblar datos desde API */
 async function cargarInfo() {
     try {
-        const res = { ok: true, json: async () => ({ data: await AcercaService.get() }) };
-        const json = await res.json();
-        if (!json.success) return;
-
-        const d = json.data;
+        const d = await AcercaService.get();
+        if (!d) return;
 
         // Dirección
         document.getElementById('info-direccion').textContent = d.direccion || 'Instituto Tecnológico de Huejutla, Hidalgo';

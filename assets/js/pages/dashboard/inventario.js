@@ -52,9 +52,15 @@ function actualizarEstadisticas() {
     document.getElementById('stat-total').textContent = productos.length;
     document.getElementById('stat-stock-bajo').textContent = stockBajo;
     document.getElementById('stat-sin-stock').textContent = sinStock;
-    // stat-valor-total no se puede calcular sin precios en este endpoint
-    if (document.getElementById('stat-valor-total'))
-        document.getElementById('stat-valor-total').textContent = '—';
+
+    // Movimientos Hoy — contar entradas del historial de hoy
+    const hoyStr = new Date().toLocaleDateString('es-MX', { year:'numeric', month:'2-digit', day:'2-digit' });
+    const movHoy = (todosLosMovimientos || []).filter(m => {
+        const fecha = new Date(m.fecha_movimiento);
+        return fecha.toLocaleDateString('es-MX', { year:'numeric', month:'2-digit', day:'2-digit' }) === hoyStr;
+    }).length;
+    if (document.getElementById('stat-movimientos-hoy'))
+        document.getElementById('stat-movimientos-hoy').textContent = movHoy;
 }
 
 /* Filtrar y renderizar */
@@ -97,7 +103,7 @@ function renderTabla(lista) {
             <td>${m.stock_anterior ?? '—'}</td>
             <td class="${FormatUtils.claseStock(m.stock_nuevo)}">${m.stock_nuevo ?? 0}</td>
             <td>${FormatUtils.badgeMovimiento(m.tipo_movimiento)}</td>
-            <td>${m.cantidad || '—'}</td>
+            <td>${Math.abs(m.cantidad) || '—'}</td>
             <td><small>${m.usuario || '—'}</small></td>
             <td><small>${FormatUtils.truncar(m.observaciones || '—', 40)}</small></td>
             <td><small>${FormatUtils.fechaHora(m.fecha_movimiento)}</small></td>
@@ -131,10 +137,10 @@ async function confirmarAjusteStock() {
         }, AuthUtils.getHeaders());
 
         bootstrap.Modal.getInstance(document.getElementById('ajustarStockModal'))?.hide();
-        Toast?.success('Stock actualizado correctamente');
+        Toast.success('Stock actualizado correctamente');
         await cargarInventario();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-confirmar-stock', false, '<i class="bi bi-check-circle me-1"></i>Aplicar Ajuste');
     }
@@ -202,5 +208,109 @@ document.addEventListener('DOMContentLoaded', async () => {
         paginaActual = 1; aplicarFiltrosYRenderizar();
     });
     document.getElementById('btn-actualizar-inventario')?.addEventListener('click', cargarInventario);
+
+    // ── Selector de período para exportar ────────────────────
+    // Estado del filtro de exportación
+    const exportState = { periodo: 'hoy', desde: null, hasta: null };
+
+    // Calcular fechas según período
+    function calcularFechasExport(periodo) {
+        const hoy  = new Date();
+        const pad  = n => String(n).padStart(2, '0');
+        const fmt  = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+        switch (periodo) {
+            case 'hoy': {
+                const f = fmt(hoy);
+                return { desde: f, hasta: f };
+            }
+            case 'semana': {
+                const lunes = new Date(hoy);
+                lunes.setDate(hoy.getDate() - hoy.getDay() + (hoy.getDay() === 0 ? -6 : 1));
+                return { desde: fmt(lunes), hasta: fmt(hoy) };
+            }
+            default: return null;
+        }
+    }
+
+    // Activar/desactivar botones del selector
+    document.getElementById('selector-periodo-export')
+        ?.addEventListener('click', e => {
+            const btn = e.target.closest('[data-periodo-export]');
+            if (!btn) return;
+            document.querySelectorAll('[data-periodo-export]')
+                .forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            exportState.periodo = btn.dataset.periodoExport;
+            const rangoDiv = document.getElementById('rango-export');
+            if (exportState.periodo === 'personalizado') {
+                rangoDiv.classList.remove('d-none');
+            } else {
+                rangoDiv.classList.add('d-none');
+                const f = calcularFechasExport(exportState.periodo);
+                exportState.desde = f?.desde || null;
+                exportState.hasta = f?.hasta || null;
+            }
+        });
+
+    // Inicializar con "Hoy"
+    const fechasHoy = calcularFechasExport('hoy');
+    exportState.desde = fechasHoy.desde;
+    exportState.hasta = fechasHoy.hasta;
+
+    // Exportar Excel con filtro de fechas
+    document.getElementById('btn-exportar')?.addEventListener('click', () => {
+        // Resolver fechas según período seleccionado
+        let desde = exportState.desde;
+        let hasta = exportState.hasta;
+
+        if (exportState.periodo === 'personalizado') {
+            desde = document.getElementById('export-desde')?.value;
+            hasta = document.getElementById('export-hasta')?.value;
+            if (!desde || !hasta) {
+                Toast.warning('Selecciona un rango de fechas válido');
+                return;
+            }
+            if (desde > hasta) {
+                Toast.warning('La fecha inicial no puede ser mayor a la final');
+                return;
+            }
+        }
+
+        // Filtrar movimientos por rango de fechas
+        const desdeDate = new Date(desde + 'T00:00:00');
+        const hastaDate = new Date(hasta + 'T23:59:59');
+
+        const movFiltrados = todosLosMovimientos.filter(m => {
+            const fecha = new Date(m.fecha_movimiento);
+            return fecha >= desdeDate && fecha <= hastaDate;
+        });
+
+        if (!movFiltrados.length) {
+            Toast.warning(`Sin movimientos del ${desde} al ${hasta}`);
+            return;
+        }
+
+        // Calcular stats del período filtrado
+        const porProducto = new Map();
+        movFiltrados.forEach(m => {
+            if (!porProducto.has(m.producto) ||
+                new Date(m.fecha_movimiento) > new Date(porProducto.get(m.producto).fecha_movimiento)) {
+                porProducto.set(m.producto, m);
+            }
+        });
+        const productos = [...porProducto.values()];
+        const hoyStr = new Date().toLocaleDateString('es-MX',
+            { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+        const stats = {
+            total:     productos.length,
+            stockBajo: productos.filter(p => (p.stock_nuevo || 0) > 0 && (p.stock_nuevo || 0) < 10).length,
+            sinStock:  productos.filter(p => (p.stock_nuevo || 0) <= 0).length,
+            movHoy:    movFiltrados.length, // en el export, es el total del período filtrado
+            periodo:   desde === hasta ? desde : `${desde} al ${hasta}`,
+        };
+
+        ExcelExport.generarInventario(movFiltrados, stats);
+    });
     document.getElementById('btn-confirmar-stock')?.addEventListener('click', confirmarAjusteStock);
 });

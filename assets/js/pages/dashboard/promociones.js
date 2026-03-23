@@ -162,10 +162,10 @@ async function guardarPromocion() {
         }
 
         bootstrap.Modal.getInstance(document.getElementById('agregarPromocionModal'))?.hide();
-        Toast?.success('Promoción creada exitosamente');
+        Toast.success('Promoción creada exitosamente');
         await cargarPromociones();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-guardar-promocion', false, '<i class="bi bi-floppy me-1"></i>Guardar');
     }
@@ -186,7 +186,7 @@ window.abrirEditar = async function (id) {
 
     // Cargar y marcar los productos ya asignados a esta promoción
     try {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/promociones/${id}`, { headers: AuthUtils.getHeaders() });
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/promociones/${id}`, { headers: AuthUtils.getHeaders() });
         const json = await res.json();
         if (json.success && json.data?.productos) {
             const idsAsignados = json.data.productos.map(pr => pr.idProducto);
@@ -232,7 +232,7 @@ async function actualizarPromocion() {
         const seleccionados = [...checkboxes].filter(cb => cb.checked).map(cb => parseInt(cb.value));
 
         // Obtener productos actuales de la promo
-        const resActual = await fetch(`${API_CONFIG.BASE_URL}/promociones/${id}`, { headers: AuthUtils.getHeaders() });
+        const resActual = await apiFetch(`${API_CONFIG.BASE_URL}/promociones/${id}`, { headers: AuthUtils.getHeaders() });
         const jActual = await resActual.json();
         const actuales = (jActual.data?.productos || []).map(pr => pr.idProducto);
 
@@ -242,20 +242,20 @@ async function actualizarPromocion() {
         const quitar = actuales.filter(x => !seleccionados.includes(x));
 
         await Promise.allSettled([
-            ...agregar.map(idP => fetch(`${API_CONFIG.BASE_URL}/promociones/${id}/productos`, {
+            ...agregar.map(idP => apiFetch(`${API_CONFIG.BASE_URL}/promociones/${id}/productos`, {
                 method: 'POST', headers: AuthUtils.getHeaders(),
                 body: JSON.stringify({ idProducto: idP })
             })),
-            ...quitar.map(idP => fetch(`${API_CONFIG.BASE_URL}/promociones/${id}/productos/${idP}`, {
+            ...quitar.map(idP => apiFetch(`${API_CONFIG.BASE_URL}/promociones/${id}/productos/${idP}`, {
                 method: 'DELETE', headers: AuthUtils.getHeaders(),
             })),
         ]);
 
         bootstrap.Modal.getInstance(document.getElementById('editarPromocionModal'))?.hide();
-        Toast?.success('Promoción actualizada exitosamente');
+        Toast.success('Promoción actualizada exitosamente');
         await cargarPromociones();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-actualizar-promocion', false, '<i class="bi bi-floppy me-1"></i>Actualizar');
     }
@@ -273,10 +273,10 @@ async function eliminarPromocion() {
     try {
         await ProductosService.eliminarPromocion(id, AuthUtils.getHeaders());
         bootstrap.Modal.getInstance(document.getElementById('eliminarPromocionModal'))?.hide();
-        Toast?.success('Promoción eliminada');
+        Toast.success('Promoción eliminada');
         await cargarPromociones();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     }
 }
 

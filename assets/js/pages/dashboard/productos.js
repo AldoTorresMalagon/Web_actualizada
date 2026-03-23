@@ -1,3 +1,5 @@
+let todasLasSubcats = [];
+
 /* Estado global */
 let todosLosProductos = [];
 let paginaActual = 1;
@@ -32,25 +34,7 @@ const initPreviewImagen = (inputId, previewId) => CloudinaryService.initPreview(
 
 /* Cargar categorías en selects */
 async function cargarCategorias() {
-    try {
-        const cats = await ProductosService.getCategorias();
-
-        // Filtro de la tabla
-        const filtro = document.getElementById('filtro-categoria');
-        cats.forEach(c => {
-            filtro.innerHTML += `<option value="${c.idCategoria}">${c.Descripcion}</option>`;
-        });
-
-        // Selects de modales
-        ['agregar-categoria', 'editar-categoria'].forEach(id => {
-            const sel = document.getElementById(id);
-            if (!sel) return;
-            sel.innerHTML = '<option value="">Seleccionar categoría</option>';
-            cats.forEach(c => {
-                sel.innerHTML += `<option value="${c.idCategoria}">${c.Descripcion}</option>`;
-            });
-        });
-    } catch { /* no crítico */ }
+    // Los selects de categoría fueron reemplazados por tipo + subcategoria
 }
 
 /* Cargar proveedores en selects */
@@ -73,7 +57,11 @@ async function cargarProveedores() {
 async function cargarProductos() {
     setLoading('tabla-productos', 7);
     try {
-        todosLosProductos = await ProductosService.getAll(AuthUtils.getHeaders());
+        // Cargar productos y subcategorías en paralelo
+        [todosLosProductos, todasLasSubcats] = await Promise.all([
+            ProductosService.getAll(AuthUtils.getHeaders()),
+            SubcategoriasService.getSubcategorias(),
+        ]);
         actualizarEstadisticas();
         aplicarFiltrosYRenderizar();
     } catch (err) {
@@ -98,7 +86,8 @@ function actualizarEstadisticas() {
 /* Filtrar + ordenar + paginar */
 function aplicarFiltrosYRenderizar() {
     const termino = document.getElementById('buscador-productos')?.value.toLowerCase().trim() || '';
-    const catFiltro = document.getElementById('filtro-categoria')?.value || '';
+    const tipoFiltro  = document.getElementById('filtro-tipo')?.value || '';
+    const subFiltro   = document.getElementById('filtro-subcategoria')?.value || '';
     const estadoFiltro = document.getElementById('filtro-estado')?.value || '';
     const ordenamiento = document.getElementById('ordenar-productos')?.value || 'nombre-asc';
 
@@ -107,9 +96,10 @@ function aplicarFiltrosYRenderizar() {
             p.Nombre?.toLowerCase().includes(termino) ||
             p.Codigo?.toLowerCase().includes(termino) ||
             p.categoria?.toLowerCase().includes(termino);
-        const coincideCategoria = !catFiltro || String(p.idCategoria) === catFiltro;
+        const coincideTipo  = !tipoFiltro || p.tipo === tipoFiltro;
+        const coincideSub   = !subFiltro || String(p.idSubcategoria) === subFiltro;
         const coincideEstado = estadoFiltro === '' || String(p.Estado ?? 1) === estadoFiltro;
-        return coincideBusqueda && coincideCategoria && coincideEstado;
+        return coincideBusqueda && coincideTipo && coincideSub && coincideEstado;
     });
 
     // Ordenamiento
@@ -144,10 +134,10 @@ function renderTabla(lista) {
 
     tbody.innerHTML = lista.map(p => {
         const imgHtml = p.Imagen
-            ? `<img src="${p.Imagen}" class="img-thumbnail" style="width:48px;height:48px;object-fit:cover;"
+            ? `<img src="${p.Imagen}" class="img-tabla img-thumbnail"
                     onerror="this.src='https://placehold.co/48x48/e2e8f0/94a3b8?text=?'">`
-            : `<div class="bg-light rounded d-flex align-items-center justify-content-center"
-                    style="width:48px;height:48px;"><i class="bi bi-image text-muted"></i></div>`;
+            : `<div class="img-tabla img-tabla-placeholder bg-light rounded">
+                    <i class="bi bi-image text-muted"></i></div>`;
 
         const stockClass = FormatUtils.claseStock(p.Stock);
 
@@ -160,7 +150,7 @@ function renderTabla(lista) {
                 <div class="fw-semibold">${p.Nombre}</div>
                 <small class="text-muted">${p.Codigo || '—'}</small>
             </td>
-            <td><span class="badge bg-primary">${p.categoria || '—'}</span></td>
+            <td><span class="badge bg-primary">${p.subcategoria || p.tipo || '—'}</span></td>
             <td class="fw-semibold">${FormatUtils.moneda(p.PrecioVenta, false)}</td>
             <td class="${stockClass}">${p.Stock}</td>
             <td>${estadoBadge}</td>
@@ -227,7 +217,7 @@ window.irAPagina = function (n) {
 /* Guardar nuevo producto */
 async function guardarProducto() {
     const nombre = document.getElementById('agregar-nombre').value.trim();
-    const categoria = document.getElementById('agregar-categoria').value;
+    const subcategoria = document.getElementById('agregar-subcategoria').value;
     const proveedor = document.getElementById('agregar-proveedor').value;
     const precio = document.getElementById('agregar-precio-venta').value;
     const stock = document.getElementById('agregar-stock').value;
@@ -241,12 +231,12 @@ async function guardarProducto() {
     } else {
         document.getElementById('agregar-nombre').classList.remove('is-invalid');
     }
-    if (!categoria) {
-        document.getElementById('agregar-categoria').classList.add('is-invalid');
-        document.getElementById('agregar-categoria-error').textContent = 'Selecciona una categoría';
+    if (!subcategoria) {
+        document.getElementById('agregar-subcategoria').classList.add('is-invalid');
+        document.getElementById('agregar-subcategoria-error').textContent = 'Selecciona una subcategoría';
         valido = false;
     } else {
-        document.getElementById('agregar-categoria').classList.remove('is-invalid');
+        document.getElementById('agregar-subcategoria').classList.remove('is-invalid');
     }
     if (!precio || parseFloat(precio) <= 0) {
         document.getElementById('agregar-precio-venta').classList.add('is-invalid');
@@ -268,7 +258,7 @@ async function guardarProducto() {
             precioVenta: parseFloat(precio),
             precioCompra: parseFloat(document.getElementById('agregar-precio-compra').value) || 0,
             stock: parseInt(stock) || 0,
-            idCategoria: parseInt(categoria),
+            idSubcategoria: parseInt(subcategoria),
             idProveedor: parseInt(proveedor) || null,
             imagen: imagen || '',
             estado: document.getElementById('agregar-estado').checked ? 1 : 0,
@@ -279,11 +269,11 @@ async function guardarProducto() {
 
         bootstrap.Modal.getInstance(document.getElementById('agregarProductoModal'))?.hide();
         limpiarModalAgregar();
-        Toast?.success('Producto agregado exitosamente');
+        Toast.success('Producto agregado exitosamente');
         await cargarProductos();
 
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-guardar-producto', false, '<i class="bi bi-floppy me-1"></i>Guardar Producto');
     }
@@ -313,14 +303,15 @@ window.abrirEditar = async function (id) {
         }
 
         // Selects — esperar que tengan opciones
+        document.getElementById('editar-tipo').value = p.tipo || '';
+        llenarSubcatsEditar(p.tipo, p.idSubcategoria);
         await Promise.all([
-            setSelectValue('editar-categoria', p.idCategoria),
             setSelectValue('editar-proveedor', p.idProveedor),
         ]);
 
         new bootstrap.Modal(document.getElementById('editarProductoModal')).show();
     } catch (err) {
-        Toast?.error('Error al cargar producto: ' + err.message);
+        Toast.error('Error al cargar producto: ' + err.message);
     }
 };
 
@@ -338,11 +329,11 @@ function setSelectValue(selectId, value) {
 async function actualizarProducto() {
     const id = document.getElementById('editar-id').value;
     const nombre = document.getElementById('editar-nombre').value.trim();
-    const categ = document.getElementById('editar-categoria').value;
+    const subcatEdit = document.getElementById('editar-subcategoria').value;
     const precio = document.getElementById('editar-precio-venta').value;
 
-    if (!nombre || !categ || !precio) {
-        Toast?.warning('Nombre, categoría y precio son obligatorios');
+    if (!nombre || !subcatEdit || !precio) {
+        Toast.warning('Nombre, subcategoría y precio son obligatorios');
         return;
     }
 
@@ -357,7 +348,7 @@ async function actualizarProducto() {
             precioVenta: parseFloat(precio),
             precioCompra: parseFloat(document.getElementById('editar-precio-compra').value) || 0,
             stock: parseInt(document.getElementById('editar-stock').value) || 0,
-            idCategoria: parseInt(categ),
+            idSubcategoria: parseInt(subcatEdit),
             idProveedor: parseInt(document.getElementById('editar-proveedor').value) || null,
             imagen: imagen || undefined,
             estado: document.getElementById('editar-estado').checked ? 1 : 0,
@@ -367,11 +358,11 @@ async function actualizarProducto() {
         if (!json.success) throw new Error(json.message || 'Error al actualizar');
 
         bootstrap.Modal.getInstance(document.getElementById('editarProductoModal'))?.hide();
-        Toast?.success('Producto actualizado exitosamente');
+        Toast.success('Producto actualizado exitosamente');
         await cargarProductos();
 
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-actualizar-producto', false, '<i class="bi bi-floppy me-1"></i>Actualizar Producto');
     }
@@ -415,11 +406,11 @@ async function confirmarAjusteStock() {
         }, AuthUtils.getHeaders());
 
         bootstrap.Modal.getInstance(document.getElementById('ajustarStockModal'))?.hide();
-        Toast?.success('Stock actualizado correctamente');
+        Toast.success('Stock actualizado correctamente');
         await cargarProductos();
 
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-confirmar-stock', false, '<i class="bi bi-check-circle me-1"></i>Aplicar Ajuste');
     }
@@ -427,8 +418,16 @@ async function confirmarAjusteStock() {
 
 /* Eliminar producto */
 window.confirmarEliminar = function (id, nombre) {
-    if (!confirm(`¿Eliminar el producto "${nombre}"?\nEsta acción no se puede deshacer.`)) return;
-    eliminarProducto(id);
+    Toast.confirm(
+        {
+            titulo:  'Eliminar producto',
+            msg:     `¿Eliminar permanentemente <strong>"${nombre}"</strong>?<br>
+                      <span style="color:#dc3545;font-size:.85rem;">Esta acción no se puede deshacer.</span>`,
+            tipo:    'danger',
+            labelOk: 'Sí, eliminar',
+        },
+        () => eliminarProducto(id)
+    );
 };
 
 async function eliminarProducto(id) {
@@ -436,10 +435,10 @@ async function eliminarProducto(id) {
         const json = await ProductosService.eliminar(id, AuthUtils.getHeaders());
         if (!json.success) throw new Error(json.message || 'Error al eliminar');
 
-        Toast?.success('Producto eliminado correctamente');
+        Toast.success('Producto eliminado correctamente');
         await cargarProductos();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     }
 }
 
@@ -450,7 +449,15 @@ function limpiarModalAgregar() {
             const el = document.getElementById(id);
             if (el) { el.value = ''; el.classList.remove('is-invalid'); }
         });
-    document.getElementById('agregar-categoria').value = '';
+    document.getElementById('agregar-tipo').value = '';
+    document.getElementById('agregar-subcategoria').innerHTML = '<option value="">Primero selecciona un tipo</option>';
+    document.getElementById('agregar-subcategoria').disabled = true;
+    document.getElementById('agregar-nombre').value = '';
+    document.getElementById('agregar-codigo').value = '';
+    document.getElementById('agregar-descripcion').value = '';
+    document.getElementById('agregar-precio-venta').value = '0.00';
+    document.getElementById('agregar-precio-compra').value = '0.00';
+    document.getElementById('agregar-stock').value = '0';
     document.getElementById('agregar-proveedor').value = '';
     document.getElementById('agregar-estado').checked = true;
     const preview = document.getElementById('agregar-imagen-preview');
@@ -469,6 +476,36 @@ function inyectarToolbarOrdenamiento() {
         }
     }
 }
+
+// Helpers de selects dependientes
+function llenarSubcatsAgregar(tipo) {
+    const sel = document.getElementById('agregar-subcategoria');
+    if (!sel) return;
+    const lista = todasLasSubcats.filter(s => s.tipo === tipo);
+    sel.disabled = lista.length === 0;
+    sel.innerHTML = lista.length
+        ? lista.map(s => `<option value="${s.idSubcategoria}">${s.Descripcion}</option>`).join('')
+        : '<option value="">Sin subcategorías para este tipo</option>';
+}
+
+function llenarSubcatsEditar(tipo, valorSeleccionado) {
+    const sel = document.getElementById('editar-subcategoria');
+    if (!sel) return;
+    const lista = todasLasSubcats.filter(s => s.tipo === tipo);
+    sel.innerHTML = lista.length
+        ? lista.map(s => `<option value="${s.idSubcategoria}">${s.Descripcion}</option>`).join('')
+        : '<option value="">Sin subcategorías para este tipo</option>';
+    if (valorSeleccionado) sel.value = String(valorSeleccionado);
+}
+
+function actualizarFiltroSubcategorias(tipo) {
+    const sel = document.getElementById('filtro-subcategoria');
+    if (!sel) return;
+    const lista = tipo ? todasLasSubcats.filter(s => s.tipo === tipo) : todasLasSubcats;
+    sel.innerHTML = '<option value="">Todas las subcategorías</option>'
+        + lista.map(s => `<option value="${s.idSubcategoria}">${s.Descripcion}</option>`).join('');
+}
+
 
 /* Init */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -498,6 +535,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         paginaActual = 1; aplicarFiltrosYRenderizar();
     });
 
+    document.getElementById('agregar-tipo')?.addEventListener('change', function() {
+        llenarSubcatsAgregar(this.value);
+    });
+    document.getElementById('editar-tipo')?.addEventListener('change', function() {
+        llenarSubcatsEditar(this.value, '');
+    });
+    document.getElementById('filtro-tipo')?.addEventListener('change', function() {
+        paginaActual = 1;
+        actualizarFiltroSubcategorias(this.value);
+        aplicarFiltrosYRenderizar();
+    });
+    document.getElementById('filtro-subcategoria')?.addEventListener('change', () => {
+        paginaActual = 1;
+        aplicarFiltrosYRenderizar();
+    });
     document.getElementById('btn-guardar-producto')?.addEventListener('click', guardarProducto);
     document.getElementById('btn-actualizar-producto')?.addEventListener('click', actualizarProducto);
     document.getElementById('btn-confirmar-stock')?.addEventListener('click', confirmarAjusteStock);

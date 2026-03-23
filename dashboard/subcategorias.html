@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subcategorías - Cafetería ITH</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/images/favicon/site.webmanifest">
+    <meta name="theme-color" content="#0b265c">
+
+    <script src="../assets/js/config/accesibilidad.init.js"></script>
+
+    <script src="../assets/js/config/bootstrap.loader.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/variables.css">
+    <link rel="stylesheet" href="../assets/css/main.css">
+    <link rel="stylesheet" href="../assets/css/components.css">
+    <link rel="stylesheet" href="../assets/css/accesibilidad.css">
+    <link rel="stylesheet" href="../assets/css/dashboard.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+    <div id="dash-header"></div>
+    <div class="dash-wrapper">
+        <div id="dash-sidebar"></div>
+        <main class="dash-main flex-grow-1 p-4">
+
+            <!-- Encabezado -->
+            <div class="position-relative d-flex align-items-center mb-4">
+                <h2 class="mb-0 w-100 text-center">
+                    <i class="bi bi-tag me-2"></i>Subcategorías
+                </h2>
+                <div class="position-absolute end-0">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregar">
+                        <i class="bi bi-plus-circle me-1"></i>Nueva Subcategoría
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tarjetas de estadísticas -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-4">
+                    <div class="card text-white bg-primary h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Total</h5>
+                            <h3 class="mb-0" id="stat-total">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card text-white bg-success h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-egg-fried me-1"></i>De Platillos</h5>
+                            <h3 class="mb-0" id="stat-platillos">--</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="card text-white bg-info h-100">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="bi bi-cup-straw me-1"></i>De Bebidas</h5>
+                            <h3 class="mb-0" id="stat-bebidas">--</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card principal — igual que productos -->
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+
+                    <!-- Toolbar igual que productos -->
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h5 class="mb-0">Listado de Subcategorías</h5>
+                        <div class="d-flex gap-2 flex-wrap align-items-center">
+                            <select id="ordenar-subcategorias" class="form-select form-select-sm"
+                                style="max-width:175px;">
+                                <option value="nombre-asc">Nombre (A → Z)</option>
+                                <option value="nombre-desc">Nombre (Z → A)</option>
+                                <option value="tipo-asc">Tipo (A → Z)</option>
+                                <option value="productos-desc">Más productos</option>
+                            </select>
+                            <select id="filtro-tipo-sub" class="form-select form-select-sm" style="max-width:150px;">
+                                <option value="">Todos los tipos</option>
+                                <option value="platillo">Platillo</option>
+                                <option value="bebida">Bebida</option>
+                                <option value="snack">Snack</option>
+                            </select>
+                            <select id="filtro-estado-sub" class="form-select form-select-sm" style="max-width:140px;">
+                                <option value="">Todos los estados</option>
+                                <option value="1">Activas</option>
+                                <option value="0">Inactivas</option>
+                            </select>
+                            <input type="text" id="buscador-subcategorias" class="form-control form-select-sm"
+                                placeholder="Buscar subcategoría..." style="max-width:210px;">
+                        </div>
+                    </div>
+
+                    <!-- Tabla -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="55">ID</th>
+                                    <th>Nombre</th>
+                                    <th>Tipo</th>
+                                    <th>Productos</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th width="90">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-subcategorias">
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">
+                                        <span class="spinner-border spinner-border-sm me-2"></span>Cargando...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="paginacion-subcategorias"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Modal: Agregar subcategoría -->
+    <div class="modal fade" id="modalAgregar" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>Nueva Subcategoría
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tipo *</label>
+                        <select id="agregar-tipo-sub" class="form-select">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="platillo">Platillo</option>
+                            <option value="bebida">Bebida</option>
+                            <option value="snack">Snack</option>
+                        </select>
+                        <div class="invalid-feedback" id="agregar-tipo-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre *</label>
+                        <input type="text" id="agregar-nombre-sub" class="form-control"
+                            placeholder="Ej: Café caliente, Torta, Papas fritas...">
+                        <div class="invalid-feedback" id="agregar-nombre-error"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btn-guardar-sub">
+                        <i class="bi bi-floppy me-1"></i>Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Editar subcategoría -->
+    <div class="modal fade" id="modalEditar" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">
+                        <i class="bi bi-pencil me-2"></i>Editar Subcategoría
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editar-id-sub">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Tipo *</label>
+                        <select id="editar-tipo-sub" class="form-select">
+                            <option value="platillo">Platillo</option>
+                            <option value="bebida">Bebida</option>
+                            <option value="snack">Snack</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nombre *</label>
+                        <input type="text" id="editar-nombre-sub" class="form-control">
+                        <div class="invalid-feedback" id="editar-nombre-error"></div>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="editar-estado-sub" checked>
+                            <label class="form-check-label" for="editar-estado-sub">
+                                Subcategoría activa
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" id="btn-actualizar-sub">
+                        <i class="bi bi-floppy me-1"></i>Actualizar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../assets/js/config/api.config.js"></script>
+    <script src="../assets/js/utils/auth.utils.js"></script>
+    <script src="../assets/js/utils/toast.utils.js"></script>
+    <script src="../assets/js/utils/format.utils.js"></script>
+
+    <script src="../assets/js/components/dash-header.js"></script>
+    <script src="../assets/js/components/dash-sidebar.js"></script>
+    <script src="../assets/js/services/productos.service.js"></script>
+    <script src="../assets/js/pages/dashboard/subcategorias.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/notificaciones.panel.css">
+    <script src="../assets/js/components/notificaciones.panel.js"></script>
+
+    <script src="../assets/js/components/accesibilidad.panel.js"></script>
+</body>
+
+</html>

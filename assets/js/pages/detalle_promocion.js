@@ -1,12 +1,5 @@
-const CATEGORIAS_BEBIDAS = [1, 4, 5, 8];
-const CATEGORIAS_PLATILLOS = [9];
-
-function getDetalleProductoUrl(idProducto, idCategoria) {
-    const id = parseInt(idCategoria);
-    if (CATEGORIAS_PLATILLOS.includes(id)) return `detalle_producto.html?id=${idProducto}`;
-    if (CATEGORIAS_BEBIDAS.includes(id)) return `detalle_bebida.html?id=${idProducto}`;
-    return `detalle_producto_snack.html?id=${idProducto}`;
-}
+/* routing delegado a CategoriaRouting */
+const getDetalleProductoUrl = (id, idCat) => CategoriaRouting.getDetalleUrl(id, idCat);
 
 /* Calcular precio con descuento */
 function precioConDescuento(precio, porcentaje) {
@@ -141,7 +134,7 @@ function agregarAlCarrito(btn) {
         btn.disabled = false;
     }, 1500);
 
-    Toast?.success(`${nombre} agregado al carrito`);
+    Toast.success(`${nombre} agregado al carrito`);
 }
 
 /* Cargar detalle de la promoción */
@@ -165,8 +158,6 @@ async function cargarPromocion() {
         if (!res.ok || !json.success) throw new Error(json.message || 'No encontrada');
 
         const p = json.data;
-        console.log('PROMO DATA:', JSON.stringify(p.productos?.map(pr => ({ id: pr.idProducto, nombre: pr.Nombre, stock: pr.Stock }))));
-
         document.title = `${p.titulo} — Cafetería ITH`;
         document.getElementById('promo-titulo').textContent = p.titulo;
         document.getElementById('promo-descripcion').textContent = p.descripcion;
@@ -184,4 +175,4 @@ async function cargarPromocion() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', cargarPromocion);
+document.addEventListener('DOMContentLoaded', async () => { await CategoriaRouting.init(); cargarPromocion(); });

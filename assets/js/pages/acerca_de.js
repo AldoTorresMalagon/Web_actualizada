@@ -7,11 +7,8 @@ function formatHora(hora) {
 
 async function cargarAcerca() {
     try {
-        const res = { ok: true, json: async () => ({ data: await AcercaService.get() }) };
-        const json = await res.json();
-        if (!json.success) return;
-
-        const d = json.data;
+        const d = await AcercaService.get();
+        if (!d) return;
 
         const set = (id, val) => {
             const el = document.getElementById(id);

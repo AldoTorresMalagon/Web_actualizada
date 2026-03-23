@@ -3,6 +3,7 @@ let paginaActual = 1;
 const POR_PAGINA = 10;
 
 let todosLosUsuarios = [];
+let catalogoRoles = [];
 let carreras = [];
 
 /* Helpers UI */
@@ -24,6 +25,22 @@ function setBtnLoading(btnId, activo, textoOriginal) {
 }
 
 /* Cargar carreras para selects */
+async function cargarRoles() {
+    try {
+        catalogoRoles = await AuthService.getRoles(AuthUtils.getHeaders());
+        ['agregar-rol', 'editar-rol'].forEach(selectId => {
+            const sel = document.getElementById(selectId);
+            if (!sel) return;
+            const defaultOpt = selectId === 'agregar-rol'
+                ? '<option value="">Seleccionar rol</option>'
+                : '';
+            sel.innerHTML = defaultOpt + catalogoRoles.map(r =>
+                `<option value="${r.intidrol}">${r.vchrolnombre}</option>`
+            ).join('');
+        });
+    } catch { /* fallback — mantiene options del HTML si los hubiera */ }
+}
+
 async function cargarCarreras() {
     try {
         carreras = await AuthService.getCarreras();
@@ -155,16 +172,13 @@ async function guardarUsuario() {
             idCarrera: parseInt(document.getElementById('agregar-carrera').value) || null,
             telefono: document.getElementById('agregar-telefono')?.value.trim() || '',
         };
-        const res = await fetch(`${API_CONFIG.BASE_URL}/usuarios`, {
-            method: 'POST', headers: AuthUtils.getHeaders(), body: JSON.stringify(payload),
-        });
-        const json = await res.json();
-        if (!res.ok || !json.success) throw new Error(json.message || 'Error al guardar');
+        const json = await AuthService.crearUsuario(payload, AuthUtils.getHeaders());
+        if (!json.success) throw new Error(json.message || 'Error al guardar');
         bootstrap.Modal.getInstance(document.getElementById('agregarUsuarioModal'))?.hide();
-        Toast?.success('Usuario creado exitosamente');
+        Toast.success('Usuario creado exitosamente');
         await cargarUsuarios();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-guardar-usuario', false, '<i class="bi bi-floppy me-1"></i>Guardar');
     }
@@ -172,6 +186,9 @@ async function guardarUsuario() {
 
 /* Abrir edición */
 window.abrirEditar = async function (id) {
+    // Limpiar contraseña del modal anterior
+    const inputPwd = document.getElementById('editar-password');
+    if (inputPwd) inputPwd.value = '';
     const u = todosLosUsuarios.find(x => x.intidusuario === id);
     if (!u) return;
     document.getElementById('editar-id').value = u.intidusuario;
@@ -182,13 +199,13 @@ window.abrirEditar = async function (id) {
     document.getElementById('editar-username').value = u.nombre_usuario || '';
     document.getElementById('editar-telefono').value = u.Telefono || '';
 
-    // Preseleccionar rol — buscar el option cuyo texto coincida con el rol del usuario
+    // Preseleccionar rol — buscar el option cuyo texto coincida (dinámico, sin mapa hardcodeado)
     setTimeout(() => {
         const selRol = document.getElementById('editar-rol');
         if (selRol && u.rol) {
             const rolNombre = u.rol.toLowerCase();
-            const map = { administrador: '2', trabajador: '1', estudiante: '3', empleado: '4' };
-            if (map[rolNombre]) selRol.value = map[rolNombre];
+            const match = catalogoRoles.find(r => r.vchrolnombre.toLowerCase() === rolNombre);
+            if (match) selRol.value = match.intidrol;
         }
         // Preseleccionar carrera — buscar el option cuyo texto coincida
         const selCarrera = document.getElementById('editar-carrera');
@@ -213,16 +230,17 @@ async function actualizarUsuario() {
             correo: document.getElementById('editar-correo').value.trim(),
             nombreUsuario: document.getElementById('editar-username').value.trim(),
             idRol: parseInt(document.getElementById('editar-rol').value) || null,
+            password: document.getElementById('editar-password')?.value.trim() || '',
             idCarrera: parseInt(document.getElementById('editar-carrera').value) || null,
             telefono: document.getElementById('editar-telefono').value.trim(),
         };
         const json = await AuthService.actualizarUsuario(id, payload, AuthUtils.getHeaders());
         if (!json.success) throw new Error(json.message || 'Error al actualizar');
         bootstrap.Modal.getInstance(document.getElementById('editarUsuarioModal'))?.hide();
-        Toast?.success('Usuario actualizado exitosamente');
+        Toast.success('Usuario actualizado exitosamente');
         await cargarUsuarios();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-actualizar-usuario', false, '<i class="bi bi-floppy me-1"></i>Actualizar');
     }
@@ -281,7 +299,27 @@ window.irAPaginaUsuarios = function (n) {
 /* Init */
 document.addEventListener('DOMContentLoaded', async () => {
     if (!AuthUtils.requiereAdmin()) return;
-    await Promise.all([cargarCarreras(), cargarUsuarios()]);
+    await Promise.all([cargarRoles(), cargarCarreras(), cargarUsuarios()]);
+
+    // Toggle visibilidad contraseña — modal Agregar
+    document.getElementById('toggle-agregar-password')?.addEventListener('click', () => {
+        const input = document.getElementById('agregar-password');
+        const ico   = document.getElementById('ico-agregar-password');
+        if (!input) return;
+        const visible = input.type === 'text';
+        input.type    = visible ? 'password' : 'text';
+        if (ico) ico.className = visible ? 'bi bi-eye' : 'bi bi-eye-slash';
+    });
+
+    // Toggle visibilidad contraseña — modal Editar
+    document.getElementById('toggle-editar-password')?.addEventListener('click', () => {
+        const input = document.getElementById('editar-password');
+        const ico   = document.getElementById('ico-editar-password');
+        if (!input) return;
+        const visible = input.type === 'text';
+        input.type    = visible ? 'password' : 'text';
+        if (ico) ico.className = visible ? 'bi bi-eye' : 'bi bi-eye-slash';
+    });
 
     let debounce;
     document.getElementById('buscador-usuarios')?.addEventListener('input', () => {

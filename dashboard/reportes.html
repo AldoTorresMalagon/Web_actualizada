@@ -6,11 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes - Cafetería ITH</title>
 
-    <!-- Accesibilidad -->
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/images/favicon/site.webmanifest">
+    <meta name="theme-color" content="#0b265c">
+
     <script src="../assets/js/config/accesibilidad.init.js"></script>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="../assets/js/config/bootstrap.loader.js"></script>
 
     <link rel="stylesheet" href="../assets/css/variables.css">
     <link rel="stylesheet" href="../assets/css/main.css">
@@ -20,18 +26,16 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-
     <div id="dash-header"></div>
-
     <div class="dash-wrapper">
         <div id="dash-sidebar"></div>
-
         <main class="dash-main flex-grow-1 p-4">
 
+            <!-- Encabezado + exportación -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Reportes</h2>
-                <div class="btn-toolbar gap-2">
-                    <button class="btn btn-outline-secondary btn-sm" id="btn-exportar-pdf">
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-danger btn-sm" id="btn-exportar-pdf">
                         <i class="bi bi-file-pdf me-1"></i>PDF
                     </button>
                     <button class="btn btn-outline-success btn-sm" id="btn-exportar-excel">
@@ -40,118 +44,248 @@
                 </div>
             </div>
 
-            <!-- Filtros de período -->
+            <!-- Selector de período -->
             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-3">
-                            <label class="form-label">Tipo de Reporte</label>
-                            <select id="filtro-tipo" class="form-select">
-                                <option value="ventas_dia">Ventas por Día</option>
-                                <option value="ventas_mes">Ventas por Mes</option>
-                                <option value="productos_mas_vendidos">Productos más Vendidos</option>
-                                <option value="inventario">Estado de Inventario</option>
-                                <option value="usuarios">Usuarios Registrados</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Fecha Inicio</label>
-                            <input type="date" id="filtro-fecha-inicio" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Fecha Fin</label>
-                            <input type="date" id="filtro-fecha-fin" class="form-control">
-                        </div>
-                        <div class="col-md-3">
-                            <button class="btn btn-primary w-100" id="btn-generar-reporte">
-                                <i class="bi bi-search me-1"></i>Generar Reporte
+                <div class="card-body py-3">
+                    <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
+                        <div class="d-flex gap-2 flex-wrap" id="selector-periodo">
+                            <button class="btn btn-outline-secondary periodo-btn" data-periodo="hoy">Hoy</button>
+                            <button class="btn btn-outline-secondary periodo-btn" data-periodo="semana">Esta
+                                semana</button>
+                            <button class="btn btn-outline-secondary periodo-btn active" data-periodo="mes">Este
+                                mes</button>
+                            <button class="btn btn-outline-secondary periodo-btn"
+                                data-periodo="trimestre">Trimestre</button>
+                            <button class="btn btn-outline-secondary periodo-btn" data-periodo="año">Este año</button>
+                            <button class="btn btn-outline-secondary periodo-btn" data-periodo="personalizado">
+                                <i class="bi bi-calendar-range me-1"></i>Personalizado
                             </button>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tarjetas de resumen -->
-            <div class="row g-3 mb-4">
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-receipt text-primary mb-2 icon-reporte"></i>
-                            <h6 class="text-muted">Total Ventas</h6>
-                            <h3 class="mb-0" id="stat-total-ventas">--</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-currency-dollar text-success mb-2 icon-reporte"></i>
-                            <h6 class="text-muted">Ingresos Totales</h6>
-                            <h3 class="mb-0" id="stat-ingresos">--</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-graph-up text-warning mb-2 icon-reporte"></i>
-                            <h6 class="text-muted">Promedio por Venta</h6>
-                            <h3 class="mb-0" id="stat-promedio">--</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body text-center">
-                            <i class="bi bi-trophy text-danger mb-2 icon-reporte"></i>
-                            <h6 class="text-muted">Producto Estrella</h6>
-                            <h5 class="mb-0" id="stat-producto-estrella">--</h5>
+                        <div class="d-flex gap-2 align-items-center d-none" id="rango-personalizado">
+                            <input type="date" id="fecha-desde" class="form-control form-control-sm mw-150">
+                            <span class="text-muted">—</span>
+                            <input type="date" id="fecha-hasta" class="form-control form-control-sm mw-150">
+                            <button class="btn btn-primary btn-sm" id="btn-aplicar-rango">Aplicar</button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Gráfica -->
+            <!-- KPIs -->
+            <div class="row g-3 mb-4" id="seccion-kpis">
+                <div class="col-6 col-xl-3">
+                    <div class="card kpi-card shadow-sm h-100">
+                        <div class="card-body text-center py-3">
+                            <i class="bi bi-receipt text-primary mb-1 icon-kpi"></i>
+                            <h6 class="text-muted small mb-1">Total Ventas</h6>
+                            <h3 class="mb-0 fw-bold" id="kpi-ventas">--</h3>
+                            <div class="kpi-variacion neutro mt-1" id="kpi-ventas-var">--</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="card kpi-card shadow-sm h-100">
+                        <div class="card-body text-center py-3">
+                            <i class="bi bi-currency-dollar text-success mb-1 icon-kpi"></i>
+                            <h6 class="text-muted small mb-1">Ingresos</h6>
+                            <h3 class="mb-0 fw-bold" id="kpi-ingresos">--</h3>
+                            <div class="kpi-variacion neutro mt-1" id="kpi-ingresos-var">--</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="card kpi-card shadow-sm h-100">
+                        <div class="card-body text-center py-3">
+                            <i class="bi bi-graph-up text-warning mb-1 icon-kpi"></i>
+                            <h6 class="text-muted small mb-1">Ticket Promedio</h6>
+                            <h3 class="mb-0 fw-bold" id="kpi-ticket">--</h3>
+                            <div class="kpi-variacion neutro mt-1" id="kpi-ticket-var">--</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-xl-3">
+                    <div class="card kpi-card shadow-sm h-100">
+                        <div class="card-body text-center py-3">
+                            <i class="bi bi-trophy text-danger mb-1 icon-kpi"></i>
+                            <h6 class="text-muted small mb-1">Producto Estrella</h6>
+                            <h5 class="mb-0 fw-bold" id="kpi-estrella">--</h5>
+                            <div class="kpi-variacion neutro mt-1" id="kpi-cancelacion">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila: Gráfica de ventas + Distribución por tipo -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-8">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                            <h6 class="mb-0 fw-semibold"><i class="bi bi-graph-up me-2 text-primary"></i>Ventas en el
+                                período</h6>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-secondary active" data-agrupacion="dia">Día</button>
+                                <button class="btn btn-outline-secondary" data-agrupacion="semana">Semana</button>
+                                <button class="btn btn-outline-secondary" data-agrupacion="mes">Mes</button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-ventas-periodo" class="chart-container chart-lg"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0 fw-semibold"><i class="bi bi-pie-chart me-2 text-warning"></i>Distribución
+                                por tipo</h6>
+                        </div>
+                        <div class="card-body d-flex align-items-center justify-content-center">
+                            <div id="chart-distribucion" class="chart-container chart-md w-100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila: Top productos + Horas pico -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-7">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                            <h6 class="mb-0 fw-semibold"><i class="bi bi-bar-chart-horizontal me-2 text-success"></i>Top
+                                10 productos</h6>
+                            <select id="filtro-tipo-top" class="form-select form-select-sm mw-140">
+                                <option value="">Todos</option>
+                                <option value="platillo">Platillo</option>
+                                <option value="bebida">Bebida</option>
+                                <option value="snack">Snack</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-top-productos" class="chart-container chart-xl"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-5">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0 fw-semibold"><i class="bi bi-clock me-2 text-info"></i>Horas pico</h6>
+                        </div>
+                        <div class="card-body">
+                            <div id="chart-horas-pico" class="chart-container chart-xl"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Predicción -->
             <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i><span id="grafica-titulo">Gráfica de
-                            Ventas</span></h5>
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-secondary active" id="btn-grafica-barras" title="Barras">
-                            <i class="bi bi-bar-chart"></i>
-                        </button>
-                        <button class="btn btn-outline-secondary" id="btn-grafica-lineas" title="Líneas">
-                            <i class="bi bi-graph-up"></i>
-                        </button>
-                        <button class="btn btn-outline-secondary" id="btn-grafica-dona" title="Dona">
-                            <i class="bi bi-pie-chart"></i>
-                        </button>
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <h6 class="mb-0 fw-semibold">
+                            <i class="bi bi-stars me-2 text-warning"></i>Predicción de demanda
+                        </h6>
+                        <div class="d-flex gap-2 flex-wrap align-items-center">
+                            <!-- Selector: general o por producto -->
+                            <select id="selector-producto-pred" class="form-select form-select-sm mw-200">
+                                <option value="">📊 Ventas generales</option>
+                            </select>
+                            <!-- Selector de días -->
+                            <div class="btn-group btn-group-sm" id="selector-dias-prediccion">
+                                <button class="btn btn-outline-secondary active" data-dias="7">7 días</button>
+                                <button class="btn btn-outline-secondary" data-dias="14">14 días</button>
+                                <button class="btn btn-outline-secondary" data-dias="30">30 días</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
-                    <canvas id="reporteChart" height="100"></canvas>
+                    <!-- Badge del modelo de predicción (se actualiza dinámicamente) -->
+                    <div id="badge-modelo-prediccion" class="mb-3"></div>
+                    <div class="prediccion-aviso mb-3" id="prediccion-aviso">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Los valores son estimados con base en el historial disponible.
+                        Períodos vacacionales o eventos especiales pueden alterar los resultados reales.
+                    </div>
+                    <div id="chart-prediccion" class="chart-container chart-md"></div>
+                    <!-- Parámetros del modelo logístico (solo visibles cuando aplica) -->
+                    <div id="params-logistico" class="params-logistico mt-3" style="display:none;">
+                        <span class="params-logistico__titulo">
+                            <i class="bi bi-sliders2 me-1"></i>Parámetros del modelo logístico:
+                        </span>
+                        <span class="params-logistico__item">
+                            <strong>r</strong> = <span id="param-r">—</span>
+                            <span class="params-logistico__desc">(tasa de crecimiento)</span>
+                        </span>
+                        <span class="params-logistico__item">
+                            <strong>K</strong> = <span id="param-K">—</span>
+                            <span class="params-logistico__desc">(capacidad máxima)</span>
+                        </span>
+                        <span class="params-logistico__item">
+                            <strong>P₀</strong> = <span id="param-P0">—</span>
+                            <span class="params-logistico__desc">(valor inicial)</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Tabla de detalle -->
-            <div class="card shadow-sm border-0">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0"><i class="bi bi-table me-2"></i>Detalle del Reporte</h5>
-                    <input type="text" id="buscador-reporte" class="form-control form-control-sm filter-search"
-                        placeholder="Buscar en el reporte...">
+            <!-- Stock crítico + Tabla detalle -->
+            <div class="row g-4 mb-4">
+                <div class="col-xl-5">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0 fw-semibold"><i
+                                    class="bi bi-exclamation-triangle me-2 text-danger"></i>Stock crítico</h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Tipo</th>
+                                            <th class="text-center">Stock</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tabla-stock-critico">
+                                        <tr>
+                                            <td colspan="4" class="text-center py-3 text-muted">Cargando...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover table-striped mb-0">
-                            <thead class="table-dark" id="tabla-reporte-head">
-                                <tr>
-                                    <th colspan="5" class="text-center text-muted fw-normal py-3">Genera un reporte para
-                                        ver los datos</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tabla-reporte-body">
-                            </tbody>
-                        </table>
+                <div class="col-xl-7">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white">
+                            <h6 class="mb-0 fw-semibold"><i class="bi bi-table me-2"></i>Detalle de ventas</h6>
+                            <input type="text" id="buscador-detalle" class="form-control form-control-sm mw-200"
+                                placeholder="Buscar...">
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive tabla-scroll">
+                                <table class="table table-hover align-middle mb-0" id="tabla-ventas-detalle">
+                                    <thead class="table-dark sticky-top">
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Ventas</th>
+                                            <th>Ingresos</th>
+                                            <th>Ticket prom.</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-ventas-detalle">
+                                        <tr>
+                                            <td colspan="4" class="text-center py-3 text-muted">Genera un período para
+                                                ver el detalle</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="card-footer text-end py-2" id="footer-detalle" style="display:none!important;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -159,9 +293,39 @@
         </main>
     </div>
 
-    <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <!-- Modal: Detalle de producto individual -->
+    <div class="modal fade" id="modal-producto" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-box-seam me-2"></i>
+                        <span id="modal-producto-titulo">Producto</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="modal-producto-body">
+                    <div class="text-center py-4">
+                        <span class="spinner-border text-primary"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <small class="text-muted me-auto">
+                        <i class="bi bi-calendar-range me-1"></i>
+                        Período: <span id="modal-producto-periodo"></span>
+                    </small>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CDNs de librerías -->
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <script src="../assets/js/config/api.config.js"></script>
     <script src="../assets/js/utils/auth.utils.js"></script>
@@ -170,10 +334,14 @@
 
     <script src="../assets/js/components/dash-header.js"></script>
     <script src="../assets/js/components/dash-sidebar.js"></script>
-    <script src="../assets/js/services/productos.service.js"></script>
-    <script src="../assets/js/services/carrito.service.js"></script>
-    <script src="../assets/js/services/auth.service.js"></script>
+    
+    <script src="../assets/js/pages/dashboard/pdf.export.js"></script>
+    <script src="../assets/js/pages/dashboard/excel.export.js"></script>
     <script src="../assets/js/pages/dashboard/reportes.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/notificaciones.panel.css">
+    <script src="../assets/js/components/notificaciones.panel.js"></script>
+
     <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>
 

@@ -6,11 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario - Cafetería ITH</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="../assets/images/favicon/site.webmanifest">
+    <meta name="theme-color" content="#0b265c">
+
     <!-- Accesibilidad -->
     <script src="../assets/js/config/accesibilidad.init.js"></script>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <script src="../assets/js/config/bootstrap.loader.js"></script>
 
     <link rel="stylesheet" href="../assets/css/variables.css">
     <link rel="stylesheet" href="../assets/css/main.css">
@@ -32,10 +38,28 @@
                 <h2 class="mb-0 w-100 text-center">
                     <i class="bi bi-clipboard-check me-2"></i>Inventario
                 </h2>
-                <div class="position-absolute end-0 d-flex gap-2">
-                    <button class="btn btn-outline-secondary btn-sm" id="btn-exportar">
-                        <i class="bi bi-download me-1"></i>Exportar
-                    </button>
+                <div class="position-absolute end-0 d-flex align-items-center gap-2 flex-wrap justify-content-end">
+
+                    <!-- Selector de período para exportar -->
+                    <div class="d-flex align-items-center gap-1" id="filtro-exportar">
+                        <div class="btn-group btn-group-sm" id="selector-periodo-export">
+                            <button class="btn btn-outline-secondary active" data-periodo-export="hoy">Hoy</button>
+                            <button class="btn btn-outline-secondary" data-periodo-export="semana">Semana</button>
+                            <button class="btn btn-outline-secondary" data-periodo-export="personalizado">
+                                <i class="bi bi-calendar-range"></i>
+                            </button>
+                        </div>
+                        <!-- Rango personalizado — oculto por defecto -->
+                        <div id="rango-export" class="d-none d-flex align-items-center gap-1">
+                            <input type="date" id="export-desde" class="form-control form-control-sm" style="max-width:130px;">
+                            <span class="text-muted small">—</span>
+                            <input type="date" id="export-hasta" class="form-control form-control-sm" style="max-width:130px;">
+                        </div>
+                        <button class="btn btn-outline-success btn-sm" id="btn-exportar">
+                            <i class="bi bi-file-excel me-1"></i>Excel
+                        </button>
+                    </div>
+
                     <button class="btn btn-primary btn-sm" id="btn-actualizar-inventario">
                         <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
                     </button>
@@ -69,10 +93,10 @@
                     </div>
                 </div>
                 <div class="col-sm-6 col-xl-3">
-                    <div class="card text-white bg-success h-100">
+                    <div class="card text-white bg-info h-100">
                         <div class="card-body">
-                            <h5 class="card-title">Valor Total</h5>
-                            <h3 class="mb-0" id="stat-valor-total">--</h3>
+                            <h5 class="card-title">Movimientos Hoy</h5>
+                            <h3 class="mb-0" id="stat-movimientos-hoy">--</h3>
                         </div>
                     </div>
                 </div>
@@ -81,9 +105,9 @@
             <!-- Tabla de inventario -->
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <div class="mb-3">
-                        <h5 class="mb-3 text-center"><i class="bi bi-table me-2"></i>Historial de Movimientos</h5>
-                        <div class="d-flex gap-2 flex-wrap justify-content-center">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                        <h5 class="mb-0"><i class="bi bi-table me-2"></i>Historial de Movimientos</h5>
+                        <div class="d-flex gap-2 flex-wrap">
                             <select id="filtro-stock" class="form-select form-select-sm" style="max-width:160px;">
                                 <option value="">Todos</option>
                                 <option value="bajo">Stock bajo</option>
@@ -162,9 +186,6 @@
         </div>
     </div>
 
-    <!-- Bootstrap Bundle JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <script src="../assets/js/config/api.config.js"></script>
     <script src="../assets/js/utils/auth.utils.js"></script>
     <script src="../assets/js/utils/toast.utils.js"></script>
@@ -174,7 +195,13 @@
     <script src="../assets/js/components/dash-sidebar.js"></script>
     <script src="../assets/js/services/productos.service.js"></script>
     <script src="../assets/js/services/inventario.service.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="../assets/js/pages/dashboard/excel.export.js"></script>
     <script src="../assets/js/pages/dashboard/inventario.js"></script>
+
+    <link rel="stylesheet" href="../assets/css/notificaciones.panel.css">
+    <script src="../assets/js/components/notificaciones.panel.js"></script>
+
     <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>
 

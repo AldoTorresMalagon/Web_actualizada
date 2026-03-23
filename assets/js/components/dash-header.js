@@ -36,11 +36,22 @@
         <!-- Título centrado -->
         <span class="dash-header-title">${titulo}</span>
 
-        <!-- Usuario -->
+        <!-- Usuario + campana de notificaciones -->
         <div class="dash-header-user">
+          <!-- Campana — a la izquierda del avatar -->
+          <div id="btn-campana" title="Notificaciones"
+               style="cursor:pointer;position:relative;margin-right:.75rem;">
+            <i class="bi bi-bell-fill"
+               style="font-size:1.25rem;color:rgba(255,255,255,.85);"></i>
+            <span id="badge-notif"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                  style="font-size:.6rem;min-width:18px;display:none;">0</span>
+          </div>
+          <!-- Avatar -->
           <div class="dash-header-avatar">
             <i class="bi bi-person-fill"></i>
           </div>
+          <!-- Nombre y rol -->
           <div class="dash-header-user-info">
             <span class="dash-header-nombre">${nombre}</span>
             <small class="dash-header-rol">${rol}</small>

@@ -1,6 +1,7 @@
 let todasLasVentas = [];
 let metodosPago = [];
 let carritoVenta = [];
+let descuentosCache = {}; // { idProducto: porcentaje } — cargado al abrir el modal
 let paginaActual = 1;
 const POR_PAGINA = 10;
 
@@ -54,9 +55,10 @@ async function cargarVentas() {
 /* Estadísticas */
 function actualizarEstadisticas() {
     const hoy = new Date().toDateString();
-    const mes = new Date().getMonth();
+    // comparar YYYY-MM para incluir el año y evitar mezclar meses de distintos años
+    const mesActual = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
     const ventasHoy = todasLasVentas.filter(v => new Date(v.FechaRegistro).toDateString() === hoy);
-    const ventasMes = todasLasVentas.filter(v => new Date(v.FechaRegistro).getMonth() === mes);
+    const ventasMes = todasLasVentas.filter(v => v.FechaRegistro?.startsWith(mesActual));
     const totalGeneral = todasLasVentas.reduce((s, v) => s + parseFloat(v.MontoTotal || 0), 0);
     const promedio = todasLasVentas.length ? totalGeneral / todasLasVentas.length : 0;
 
@@ -201,7 +203,7 @@ window.verDetalle = async function (id) {
 
         new bootstrap.Modal(document.getElementById('detalleVentaModal')).show();
     } catch (err) {
-        Toast?.error('Error al cargar detalle: ' + err.message);
+        Toast.error('Error al cargar detalle: ' + err.message);
     }
 };
 
@@ -218,10 +220,10 @@ async function confirmarCancelar() {
         const json = await CarritoService.cancelarVenta(id, AuthUtils.getHeaders());
         if (!json.success) throw new Error(json.message || 'Error al cancelar');
         bootstrap.Modal.getInstance(document.getElementById('cancelarVentaModal'))?.hide();
-        Toast?.success('Venta cancelada');
+        Toast.success('Venta cancelada');
         await cargarVentas();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-confirmar-cancelar', false, '<i class="bi bi-x-circle me-1"></i>Cancelar Venta');
     }
@@ -253,18 +255,34 @@ async function buscarProductoVenta() {
                 </tr>`).join('')
             : '<tr><td colspan="4" class="text-muted text-center">Sin resultados</td></tr>';
     } catch (err) {
-        Toast?.error('Error al buscar: ' + err.message);
+        Toast.error('Error al buscar: ' + err.message);
     }
 }
 
 /* Carrito */
-window.agregarAlCarrito = function (id, nombre, precio, stock) {
+window.agregarAlCarrito = async function (id, nombre, precio, stock) {
     const existe = carritoVenta.find(x => x.idProducto === id);
     if (existe) {
-        if (existe.cantidad >= stock) { Toast?.warning('Stock insuficiente'); return; }
+        if (existe.cantidad >= stock) { Toast.warning('Stock insuficiente'); return; }
         existe.cantidad++;
     } else {
-        carritoVenta.push({ idProducto: id, nombre, precio, cantidad: 1, stock });
+        // consultar precio con descuento via fn_precio_final
+        let precioFinal = precio;
+        let precioOriginal = null;
+        try {
+            const res = await apiFetch(
+                `${API_CONFIG.BASE_URL}/promociones/precio/${id}/1`,
+                { headers: AuthUtils.getHeaders() }
+            );
+            const json = await res.json();
+            if (json.success && json.data?.tieneDescuento) {
+                precioFinal  = json.data.precioFinal;
+                precioOriginal = precio;
+            }
+        } catch { /* sin descuento, usar precio normal */ }
+
+        carritoVenta.push({ idProducto: id, nombre, precio: precioFinal,
+                            precioOriginal, cantidad: 1, stock });
     }
     renderCarrito();
 };
@@ -284,13 +302,22 @@ function renderCarrito() {
         <tr>
             <td>${item.nombre}</td>
             <td>
-                <div class="input-group input-group-sm" style="width:100px">
+                <div class="input-group input-group-sm" class="input-cantidad">
                     <button class="btn btn-outline-secondary" onclick="cambiarCantidad(${i}, -1)">−</button>
                     <input type="text" class="form-control text-center" value="${item.cantidad}" readonly>
                     <button class="btn btn-outline-secondary" onclick="cambiarCantidad(${i}, 1)">+</button>
                 </div>
             </td>
-            <td>${FormatUtils.moneda(item.precio * item.cantidad, false)}</td>
+            <td>
+                ${item.precioOriginal
+                    ? `<small class="text-muted text-decoration-line-through me-1">
+                           $${(item.precioOriginal * item.cantidad).toFixed(2)}
+                       </small>`
+                    : ''}
+                <span class="${item.precioOriginal ? 'text-success fw-semibold' : ''}">
+                    ${FormatUtils.moneda(item.precio * item.cantidad, false)}
+                </span>
+            </td>
             <td>
                 <button class="btn btn-sm btn-outline-danger" onclick="quitarDelCarrito(${i})">
                     <i class="bi bi-trash"></i>
@@ -317,10 +344,10 @@ window.quitarDelCarrito = function (i) {
 
 /* Confirmar nueva venta */
 async function confirmarVenta() {
-    if (!carritoVenta.length) { Toast?.warning('Agrega productos al carrito'); return; }
+    if (!carritoVenta.length) { Toast.warning('Agrega productos al carrito'); return; }
 
     const metodoPagoNombre = document.getElementById('metodo-pago-venta').value;
-    if (!metodoPagoNombre) { Toast?.warning('Selecciona un método de pago'); return; }
+    if (!metodoPagoNombre) { Toast.warning('Selecciona un método de pago'); return; }
 
     setBtnLoading('btn-confirmar-venta', true, '<i class="bi bi-check-circle me-1"></i>Confirmar Venta');
     try {
@@ -337,10 +364,10 @@ async function confirmarVenta() {
         bootstrap.Modal.getInstance(document.getElementById('nuevaVentaModal'))?.hide();
         carritoVenta = [];
         renderCarrito();
-        Toast?.success('Venta registrada exitosamente');
+        Toast.success('Venta registrada exitosamente');
         await cargarVentas();
     } catch (err) {
-        Toast?.error(err.message);
+        Toast.error(err.message);
     } finally {
         setBtnLoading('btn-confirmar-venta', false, '<i class="bi bi-check-circle me-1"></i>Confirmar Venta');
     }

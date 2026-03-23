@@ -32,7 +32,7 @@ const AuthService = {
 
     /* GET /api/usuarios/perfil */
     async getPerfil(headers) {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/usuarios/perfil`, { headers });
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/usuarios/perfil`, { headers });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Error al cargar perfil');
         return data.data;
@@ -40,7 +40,7 @@ const AuthService = {
 
     /* PUT /api/usuarios/perfil */
     async actualizarPerfil(payload, headers) {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/usuarios/perfil`, {
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/usuarios/perfil`, {
             method: 'PUT',
             headers,
             body: JSON.stringify(payload),
@@ -52,7 +52,7 @@ const AuthService = {
 
     /* PUT /api/usuarios/perfil/password */
     async cambiarPassword(payload, headers) {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/usuarios/perfil/password`, {
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/usuarios/perfil/password`, {
             method: 'PUT',
             headers,
             body: JSON.stringify(payload),
@@ -66,18 +66,16 @@ const AuthService = {
 
     /* GET /api/usuarios */
     async getUsuarios(headers) {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/usuarios`, { headers });
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/usuarios`, { headers });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Error al cargar usuarios');
         return data.data || [];
     },
 
     /*
-     * POST /api/usuarios  (crear desde dashboard — solo admin)
-     * Diferente a /registro: no requiere captcha y el admin asigna el rol
-     */
+     * POST /api/usuarios  (crear desde dashboard — solo admin) */
     async crearUsuario(payload, headers) {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/usuarios`, {
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/usuarios`, {
             method: 'POST',
             headers,
             body: JSON.stringify(payload),
@@ -89,7 +87,7 @@ const AuthService = {
 
     /* PUT /api/usuarios/:id */
     async actualizarUsuario(id, payload, headers) {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/usuarios/${id}`, {
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/usuarios/${id}`, {
             method: 'PUT',
             headers,
             body: JSON.stringify(payload),
@@ -101,7 +99,7 @@ const AuthService = {
 
     /* DELETE /api/usuarios/:id — soft delete (estado = inactivo) */
     async eliminarUsuario(id, headers) {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/usuarios/${id}`, {
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/usuarios/${id}`, {
             method: 'DELETE',
             headers,
         });
@@ -122,9 +120,21 @@ const AuthService = {
 
     /* GET /api/roles — solo admin, devuelve { intidrol, vchrolnombre, nivel_acceso } */
     async getRoles(headers) {
-        const res = await fetch(`${API_CONFIG.BASE_URL}/roles`, { headers });
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/roles`, { headers });
         const data = await res.json();
         if (!res.ok) throw new Error('Error al cargar roles');
         return data.data || [];
+    },
+
+    /* POST /api/usuarios — crear usuario desde dashboard (admin) */
+    async crearUsuario(payload, headers) {
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/usuarios`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Error al crear usuario');
+        return data;
     },
 };

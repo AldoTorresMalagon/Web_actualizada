@@ -18,7 +18,8 @@ const FormatUtils = {
     /* 15 de marzo de 2026 */
     fechaLarga(f) {
         if (!f) return '—';
-        return new Date(f).toLocaleDateString('es-MX', {
+        const _f3 = typeof f === 'string' ? f.replace(' ', 'T') : f;
+        return new Date(_f3).toLocaleDateString('es-MX', {
             year: 'numeric', month: 'long', day: 'numeric'
         });
     },
@@ -26,12 +27,19 @@ const FormatUtils = {
     /* 15/03/2026 */
     fechaCorta(f) {
         if (!f) return '—';
-        return new Date(f).toLocaleDateString('es-MX');
+        const _f2 = typeof f === 'string' ? f.replace(' ', 'T') : f;
+        return new Date(_f2).toLocaleDateString('es-MX');
     },
 
     /* 15/03/2026 10:44 p.m. */
     fechaHora(f) {
         if (!f) return '—';
+        // Forzar zona America/Mexico_City para consistencia en cualquier dispositivo
+        // El servidor MariaDB está en CST (UTC-6, zona Centro)
+        // Mostrar sin conversión de zona para que coincida con lo guardado
+        if (typeof f === 'string') {
+            return new Date(f.replace(' ', 'T')).toLocaleString('es-MX');
+        }
         return new Date(f).toLocaleString('es-MX');
     },
 
