@@ -34,9 +34,10 @@ const FormatUtils = {
     /* 15/03/2026 10:44 p.m. */
     fechaHora(f) {
         if (!f) return '—';
-        // Forzar zona America/Mexico_City para consistencia en cualquier dispositivo
-        // El servidor MariaDB está en CST (UTC-6, zona Centro)
-        // Mostrar sin conversión de zona para que coincida con lo guardado
+        // db.js ya fuerza SET time_zone = '-06:00' en cada conexión del pool,
+        // por lo que NOW() guarda la hora local correcta del ITH (UTC-6) y
+        // mysql2 devuelve las fechas ya en esa zona. El navegador las parsea
+        // como hora local del dispositivo → no se requiere ajuste adicional.
         if (typeof f === 'string') {
             return new Date(f.replace(' ', 'T')).toLocaleString('es-MX');
         }
@@ -87,9 +88,14 @@ const FormatUtils = {
     /* Badge de estado de venta con color dinámico */
     badgeEstadoVenta(estado) {
         const map = {
+            'Pendiente': 'bg-warning text-dark',
+            'En Preparación': 'bg-info text-dark',
+            'Listo': 'bg-primary',
+            'Entregado': 'bg-success',
+            'Cancelado': 'bg-danger',
+            'Pagado en línea': 'bg-success',
             'Completada': 'bg-success',
             'Cancelada': 'bg-danger',
-            'Pendiente': 'bg-warning text-dark',
         };
         const cls = map[estado] || 'bg-secondary';
         return `<span class="badge ${cls}">${estado || '—'}</span>`;

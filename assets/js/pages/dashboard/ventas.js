@@ -1,8 +1,11 @@
-let todasLasVentas = [];
+let estadosDisponibles = [];
 let metodosPago = [];
 let carritoVenta = [];
-let descuentosCache = {}; // { idProducto: porcentaje } — cargado al abrir el modal
 let paginaActual = 1;
+let totalVentas = 0;
+let totalPaginas = 0;
+let filtroEstado = '';
+let filtroBusqueda = '';
 const POR_PAGINA = 10;
 
 /* Helpers UI */
@@ -25,9 +28,29 @@ function setBtnLoading(btnId, activo, textoOriginal) {
         : textoOriginal;
 }
 
-/* Cargar métodos de pago */
-async function cargarMetodosPago() {
+/* Cargar estados y métodos de pago
+ * IMPORTANTE: debe completarse ANTES de cargar ventas,
+ * para que renderTabla tenga estadosDisponibles llenos.
+ */
+async function cargarCatalogos() {
     try {
+        // Estados
+        const resEstados = await fetch(`${API_CONFIG.BASE_URL}/ventas/estados`, {
+            headers: AuthUtils.getHeaders(),
+        });
+        const dataEstados = await resEstados.json();
+        estadosDisponibles = dataEstados.data || [];
+
+        // Poblar filtro de estados del encabezado
+        const filtro = document.getElementById('filtro-estado');
+        if (filtro) {
+            filtro.innerHTML = '<option value="">Todos los estados</option>';
+            estadosDisponibles.forEach(e => {
+                filtro.innerHTML += `<option value="${e.nombre_estado}">${e.nombre_estado}</option>`;
+            });
+        }
+
+        // Métodos de pago
         metodosPago = await CarritoService.getMetodosPago(AuthUtils.getHeaders());
         const sel = document.getElementById('metodo-pago-venta');
         if (sel) {
@@ -36,60 +59,74 @@ async function cargarMetodosPago() {
                 sel.innerHTML += `<option value="${m.nombre_metodo}">${m.nombre_metodo}</option>`;
             });
         }
-    } catch { /* no crítico */ }
+    } catch (err) {
+        console.error('Error cargando catálogos:', err);
+    }
 }
 
-/* Cargar ventas */
-async function cargarVentas() {
+/* Cargar ventas de la página actual desde el servidor */
+async function cargarVentas(pagina = 1) {
     setLoading('tabla-ventas', 7);
+    paginaActual = pagina;
     try {
-        todasLasVentas = await CarritoService.getTodasVentas(AuthUtils.getHeaders());
-        actualizarEstadisticas();
-        aplicarFiltrosYRenderizar();
+        // Construir URL con filtros opcionales
+        let url = `${API_CONFIG.BASE_URL}/ventas?page=${pagina}&limit=${POR_PAGINA}`;
+
+        const resultado = await fetch(url, { headers: AuthUtils.getHeaders() })
+            .then(r => r.json());
+
+        if (!resultado.success) throw new Error(resultado.message || 'Error al cargar ventas');
+
+        const datos = resultado.data;
+        totalVentas = datos.total || 0;
+        totalPaginas = datos.totalPaginas || 0;
+        const items = datos.items || [];
+
+        actualizarEstadisticas(datos);
+        renderTabla(items);
+        renderPaginacion();
     } catch (err) {
         setError('tabla-ventas', 7, 'Error al cargar ventas');
         console.error(err);
     }
 }
 
-/* Estadísticas */
-function actualizarEstadisticas() {
+/* Estadísticas — calculadas desde los datos de la página actual
+ * Los totales reales los entrega el endpoint de reportes (dashboard index).
+ * Aquí solo mostramos conteos simples de lo que ya está en pantalla.
+ */
+function actualizarEstadisticas(datos) {
     const hoy = new Date().toDateString();
-    // comparar YYYY-MM para incluir el año y evitar mezclar meses de distintos años
-    const mesActual = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
-    const ventasHoy = todasLasVentas.filter(v => new Date(v.FechaRegistro).toDateString() === hoy);
-    const ventasMes = todasLasVentas.filter(v => v.FechaRegistro?.startsWith(mesActual));
-    const totalGeneral = todasLasVentas.reduce((s, v) => s + parseFloat(v.MontoTotal || 0), 0);
-    const promedio = todasLasVentas.length ? totalGeneral / todasLasVentas.length : 0;
+    const mesActual = new Date().toISOString().slice(0, 7);
 
-    document.getElementById('stat-ventas-hoy').textContent = ventasHoy.length;
-    document.getElementById('stat-ventas-mes').textContent = ventasMes.length;
-    document.getElementById('stat-venta-promedio').textContent = FormatUtils.moneda(promedio, false);
-    document.getElementById('stat-total-general').textContent = FormatUtils.moneda(totalGeneral, false);
+    // Para estadísticas precisas necesitamos todos los registros del día/mes,
+    // no solo la página actual. Hacemos una llamada rápida al resumen.
+    const hoySql = new Date().toISOString().split('T')[0];
+    const primerDiaMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+        .toISOString().split('T')[0];
+
+    fetch(`${API_CONFIG.BASE_URL}/reportes/resumen?desde=${hoySql}&hasta=${hoySql}`,
+        { headers: AuthUtils.getHeaders() })
+        .then(r => r.json())
+        .then(res => {
+            const d = res.data?.actual || {};
+            document.getElementById('stat-ventas-hoy').textContent = d.totalVentas ?? '—';
+            document.getElementById('stat-venta-promedio').textContent =
+                d.ticketPromedio ? FormatUtils.moneda(d.ticketPromedio, false) : '$0.00';
+        }).catch(() => { });
+
+    fetch(`${API_CONFIG.BASE_URL}/reportes/resumen?desde=${primerDiaMes}&hasta=${hoySql}`,
+        { headers: AuthUtils.getHeaders() })
+        .then(r => r.json())
+        .then(res => {
+            const d = res.data?.actual || {};
+            document.getElementById('stat-ventas-mes').textContent = d.totalVentas ?? '—';
+            document.getElementById('stat-total-general').textContent =
+                FormatUtils.moneda(d.totalIngresos || 0, false);
+        }).catch(() => { });
 }
 
-/* Filtrar y renderizar */
-function aplicarFiltrosYRenderizar() {
-    const termino = document.getElementById('buscador-ventas')?.value.toLowerCase().trim() || '';
-    const estadoFiltro = document.getElementById('filtro-estado')?.value || '';
-
-    let lista = todasLasVentas.filter(v => {
-        const coincide = v.cliente?.toLowerCase().includes(termino) ||
-            String(v.idVenta).includes(termino);
-        const coincideEstado = !estadoFiltro || v.estado === estadoFiltro;
-        return coincide && coincideEstado;
-    });
-
-    const total = lista.length;
-    const totalPags = Math.ceil(total / POR_PAGINA) || 1;
-    if (paginaActual > totalPags) paginaActual = totalPags;
-
-    const inicio = (paginaActual - 1) * POR_PAGINA;
-    renderTabla(lista.slice(inicio, inicio + POR_PAGINA));
-    renderPaginacion(total, totalPags);
-}
-
-/* ── Renderizar tabla ── */
+/* Renderizar tabla con selector inline */
 function renderTabla(lista) {
     const tbody = document.getElementById('tabla-ventas');
     if (!lista.length) {
@@ -97,13 +134,35 @@ function renderTabla(lista) {
             <i class="bi bi-search me-2"></i>No se encontraron ventas</td></tr>`;
         return;
     }
-    tbody.innerHTML = lista.map(v => `
+
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const puedeEditar = ['administrador', 'trabajador'].includes(user.rol);
+
+    tbody.innerHTML = lista.map(v => {
+        const cancelada = v.estado === 'Cancelada' || v.estado === 'Cancelado';
+
+        // Selector inline — solo si puede editar y no está cancelada
+        const selectorEstado = (puedeEditar && !cancelada)
+            ? `<select class="form-select form-select-sm estado-inline"
+                       style="min-width:145px;"
+                       data-id="${v.idVenta}"
+                       onchange="cambiarEstadoInline(this)">
+                   ${estadosDisponibles
+                .filter(e => e.nombre_estado !== 'Cancelado' && e.nombre_estado !== 'Cancelada')
+                .map(e => `<option value="${e.id_estado_venta}"
+                           ${e.nombre_estado === v.estado ? 'selected' : ''}>
+                           ${e.nombre_estado}
+                       </option>`).join('')}
+               </select>`
+            : FormatUtils.badgeEstadoVenta(v.estado || 'Pendiente');
+
+        return `
         <tr>
             <td><span class="fw-semibold">#${v.idVenta}</span></td>
             <td>${v.cliente || 'Sin nombre'}</td>
             <td>${FormatUtils.badgePrecio(v.MontoTotal)}</td>
             <td>${v.TipoDocumento || '—'}</td>
-            <td>${FormatUtils.badgeEstadoVenta(v.estado || 'Pendiente')}</td>
+            <td>${selectorEstado}</td>
             <td><small>${FormatUtils.fechaHora(v.FechaRegistro)}</small></td>
             <td>
                 <div class="btn-group btn-group-sm">
@@ -111,32 +170,65 @@ function renderTabla(lista) {
                             onclick="verDetalle(${v.idVenta})">
                         <i class="bi bi-eye"></i>
                     </button>
-                    ${v.estado === 'Pendiente' ? `
+                    ${!cancelada ? `
                     <button class="btn btn-outline-danger" title="Cancelar"
                             onclick="abrirCancelar(${v.idVenta})">
                         <i class="bi bi-x-circle"></i>
                     </button>` : ''}
                 </div>
             </td>
-        </tr>`).join('');
+        </tr>`;
+    }).join('');
 }
 
-/* Paginación */
-function renderPaginacion(total, totalPags) {
+/* Cambiar estado directo desde la tabla */
+window.cambiarEstadoInline = async function (select) {
+    const idVenta = parseInt(select.dataset.id);
+    const idEstado = parseInt(select.value);
+    const valorAnterior = Array.from(select.options)
+        .find(o => o.defaultSelected)?.value || select.value;
+
+    select.disabled = true;
+    try {
+        const res = await fetch(`${API_CONFIG.BASE_URL}/ventas/${idVenta}/estado`, {
+            method: 'PUT',
+            headers: { ...AuthUtils.getHeaders(), 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idEstado }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Error al actualizar estado');
+
+        const estadoObj = estadosDisponibles.find(e => e.id_estado_venta === idEstado);
+        Toast.success(`Venta #${idVenta} → ${estadoObj?.nombre_estado || 'actualizada'}`);
+
+        // Marcar la opción seleccionada como default para futuras reversiones
+        Array.from(select.options).forEach(o => o.defaultSelected = false);
+        select.options[select.selectedIndex].defaultSelected = true;
+
+    } catch (err) {
+        Toast.error(err.message);
+        select.value = valorAnterior;
+    } finally {
+        select.disabled = false;
+    }
+};
+
+/* Paginación del servidor */
+function renderPaginacion() {
     let cont = document.getElementById('paginacion-ventas');
     if (!cont) {
         cont = document.createElement('div');
         cont.id = 'paginacion-ventas';
         document.getElementById('tabla-ventas')?.closest('.card-body')?.appendChild(cont);
     }
-    if (totalPags <= 1) { cont.innerHTML = ''; return; }
+    if (totalPaginas <= 1) { cont.innerHTML = ''; return; }
 
     const inicio = (paginaActual - 1) * POR_PAGINA + 1;
-    const fin = Math.min(paginaActual * POR_PAGINA, total);
+    const fin = Math.min(paginaActual * POR_PAGINA, totalVentas);
     let btns = '';
-    for (let i = 1; i <= totalPags; i++) {
-        if (totalPags > 7 && i > 2 && i < totalPags - 1 && Math.abs(i - paginaActual) > 1) {
-            if (i === 3 || i === totalPags - 2)
+    for (let i = 1; i <= totalPaginas; i++) {
+        if (totalPaginas > 7 && i > 2 && i < totalPaginas - 1 && Math.abs(i - paginaActual) > 1) {
+            if (i === 3 || i === totalPaginas - 2)
                 btns += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
             continue;
         }
@@ -145,13 +237,13 @@ function renderPaginacion(total, totalPags) {
     }
     cont.innerHTML = `
         <div class="d-flex flex-column align-items-center gap-2 mt-3">
-            <small class="text-muted">Mostrando ${inicio}–${fin} de ${total}</small>
+            <small class="text-muted">Mostrando ${inicio}–${fin} de ${totalVentas}</small>
             <nav><ul class="pagination pagination-sm mb-0">
                 <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
                     <button class="page-link" onclick="irAPagina(${paginaActual - 1})">
                         <i class="bi bi-chevron-left"></i></button></li>
                 ${btns}
-                <li class="page-item ${paginaActual === totalPags ? 'disabled' : ''}">
+                <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
                     <button class="page-link" onclick="irAPagina(${paginaActual + 1})">
                         <i class="bi bi-chevron-right"></i></button></li>
             </ul></nav>
@@ -159,13 +251,11 @@ function renderPaginacion(total, totalPags) {
 }
 
 window.irAPagina = function (n) {
-    const totalPags = Math.ceil(todasLasVentas.length / POR_PAGINA) || 1;
-    if (n < 1 || n > totalPags) return;
-    paginaActual = n;
-    aplicarFiltrosYRenderizar();
+    if (n < 1 || n > totalPaginas) return;
+    cargarVentas(n);
 };
 
-/* Ver detalle de venta */
+/* Ver detalle — solo información, sin selector de estado */
 window.verDetalle = async function (id) {
     try {
         const v = await CarritoService.getVentaById(id, AuthUtils.getHeaders());
@@ -181,24 +271,48 @@ window.verDetalle = async function (id) {
             </tr>`).join('') || '<tr><td colspan="4" class="text-muted text-center">Sin detalle</td></tr>';
 
         body.innerHTML = `
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <small class="text-muted d-block">Cliente</small>
+                    <strong>${v.cliente || '—'}</strong>
+                    <small class="text-muted d-block">${v.correoCliente || ''}</small>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted d-block">Fecha</small>
+                    <span>${FormatUtils.fechaHora(v.FechaRegistro)}</span>
+                </div>
+                <div class="col-md-3">
+                    <small class="text-muted d-block">Método de pago</small>
+                    <span>${v.TipoDocumento || '—'}</span>
+                </div>
+            </div>
             <div class="mb-3">
-                <strong>Cliente:</strong> ${v.cliente || '—'}<br>
-                <strong>Fecha:</strong> ${FormatUtils.fechaHora(v.FechaRegistro)}<br>
-                <strong>Estado:</strong> ${FormatUtils.badgeEstadoVenta(v.estado)}<br>
-                <strong>Tipo documento:</strong> ${v.TipoDocumento || '—'}
+                <small class="text-muted d-block">Estado</small>
+                ${FormatUtils.badgeEstadoVenta(v.estado)}
             </div>
             <table class="table table-sm">
-                <thead><tr>
+                <thead class="table-dark"><tr>
                     <th>Producto</th>
                     <th class="text-center">Cant.</th>
-                    <th class="text-end">Precio</th>
+                    <th class="text-end">Precio unit.</th>
                     <th class="text-end">Subtotal</th>
                 </tr></thead>
                 <tbody>${items}</tbody>
-                <tfoot><tr>
-                    <td colspan="3" class="text-end fw-bold">Total:</td>
-                    <td class="text-end fw-bold">${FormatUtils.moneda(v.MontoTotal, false)}</td>
-                </tr></tfoot>
+                <tfoot>
+                    <tr class="fw-bold">
+                        <td colspan="3" class="text-end">Total:</td>
+                        <td class="text-end">${FormatUtils.moneda(v.MontoTotal, false)}</td>
+                    </tr>
+                    ${v.MontoPago ? `
+                    <tr class="text-muted small">
+                        <td colspan="3" class="text-end">Pagado:</td>
+                        <td class="text-end">${FormatUtils.moneda(v.MontoPago, false)}</td>
+                    </tr>
+                    <tr class="text-muted small">
+                        <td colspan="3" class="text-end">Cambio:</td>
+                        <td class="text-end">${FormatUtils.moneda(v.MontoCambio, false)}</td>
+                    </tr>` : ''}
+                </tfoot>
             </table>`;
 
         new bootstrap.Modal(document.getElementById('detalleVentaModal')).show();
@@ -209,19 +323,20 @@ window.verDetalle = async function (id) {
 
 /* Cancelar venta */
 window.abrirCancelar = function (id) {
-    document.getElementById('cancelar-venta-id').value = id;
+    document.getElementById('cancelar-venta-id').textContent = `#${id}`;
+    document.getElementById('cancelar-venta-id-input').value = id;
     new bootstrap.Modal(document.getElementById('cancelarVentaModal')).show();
 };
 
 async function confirmarCancelar() {
-    const id = document.getElementById('cancelar-venta-id').value;
+    const id = document.getElementById('cancelar-venta-id-input').value;
     setBtnLoading('btn-confirmar-cancelar', true, '<i class="bi bi-x-circle me-1"></i>Cancelar Venta');
     try {
         const json = await CarritoService.cancelarVenta(id, AuthUtils.getHeaders());
         if (!json.success) throw new Error(json.message || 'Error al cancelar');
         bootstrap.Modal.getInstance(document.getElementById('cancelarVentaModal'))?.hide();
-        Toast.success('Venta cancelada');
-        await cargarVentas();
+        Toast.success('Venta cancelada y stock revertido');
+        await cargarVentas(paginaActual); // recargar la misma página
     } catch (err) {
         Toast.error(err.message);
     } finally {
@@ -266,23 +381,22 @@ window.agregarAlCarrito = async function (id, nombre, precio, stock) {
         if (existe.cantidad >= stock) { Toast.warning('Stock insuficiente'); return; }
         existe.cantidad++;
     } else {
-        // consultar precio con descuento via fn_precio_final
+        // Consultar precio con descuento vía promociones
         let precioFinal = precio;
         let precioOriginal = null;
         try {
-            const res = await apiFetch(
+            const res = await fetch(
                 `${API_CONFIG.BASE_URL}/promociones/precio/${id}/1`,
                 { headers: AuthUtils.getHeaders() }
             );
             const json = await res.json();
             if (json.success && json.data?.tieneDescuento) {
-                precioFinal  = json.data.precioFinal;
+                precioFinal = json.data.precioFinal;
                 precioOriginal = precio;
             }
         } catch { /* sin descuento, usar precio normal */ }
 
-        carritoVenta.push({ idProducto: id, nombre, precio: precioFinal,
-                            precioOriginal, cantidad: 1, stock });
+        carritoVenta.push({ idProducto: id, nombre, precio: precioFinal, precioOriginal, cantidad: 1, stock });
     }
     renderCarrito();
 };
@@ -302,7 +416,7 @@ function renderCarrito() {
         <tr>
             <td>${item.nombre}</td>
             <td>
-                <div class="input-group input-group-sm" class="input-cantidad">
+                <div class="input-group input-group-sm">
                     <button class="btn btn-outline-secondary" onclick="cambiarCantidad(${i}, -1)">−</button>
                     <input type="text" class="form-control text-center" value="${item.cantidad}" readonly>
                     <button class="btn btn-outline-secondary" onclick="cambiarCantidad(${i}, 1)">+</button>
@@ -310,10 +424,10 @@ function renderCarrito() {
             </td>
             <td>
                 ${item.precioOriginal
-                    ? `<small class="text-muted text-decoration-line-through me-1">
+            ? `<small class="text-muted text-decoration-line-through me-1">
                            $${(item.precioOriginal * item.cantidad).toFixed(2)}
                        </small>`
-                    : ''}
+            : ''}
                 <span class="${item.precioOriginal ? 'text-success fw-semibold' : ''}">
                     ${FormatUtils.moneda(item.precio * item.cantidad, false)}
                 </span>
@@ -359,13 +473,13 @@ async function confirmarVenta() {
         };
 
         const json = await CarritoService.crearVenta(payload, AuthUtils.getHeaders());
-        if (!json.success) throw new Error(json.message || 'Error al registrar venta');
+        if (!json?.idVenta) throw new Error('Error al registrar venta');
 
         bootstrap.Modal.getInstance(document.getElementById('nuevaVentaModal'))?.hide();
         carritoVenta = [];
         renderCarrito();
         Toast.success('Venta registrada exitosamente');
-        await cargarVentas();
+        await cargarVentas(1); // volver a la primera página para ver la nueva venta
     } catch (err) {
         Toast.error(err.message);
     } finally {
@@ -373,19 +487,20 @@ async function confirmarVenta() {
     }
 }
 
-/* Init */
+/* Init — catálogos PRIMERO, ventas DESPUÉS */
 document.addEventListener('DOMContentLoaded', async () => {
     if (!AuthUtils.requiereAdmin()) return;
-    await Promise.all([cargarMetodosPago(), cargarVentas()]);
+
+    // Orden secuencial: los estados deben estar listos antes de renderizar la tabla
+    await cargarCatalogos();
+    await cargarVentas(1);
 
     let debounce;
     document.getElementById('buscador-ventas')?.addEventListener('input', () => {
         clearTimeout(debounce);
-        debounce = setTimeout(() => { paginaActual = 1; aplicarFiltrosYRenderizar(); }, 300);
+        debounce = setTimeout(() => cargarVentas(1), 400);
     });
-    document.getElementById('filtro-estado')?.addEventListener('change', () => {
-        paginaActual = 1; aplicarFiltrosYRenderizar();
-    });
+    document.getElementById('filtro-estado')?.addEventListener('change', () => cargarVentas(1));
     document.getElementById('buscar-producto-venta')?.addEventListener('input', buscarProductoVenta);
     document.getElementById('btn-confirmar-venta')?.addEventListener('click', confirmarVenta);
     document.getElementById('btn-confirmar-cancelar')?.addEventListener('click', confirmarCancelar);

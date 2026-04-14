@@ -29,7 +29,7 @@ function cargarInfoSistema() {
     actualizarReloj();
     setInterval(actualizarReloj, 1000);
 
-    // Estado de la API — ping simple, no necesita servicio
+    // Estado de la API — ping simple
     fetch(`${API_CONFIG.BASE_URL}/productos?limit=1`)
         .then(r => {
             document.getElementById('sys-api-status').innerHTML = r.ok
@@ -42,48 +42,70 @@ function cargarInfoSistema() {
         });
 }
 
-/* Estadísticas principales*/
+/* Estadísticas principales
+ * Usa /api/reportes/resumen en lugar de traer todas las ventas al frontend.
+ * Mucho más eficiente: la BD hace los cálculos, no el navegador.
+ */
 async function cargarEstadisticas() {
     try {
         const headers = AuthUtils.getHeaders();
+        const hoy = new Date().toISOString().split('T')[0];
+        const primerDiaMes = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+            .toISOString().split('T')[0];
 
-        // Usar los servicios existentes en paralelo
-        const [ventas, usuarios, productos] = await Promise.all([
-            CarritoService.getTodasVentas(headers),
+        // KPIs del día, del mes, usuarios y stock crítico — todo en paralelo
+        const [resumenHoy, resumenMes, usuarios, stockData] = await Promise.all([
+            fetch(`${API_CONFIG.BASE_URL}/reportes/resumen?desde=${hoy}&hasta=${hoy}`,
+                { headers }).then(r => r.json()),
+            fetch(`${API_CONFIG.BASE_URL}/reportes/resumen?desde=${primerDiaMes}&hasta=${hoy}`,
+                { headers }).then(r => r.json()),
             AuthService.getUsuarios(headers),
-            ProductosService.getAll(headers),
+            fetch(`${API_CONFIG.BASE_URL}/reportes/stock-critico?umbral=10`,
+                { headers }).then(r => r.json()),
         ]);
 
-        // Ventas de hoy
-        const hoy = new Date().toISOString().split('T')[0];
-        const ventasHoy = ventas.filter(v => v.FechaRegistro?.startsWith(hoy));
-        document.getElementById('stat-ventas-hoy').textContent = ventasHoy.length;
+        const hoyData = resumenHoy.data?.actual || {};
+        const mesData = resumenMes.data?.actual || {};
 
-        // Ingresos del mes
-        const mesActual = new Date().toISOString().slice(0, 7);
-        const ingresosMes = ventas
-            .filter(v => v.FechaRegistro?.startsWith(mesActual))
-            .reduce((sum, v) => sum + parseFloat(v.MontoTotal || 0), 0);
-        document.getElementById('stat-ingresos-mes').textContent = FormatUtils.moneda(ingresosMes, false);
+        // Ventas de hoy (todas las registradas, incluye pendientes)
+        document.getElementById('stat-ventas-hoy').textContent =
+            hoyData.totalVentas ?? '—';
+
+        // Ticket promedio del día (solo completadas)
+        const elTicket = document.getElementById('stat-ticket-promedio');
+        if (elTicket) elTicket.textContent =
+            hoyData.ticketPromedio
+                ? FormatUtils.moneda(hoyData.ticketPromedio, false)
+                : '$0.00';
+
+        // Cancelaciones del día
+        const elCancel = document.getElementById('stat-cancelaciones');
+        if (elCancel) elCancel.textContent = hoyData.canceladas ?? '—';
+
+        // Ingresos del mes (solo ventas completadas)
+        document.getElementById('stat-ingresos-mes').textContent =
+            FormatUtils.moneda(mesData.totalIngresos || 0, false);
 
         // Usuarios activos
         document.getElementById('stat-usuarios').textContent = usuarios.length;
 
-        // Productos con stock bajo (< 10)
-        const stockBajo = productos.filter(p => p.Stock < 10).length;
-        document.getElementById('stat-stock-bajo').textContent = stockBajo;
+        // Productos con stock bajo
+        document.getElementById('stat-stock-bajo').textContent =
+            stockData.data?.stockBajo?.length ?? '—';
 
     } catch (err) {
         console.error('Error cargando estadísticas:', err);
     }
 }
 
-/* Pedidos recientes */
+/* Pedidos recientes — solo los 8 más recientes via paginación */
 async function cargarPedidosRecientes() {
     const tbody = document.getElementById('tabla-pedidos-recientes');
     try {
-        const ventas = await CarritoService.getTodasVentas(AuthUtils.getHeaders());
-        const recientes = ventas.slice(0, 8);
+        const resultado = await CarritoService.getVentasPaginadas(
+            AuthUtils.getHeaders(), 1, 8
+        );
+        const recientes = resultado.items || [];
 
         if (!recientes.length) {
             tbody.innerHTML = `<tr><td colspan="5" class="text-center py-3 text-muted">No hay pedidos recientes</td></tr>`;
@@ -91,7 +113,7 @@ async function cargarPedidosRecientes() {
         }
 
         tbody.innerHTML = recientes.map(v => {
-            const fecha = new Date(v.FechaRegistro);
+            const fecha = new Date(v.FechaRegistro?.replace(' ', 'T'));
             const fechaStr = fecha.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' });
             const horaStr = fecha.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
             return `
@@ -140,8 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cargarPedidosRecientes();
     cargarProductosPopulares();
 
-    // Generar alertas automáticas al abrir el dashboard (solo admin)
-    // No bloqueante — corre en segundo plano
+    // Generar alertas automáticas (no bloqueante)
     fetch(`${API_CONFIG.BASE_URL}/notificaciones/generar-alertas`, {
         method: 'POST',
         headers: AuthUtils.getHeaders(),

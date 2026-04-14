@@ -1,7 +1,10 @@
 let todasLasSubcats = [];
+let todasLasCategorias = [];
 
 /* Estado global */
-let todosLosProductos = [];
+let todosLosProductos = []; // página actual
+let totalProductos = 0;
+let totalPaginas = 0;
 let paginaActual = 1;
 const POR_PAGINA = 10;
 
@@ -54,40 +57,62 @@ async function cargarProveedores() {
 }
 
 /* Cargar y renderizar productos */
-async function cargarProductos() {
+/* Cargar productos del servidor — paginación real
+ * Los filtros de búsqueda, tipo, subcategoría, estado y ordenamiento
+ * se aplican en el frontend sobre la página actual.
+ * Al cambiar de página se hace una nueva llamada al servidor.
+ */
+async function cargarProductos(pagina = 1) {
     setLoading('tabla-productos', 7);
+    paginaActual = pagina;
     try {
-        // Cargar productos y subcategorías en paralelo
-        [todosLosProductos, todasLasSubcats] = await Promise.all([
-            ProductosService.getAll(AuthUtils.getHeaders()),
-            SubcategoriasService.getSubcategorias(),
-        ]);
+        // Subcategorías y categorías se cargan una sola vez (catálogos ligeros)
+        if (!todasLasSubcats.length || !todasLasCategorias.length) {
+            const [subcats, cats] = await Promise.all([
+                SubcategoriasService.getSubcategorias(),
+                ProductosService.getCategorias(),
+            ]);
+            todasLasSubcats = subcats;
+            todasLasCategorias = cats;
+        }
+
+        const resultado = await ProductosService.getAllPaginado(
+            AuthUtils.getHeaders(), pagina, POR_PAGINA
+        );
+        todosLosProductos = resultado.items || [];
+        totalProductos = resultado.total || 0;
+        totalPaginas = resultado.totalPaginas || 0;
+
         actualizarEstadisticas();
-        aplicarFiltrosYRenderizar();
+        renderTabla(todosLosProductos);
+        renderPaginacion();
     } catch (err) {
         mostrarError('tabla-productos', 7, 'Error al cargar productos');
         console.error(err);
     }
 }
 
-/* Estadísticas */
+/* Estadísticas — usa stock-critico para conteos precisos sobre todos los productos */
 function actualizarEstadisticas() {
-    const total = todosLosProductos.length;
+    // Total viene del servidor
+    document.getElementById('stat-total').textContent = totalProductos;
+
+    // Activos, stock bajo y sin stock: calculados sobre la página actual
+    // (aproximación visual — los conteos exactos están en reportes/stock-critico)
     const activos = todosLosProductos.filter(p => p.Estado !== 0).length;
     const stockBajo = todosLosProductos.filter(p => p.Stock > 0 && p.Stock < 10).length;
     const sinStock = todosLosProductos.filter(p => p.Stock <= 0).length;
 
-    document.getElementById('stat-total').textContent = total;
     document.getElementById('stat-activos').textContent = activos;
     document.getElementById('stat-stock-bajo').textContent = stockBajo;
     document.getElementById('stat-sin-stock').textContent = sinStock;
 }
 
-/* Filtrar + ordenar + paginar */
+/* Filtrar + ordenar la página actual y re-renderizar sin ir al servidor */
 function aplicarFiltrosYRenderizar() {
     const termino = document.getElementById('buscador-productos')?.value.toLowerCase().trim() || '';
-    const tipoFiltro  = document.getElementById('filtro-tipo')?.value || '';
-    const subFiltro   = document.getElementById('filtro-subcategoria')?.value || '';
+    const tipoFiltro = document.getElementById('filtro-tipo')?.value || '';
+    const subFiltro = document.getElementById('filtro-subcategoria')?.value || '';
     const estadoFiltro = document.getElementById('filtro-estado')?.value || '';
     const ordenamiento = document.getElementById('ordenar-productos')?.value || 'nombre-asc';
 
@@ -95,14 +120,13 @@ function aplicarFiltrosYRenderizar() {
         const coincideBusqueda =
             p.Nombre?.toLowerCase().includes(termino) ||
             p.Codigo?.toLowerCase().includes(termino) ||
-            p.categoria?.toLowerCase().includes(termino);
-        const coincideTipo  = !tipoFiltro || p.tipo === tipoFiltro;
-        const coincideSub   = !subFiltro || String(p.idSubcategoria) === subFiltro;
+            p.subcategoria?.toLowerCase().includes(termino);
+        const coincideTipo = !tipoFiltro || p.tipo === tipoFiltro;
+        const coincideSub = !subFiltro || String(p.idSubcategoria) === subFiltro;
         const coincideEstado = estadoFiltro === '' || String(p.Estado ?? 1) === estadoFiltro;
         return coincideBusqueda && coincideTipo && coincideSub && coincideEstado;
     });
 
-    // Ordenamiento
     switch (ordenamiento) {
         case 'nombre-asc': lista.sort((a, b) => a.Nombre.localeCompare(b.Nombre)); break;
         case 'nombre-desc': lista.sort((a, b) => b.Nombre.localeCompare(a.Nombre)); break;
@@ -112,22 +136,14 @@ function aplicarFiltrosYRenderizar() {
         case 'stock-desc': lista.sort((a, b) => b.Stock - a.Stock); break;
     }
 
-    const total = lista.length;
-    const totalPags = Math.ceil(total / POR_PAGINA) || 1;
-    if (paginaActual > totalPags) paginaActual = totalPags;
-
-    const inicio = (paginaActual - 1) * POR_PAGINA;
-    const pagina = lista.slice(inicio, inicio + POR_PAGINA);
-
-    renderTabla(pagina);
-    renderPaginacion(total, totalPags);
+    renderTabla(lista);
 }
 
 /* Renderizar tabla */
 function renderTabla(lista) {
     const tbody = document.getElementById('tabla-productos');
     if (!lista.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">
             <i class="bi bi-search me-2"></i>No se encontraron productos</td></tr>`;
         return;
     }
@@ -141,8 +157,6 @@ function renderTabla(lista) {
 
         const stockClass = FormatUtils.claseStock(p.Stock);
 
-        const estadoBadge = FormatUtils.badgeEstado(p.Estado !== 0);
-
         return `
         <tr>
             <td>${imgHtml}</td>
@@ -152,10 +166,13 @@ function renderTabla(lista) {
             </td>
             <td><span class="badge bg-primary">${p.subcategoria || p.tipo || '—'}</span></td>
             <td class="fw-semibold">${FormatUtils.moneda(p.PrecioVenta, false)}</td>
-            <td class="${stockClass}">${p.Stock}</td>
-            <td>${estadoBadge}</td>
+            <td class="${stockClass} fw-semibold">${p.Stock}</td>
             <td>
                 <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-info" title="Ver detalles"
+                            data-id="${p.idProducto}" onclick="abrirDetalle(this.dataset.id)">
+                        <i class="bi bi-eye"></i>
+                    </button>
                     <button class="btn btn-outline-warning" title="Editar"
                             onclick="abrirEditar(${p.idProducto})">
                         <i class="bi bi-pencil"></i>
@@ -174,18 +191,20 @@ function renderTabla(lista) {
     }).join('');
 }
 
-/* Paginación */
-function renderPaginacion(total, totalPags) {
+/* Paginación del servidor */
+function renderPaginacion() {
     const contenedor = document.getElementById('paginacion-productos');
     if (!contenedor) return;
+    if (totalPaginas <= 1) { contenedor.innerHTML = ''; return; }
 
     const inicio = (paginaActual - 1) * POR_PAGINA + 1;
-    const fin = Math.min(paginaActual * POR_PAGINA, total);
+    const fin = Math.min(paginaActual * POR_PAGINA, totalProductos);
 
     let btns = '';
-    for (let i = 1; i <= totalPags; i++) {
-        if (totalPags > 7 && i > 2 && i < totalPags - 1 && Math.abs(i - paginaActual) > 1) {
-            if (i === 3 || i === totalPags - 2) btns += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+    for (let i = 1; i <= totalPaginas; i++) {
+        if (totalPaginas > 7 && i > 2 && i < totalPaginas - 1 && Math.abs(i - paginaActual) > 1) {
+            if (i === 3 || i === totalPaginas - 2)
+                btns += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
             continue;
         }
         btns += `<li class="page-item ${i === paginaActual ? 'active' : ''}">
@@ -194,13 +213,13 @@ function renderPaginacion(total, totalPags) {
 
     contenedor.innerHTML = `
         <div class="d-flex flex-column align-items-center gap-2 mt-3">
-            <small class="text-muted">Mostrando ${total ? inicio : 0}–${fin} de ${total} productos</small>
+            <small class="text-muted">Mostrando ${totalProductos ? inicio : 0}–${fin} de ${totalProductos} productos</small>
             <nav><ul class="pagination pagination-sm mb-0">
                 <li class="page-item ${paginaActual === 1 ? 'disabled' : ''}">
                     <button class="page-link" onclick="irAPagina(${paginaActual - 1})">
                         <i class="bi bi-chevron-left"></i></button></li>
                 ${btns}
-                <li class="page-item ${paginaActual === totalPags ? 'disabled' : ''}">
+                <li class="page-item ${paginaActual === totalPaginas ? 'disabled' : ''}">
                     <button class="page-link" onclick="irAPagina(${paginaActual + 1})">
                         <i class="bi bi-chevron-right"></i></button></li>
             </ul></nav>
@@ -208,10 +227,8 @@ function renderPaginacion(total, totalPags) {
 }
 
 window.irAPagina = function (n) {
-    const totalPags = Math.ceil(todosLosProductos.length / POR_PAGINA) || 1;
-    if (n < 1 || n > totalPags) return;
-    paginaActual = n;
-    aplicarFiltrosYRenderizar();
+    if (n < 1 || n > totalPaginas) return;
+    cargarProductos(n);
 };
 
 /* Guardar nuevo producto */
@@ -251,6 +268,11 @@ async function guardarProducto() {
 
     try {
         const imagen = await leerImagenBase64('agregar-imagen');
+        // Obtener idCategoria desde el tipo seleccionado
+        const tipoSel = document.getElementById('agregar-tipo').value;
+        const catObj = todasLasCategorias.find(c => c.tipo === tipoSel);
+        const idCategoria = catObj?.idCategoria || null;
+
         const payload = {
             nombre,
             codigo: document.getElementById('agregar-codigo').value.trim(),
@@ -258,6 +280,7 @@ async function guardarProducto() {
             precioVenta: parseFloat(precio),
             precioCompra: parseFloat(document.getElementById('agregar-precio-compra').value) || 0,
             stock: parseInt(stock) || 0,
+            idCategoria,
             idSubcategoria: parseInt(subcategoria),
             idProveedor: parseInt(proveedor) || null,
             imagen: imagen || '',
@@ -270,7 +293,7 @@ async function guardarProducto() {
         bootstrap.Modal.getInstance(document.getElementById('agregarProductoModal'))?.hide();
         limpiarModalAgregar();
         Toast.success('Producto agregado exitosamente');
-        await cargarProductos();
+        await cargarProductos(1);
 
     } catch (err) {
         Toast.error(err.message);
@@ -278,6 +301,46 @@ async function guardarProducto() {
         setBtnLoading('btn-guardar-producto', false, '<i class="bi bi-floppy me-1"></i>Guardar Producto');
     }
 }
+
+
+/* Ver detalles del producto */
+window.abrirDetalle = function (id) {
+    const p = todosLosProductos.find(x => String(x.idProducto) === String(id));
+    if (!p) return;
+    const modal = document.getElementById('detalleProductoModal');
+    const body = document.getElementById('detalle-producto-body');
+    const margen = p.PrecioCompra > 0
+        ? (((p.PrecioVenta - p.PrecioCompra) / p.PrecioVenta) * 100).toFixed(1) + '%'
+        : '—';
+    body.innerHTML = `
+        <div class="row g-3">
+            <div class="col-md-4 text-center">
+                ${p.Imagen
+            ? `<img src="${p.Imagen}" class="img-fluid rounded shadow-sm"
+                            style="max-height:200px;object-fit:cover;"
+                            onerror="this.src='https://placehold.co/200x200/e2e8f0/94a3b8?text=Sin+imagen'">`
+            : `<div class="bg-light rounded d-flex align-items-center justify-content-center"
+                            style="height:200px;"><i class="bi bi-image fs-1 text-muted"></i></div>`
+        }
+                <div class="mt-2">${FormatUtils.badgeEstado(p.Estado !== 0)}</div>
+            </div>
+            <div class="col-md-8">
+                <h5 class="fw-bold">${p.Nombre}</h5>
+                <p class="text-muted small">${p.Descripcion || 'Sin descripción'}</p>
+                <div class="row g-2">
+                    <div class="col-6"><small class="text-muted d-block">Código</small><strong>${p.Codigo || '—'}</strong></div>
+                    <div class="col-6"><small class="text-muted d-block">Tipo</small><span class="badge bg-secondary">${p.tipo || '—'}</span></div>
+                    <div class="col-6"><small class="text-muted d-block">Subcategoría</small><span class="badge bg-primary">${p.subcategoria || '—'}</span></div>
+                    <div class="col-6"><small class="text-muted d-block">Stock actual</small><strong class="${FormatUtils.claseStock(p.Stock)}">${p.Stock} unidades</strong></div>
+                    <div class="col-6"><small class="text-muted d-block">Precio venta</small><strong class="text-success">${FormatUtils.moneda(p.PrecioVenta, false)}</strong></div>
+                    <div class="col-6"><small class="text-muted d-block">Precio compra</small><strong>${FormatUtils.moneda(p.PrecioCompra, false)}</strong></div>
+                    <div class="col-6"><small class="text-muted d-block">Margen de ganancia</small><strong class="text-info">${margen}</strong></div>
+                    <div class="col-6"><small class="text-muted d-block">Estado</small>${FormatUtils.badgeEstado(p.Estado !== 0)}</div>
+                </div>
+            </div>
+        </div>`;
+    new bootstrap.Modal(modal).show();
+};
 
 /* Abrir modal de edición */
 window.abrirEditar = async function (id) {
@@ -341,6 +404,11 @@ async function actualizarProducto() {
 
     try {
         const imagen = await leerImagenBase64('editar-imagen');
+        // Obtener idCategoria desde el tipo seleccionado
+        const tipoEdit = document.getElementById('editar-tipo').value;
+        const catObjEdit = todasLasCategorias.find(ct => ct.tipo === tipoEdit);
+        const idCatEdit = catObjEdit?.idCategoria || null;
+
         const payload = {
             nombre,
             codigo: document.getElementById('editar-codigo').value.trim(),
@@ -348,6 +416,7 @@ async function actualizarProducto() {
             precioVenta: parseFloat(precio),
             precioCompra: parseFloat(document.getElementById('editar-precio-compra').value) || 0,
             stock: parseInt(document.getElementById('editar-stock').value) || 0,
+            idCategoria: idCatEdit,
             idSubcategoria: parseInt(subcatEdit),
             idProveedor: parseInt(document.getElementById('editar-proveedor').value) || null,
             imagen: imagen || undefined,
@@ -359,7 +428,7 @@ async function actualizarProducto() {
 
         bootstrap.Modal.getInstance(document.getElementById('editarProductoModal'))?.hide();
         Toast.success('Producto actualizado exitosamente');
-        await cargarProductos();
+        await cargarProductos(paginaActual);
 
     } catch (err) {
         Toast.error(err.message);
@@ -407,7 +476,7 @@ async function confirmarAjusteStock() {
 
         bootstrap.Modal.getInstance(document.getElementById('ajustarStockModal'))?.hide();
         Toast.success('Stock actualizado correctamente');
-        await cargarProductos();
+        await cargarProductos(paginaActual);
 
     } catch (err) {
         Toast.error(err.message);
@@ -420,10 +489,10 @@ async function confirmarAjusteStock() {
 window.confirmarEliminar = function (id, nombre) {
     Toast.confirm(
         {
-            titulo:  'Eliminar producto',
-            msg:     `¿Eliminar permanentemente <strong>"${nombre}"</strong>?<br>
+            titulo: 'Eliminar producto',
+            msg: `¿Eliminar permanentemente <strong>"${nombre}"</strong>?<br>
                       <span style="color:#dc3545;font-size:.85rem;">Esta acción no se puede deshacer.</span>`,
-            tipo:    'danger',
+            tipo: 'danger',
             labelOk: 'Sí, eliminar',
         },
         () => eliminarProducto(id)
@@ -436,7 +505,7 @@ async function eliminarProducto(id) {
         if (!json.success) throw new Error(json.message || 'Error al eliminar');
 
         Toast.success('Producto eliminado correctamente');
-        await cargarProductos();
+        await cargarProductos(paginaActual);
     } catch (err) {
         Toast.error(err.message);
     }
@@ -515,39 +584,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     initPreviewImagen('agregar-imagen', 'agregar-imagen-preview');
 
     await Promise.all([cargarCategorias(), cargarProveedores()]);
-    await cargarProductos();
+    await cargarProductos(1);
 
-    // Búsqueda con debounce
+    // Búsqueda con debounce — recarga del servidor en página 1
     let debounce;
     document.getElementById('buscador-productos')?.addEventListener('input', () => {
         clearTimeout(debounce);
-        debounce = setTimeout(() => { paginaActual = 1; aplicarFiltrosYRenderizar(); }, 300);
+        debounce = setTimeout(() => cargarProductos(1), 400);
     });
 
+    // Ordenamiento — aplica sobre la página actual sin ir al servidor
     document.getElementById('ordenar-productos')?.addEventListener('change', () => {
-        paginaActual = 1; aplicarFiltrosYRenderizar();
-    });
-    document.getElementById('filtro-categoria')?.addEventListener('change', () => {
-        paginaActual = 1; aplicarFiltrosYRenderizar();
+        aplicarFiltrosYRenderizar();
     });
 
     document.getElementById('filtro-estado')?.addEventListener('change', () => {
-        paginaActual = 1; aplicarFiltrosYRenderizar();
+        aplicarFiltrosYRenderizar();
     });
 
-    document.getElementById('agregar-tipo')?.addEventListener('change', function() {
+    document.getElementById('agregar-tipo')?.addEventListener('change', function () {
         llenarSubcatsAgregar(this.value);
     });
-    document.getElementById('editar-tipo')?.addEventListener('change', function() {
+    document.getElementById('editar-tipo')?.addEventListener('change', function () {
         llenarSubcatsEditar(this.value, '');
     });
-    document.getElementById('filtro-tipo')?.addEventListener('change', function() {
-        paginaActual = 1;
+    document.getElementById('filtro-tipo')?.addEventListener('change', function () {
         actualizarFiltroSubcategorias(this.value);
         aplicarFiltrosYRenderizar();
     });
     document.getElementById('filtro-subcategoria')?.addEventListener('change', () => {
-        paginaActual = 1;
         aplicarFiltrosYRenderizar();
     });
     document.getElementById('btn-guardar-producto')?.addEventListener('click', guardarProducto);

@@ -113,17 +113,16 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th>Imagen</th>
-                                    <th>Nombre</th>
-                                    <th>Categoría</th>
+                                    <th>Nombre / Código</th>
+                                    <th>Subcategoría</th>
                                     <th>Precio</th>
                                     <th>Stock</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th width="90">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-productos">
                                 <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">Cargando productos...</td>
+                                    <td colspan="6" class="text-center py-4 text-muted">Cargando productos...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -357,7 +356,27 @@
         </div>
     </div>
 
-    <!-- Bootstrap Bundle JS -->
+    <!-- Modal Detalles: productos -->
+    <div class="modal fade" id="detalleProductoModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:var(--color-primario,#1E3A5F);color:#fff;">
+                    <h5 class="modal-title">
+                        <i class="bi bi-box-seam me-2"></i>Detalle del Producto
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="detalle-producto-body">
+                    <div class="text-center py-4">
+                        <span class="spinner-border text-primary"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="../assets/js/config/api.config.js"></script>
     <script src="../assets/js/utils/auth.utils.js"></script>
@@ -371,8 +390,8 @@
     <script src="../assets/js/services/inventario.service.js"></script>
     <script src="../assets/js/pages/dashboard/productos.js"></script>
 
-<link rel="stylesheet" href="../assets/css/notificaciones.panel.css">
-<script src="../assets/js/components/notificaciones.panel.js"></script>
+    <link rel="stylesheet" href="../assets/css/notificaciones.panel.css">
+    <script src="../assets/js/components/notificaciones.panel.js"></script>
 
     <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>

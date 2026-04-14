@@ -2,23 +2,24 @@ const PDFExport = (() => {
 
     // Colores
     const C = {
-        primario:   [11,  38,  92],   // #0b265c
-        secundario: [8,   26,  66],   // #081a42
-        acento:     [30,  64, 175],   // #1e40af
-        verde:      [25, 135,  84],   // #198754
-        rojo:       [220, 53,  69],   // #dc3545
-        naranja:    [253,126,  20],   // #fd7e14
-        amarillo:   [245,158,  11],   // #f59e0b
-        gris:       [108,117, 125],   // #6c757d
-        grisClarot: [248,249, 250],   // #f8f9fa
-        blanco:     [255,255, 255],
-        negro:      [33,  37,  41],   // #212529
-        borde:      [222,226, 230],   // #dee2e6
+        primario: [11, 38, 92],   // #0b265c
+        secundario: [8, 26, 66],   // #081a42
+        acento: [30, 64, 175],   // #1e40af
+        verde: [25, 135, 84],   // #198754
+        rojo: [220, 53, 69],   // #dc3545
+        naranja: [253, 126, 20],   // #fd7e14
+        amarillo: [245, 158, 11],   // #f59e0b
+        gris: [108, 117, 125],   // #6c757d
+        grisClarot: [248, 249, 250],   // #f8f9fa
+        blanco: [255, 255, 255],
+        negro: [33, 37, 41],   // #212529
+        borde: [222, 226, 230],   // #dee2e6
     };
 
     // Helpers
-    const moneda = v => `$${parseFloat(v || 0).toFixed(2)}`;
-    const fmt    = s => s ? String(s) : '--';
+    // Usa FormatUtils.moneda (conSufijo=false) para consistencia con el resto del sistema
+    const moneda = v => FormatUtils.moneda(v, false);
+    const fmt = s => s ? String(s) : '--';
 
     // Dibujar rectangulo con relleno
     function rect(pdf, x, y, w, h, color, radio = 0) {
@@ -65,14 +66,14 @@ const PDFExport = (() => {
         const W = 210, H = 297;
 
         // Fondo superior degradado simulado (jsPDF no soporta gradientes - usamos 3 bandas)
-        rect(pdf, 0, 0,   W, 100, C.secundario);
-        rect(pdf, 0, 100, W, 20,  C.primario);
-        rect(pdf, 0, 120, W, 3,   C.acento);
+        rect(pdf, 0, 0, W, 100, C.secundario);
+        rect(pdf, 0, 100, W, 20, C.primario);
+        rect(pdf, 0, 120, W, 3, C.acento);
 
         // Logo centrado — si carga correctamente, insertar imagen
         // Si no, usar texto de fallback
         const logoSize = 28; // tamaño del logo en mm
-        const logoX    = (W - logoSize) / 2;
+        const logoX = (W - logoSize) / 2;
 
         if (logoBase64) {
             try {
@@ -103,9 +104,9 @@ const PDFExport = (() => {
 
         // Seccion de KPIs en portada
         const kpis = [
-            { label: 'Total Ventas',     valor: fmt(estado._kpis?.totalVentas),    color: C.acento },
-            { label: 'Ingresos',         valor: moneda(estado._kpis?.totalIngresos), color: C.verde },
-            { label: 'Ticket Promedio',  valor: moneda(estado._kpis?.ticketPromedio), color: C.naranja },
+            { label: 'Total Ventas', valor: fmt(estado._kpis?.totalVentas), color: C.acento },
+            { label: 'Ingresos', valor: moneda(estado._kpis?.totalIngresos), color: C.verde },
+            { label: 'Ticket Promedio', valor: moneda(estado._kpis?.ticketPromedio), color: C.naranja },
             { label: 'Tasa Cancelacion', valor: `${estado._kpis?.tasaCancelacion || 0}%`, color: C.rojo },
         ];
 
@@ -163,11 +164,11 @@ const PDFExport = (() => {
 
     // Tabla generica
     function tabla(pdf, y, cols, filas, opcs = {}) {
-        const margin  = opcs.margin  || 14;
-        const ancho   = 210 - margin * 2;
-        const rowH    = opcs.rowH    || 7;
-        const headH   = opcs.headH   || 8;
-        const maxY    = 278;
+        const margin = opcs.margin || 14;
+        const ancho = 210 - margin * 2;
+        const rowH = opcs.rowH || 7;
+        const headH = opcs.headH || 8;
+        const maxY = 278;
 
         // Calcular anchos de columna
         const anchos = cols.map(c => (c.pct || 1 / cols.length) * ancho);
@@ -223,10 +224,10 @@ const PDFExport = (() => {
             pdf.setFontSize(8);
             cx = margin;
             cols.forEach((col, i) => {
-                const val  = fmt(fila[col.key]);
+                const val = fmt(fila[col.key]);
                 const color = col.colorFn ? col.colorFn(fila[col.key], fila) : C.negro;
                 pdf.setTextColor(...color);
-                const tw   = pdf.getTextWidth(val);
+                const tw = pdf.getTextWidth(val);
                 const xText = col.align === 'right'
                     ? cx + anchos[i] - tw - 2
                     : col.align === 'center'
@@ -254,7 +255,7 @@ const PDFExport = (() => {
             img.crossOrigin = 'anonymous';
             img.onload = () => {
                 const canvas = document.createElement('canvas');
-                canvas.width  = img.naturalWidth;
+                canvas.width = img.naturalWidth;
                 canvas.height = img.naturalHeight;
                 canvas.getContext('2d').drawImage(img, 0, 0);
                 resolve(canvas.toDataURL('image/png'));
@@ -301,16 +302,20 @@ const PDFExport = (() => {
 
             if (estado.datosPeriodo.length) {
                 y = tabla(pdf, y, [
-                    { header: 'Fecha',              key: 'fecha',             pct: 0.22 },
+                    { header: 'Fecha', key: 'fecha', pct: 0.22 },
                     { header: 'Ventas completadas', key: 'ventasCompletadas', pct: 0.20, align: 'center' },
-                    { header: 'Canceladas',         key: 'ventasCanceladas',  pct: 0.16, align: 'center',
-                      colorFn: v => v > 0 ? C.rojo : C.negro },
-                    { header: 'Ingresos ($)',       key: 'ingresos',          pct: 0.22, align: 'right',
-                      colorFn: () => C.verde },
-                    { header: 'Ticket promedio',    key: 'ticketPromedio',    pct: 0.20, align: 'right' },
+                    {
+                        header: 'Canceladas', key: 'ventasCanceladas', pct: 0.16, align: 'center',
+                        colorFn: v => v > 0 ? C.rojo : C.negro
+                    },
+                    {
+                        header: 'Ingresos ($)', key: 'ingresos', pct: 0.22, align: 'right',
+                        colorFn: () => C.verde
+                    },
+                    { header: 'Ticket promedio', key: 'ticketPromedio', pct: 0.20, align: 'right' },
                 ], estado.datosPeriodo.map(r => ({
                     ...r,
-                    ingresos:       moneda(r.ingresos),
+                    ingresos: moneda(r.ingresos),
                     ticketPromedio: moneda(r.ticketPromedio),
                 })));
             } else {
@@ -326,15 +331,19 @@ const PDFExport = (() => {
 
             if (estado.datosTop.length) {
                 y = tabla(pdf, y, [
-                    { header: '#',         key: 'posicion',         pct: 0.06, align: 'center' },
-                    { header: 'Producto',  key: 'nombre',           pct: 0.30 },
-                    { header: 'Tipo',      key: 'tipo',             pct: 0.12, align: 'center' },
-                    { header: 'Unidades',  key: 'unidadesVendidas', pct: 0.12, align: 'center' },
-                    { header: 'Ingresos',  key: 'ingresos',         pct: 0.18, align: 'right',
-                      colorFn: () => C.verde },
-                    { header: 'Ganancia',  key: 'ganancia',         pct: 0.12, align: 'right',
-                      colorFn: v => parseFloat(v) >= 0 ? C.verde : C.rojo },
-                    { header: 'Margen %',  key: 'margenPct',        pct: 0.10, align: 'right' },
+                    { header: '#', key: 'posicion', pct: 0.06, align: 'center' },
+                    { header: 'Producto', key: 'nombre', pct: 0.30 },
+                    { header: 'Tipo', key: 'tipo', pct: 0.12, align: 'center' },
+                    { header: 'Unidades', key: 'unidadesVendidas', pct: 0.12, align: 'center' },
+                    {
+                        header: 'Ingresos', key: 'ingresos', pct: 0.18, align: 'right',
+                        colorFn: () => C.verde
+                    },
+                    {
+                        header: 'Ganancia', key: 'ganancia', pct: 0.12, align: 'right',
+                        colorFn: v => parseFloat(v) >= 0 ? C.verde : C.rojo
+                    },
+                    { header: 'Margen %', key: 'margenPct', pct: 0.10, align: 'right' },
                 ], estado.datosTop.map(r => ({
                     ...r,
                     ingresos: moneda(r.ingresos),
@@ -350,12 +359,16 @@ const PDFExport = (() => {
                 y = encabezadoSeccion(pdf, 'Stock Critico', '!', y);
 
                 y = tabla(pdf, y, [
-                    { header: 'Producto',    key: 'nombre', pct: 0.45 },
-                    { header: 'Tipo',        key: 'tipo',   pct: 0.15, align: 'center' },
-                    { header: 'Stock',       key: 'stock',  pct: 0.15, align: 'center',
-                      colorFn: v => parseInt(v) === 0 ? C.rojo : C.naranja },
-                    { header: 'Estado',      key: 'nivel',  pct: 0.25, align: 'center',
-                      colorFn: v => v === 'agotado' ? C.rojo : C.naranja },
+                    { header: 'Producto', key: 'nombre', pct: 0.45 },
+                    { header: 'Tipo', key: 'tipo', pct: 0.15, align: 'center' },
+                    {
+                        header: 'Stock', key: 'stock', pct: 0.15, align: 'center',
+                        colorFn: v => parseInt(v) === 0 ? C.rojo : C.naranja
+                    },
+                    {
+                        header: 'Estado', key: 'nivel', pct: 0.25, align: 'center',
+                        colorFn: v => v === 'agotado' ? C.rojo : C.naranja
+                    },
                 ], stockItems.map(p => ({
                     ...p,
                     nivel: p.nivel === 'agotado' ? 'AGOTADO' : 'CRITICO',
@@ -368,25 +381,25 @@ const PDFExport = (() => {
                 y = encabezadoSeccion(pdf, 'Resumen Ejecutivo', '>', y);
 
                 const kpis = [
-                    ['Total de ventas',        fmt(estado._kpis.totalVentas)],
-                    ['Ventas completadas',      fmt(estado._kpis.completadas)],
-                    ['Ventas canceladas',       fmt(estado._kpis.canceladas)],
-                    ['Ingresos totales',        moneda(estado._kpis.totalIngresos)],
-                    ['Ticket promedio',         moneda(estado._kpis.ticketPromedio)],
-                    ['Tasa de cancelacion',     `${estado._kpis.tasaCancelacion}%`],
-                    ['Producto estrella',       estado._kpis.productoEstrella || '--'],
-                    ['Agrupacion del reporte',  estado.agrupacion],
+                    ['Total de ventas', fmt(estado._kpis.totalVentas)],
+                    ['Ventas completadas', fmt(estado._kpis.completadas)],
+                    ['Ventas canceladas', fmt(estado._kpis.canceladas)],
+                    ['Ingresos totales', moneda(estado._kpis.totalIngresos)],
+                    ['Ticket promedio', moneda(estado._kpis.ticketPromedio)],
+                    ['Tasa de cancelacion', `${estado._kpis.tasaCancelacion}%`],
+                    ['Producto estrella', estado._kpis.productoEstrella || '--'],
+                    ['Agrupacion del reporte', estado.agrupacion],
                 ];
 
                 // Tabla de 2 columnas: col izq y col der
                 const labelW = 55, valW = 35, gapCol = 8;
-                const xDer   = 14 + labelW + valW + gapCol;
+                const xDer = 14 + labelW + valW + gapCol;
 
                 kpis.forEach(([label, val], i) => {
                     const fila = Math.floor(i / 2);
-                    const col  = i % 2;
+                    const col = i % 2;
                     const baseX = col === 0 ? 14 : xDer;
-                    const ry    = y + fila * 9;
+                    const ry = y + fila * 9;
 
                     pdf.setFontSize(8.5);
                     pdf.setTextColor(...C.gris);

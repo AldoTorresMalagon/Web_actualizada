@@ -81,9 +81,8 @@ async function handleLogin() {
 
         const { token, usuario } = data.data;
 
-        // Guardar sesión
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify(usuario));
+        // Guardar sesión usando AuthUtils para consistencia
+        AuthUtils.guardarSesion(token, usuario);
 
         // Redirigir según rol
         const rol = usuario?.rol?.toLowerCase();
@@ -116,20 +115,17 @@ function initTogglePassword() {
     });
 }
 
-/* Redirigir si ya está logueado */
+/* Redirigir si ya está logueado — usa AuthUtils para no duplicar lógica */
 function verificarSesionActiva() {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!AuthUtils.estaAutenticado()) return;
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        if (!payload.exp || Date.now() / 1000 < payload.exp) {
-            const user = JSON.parse(localStorage.getItem('user') || 'null');
-            const rol = user?.rol?.toLowerCase();
-            window.location.href = (rol === 'administrador' || rol === 'trabajador')
-                ? '../dashboard/index.html'
-                : 'inicio.html';
-        }
-    } catch { /* token inválido, ignorar */ }
+        const user = AuthUtils.getUser();
+        const rol = user?.rol?.toLowerCase();
+        window.location.href = (rol === 'administrador' || rol === 'trabajador')
+            ? '../dashboard/index.html'
+            : 'inicio.html';
+    }
+     catch { /* token inválido, ignorar */ }
 }
 
 /* Init */

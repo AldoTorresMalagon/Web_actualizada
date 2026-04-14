@@ -1,28 +1,29 @@
 <!DOCTYPE html>
+
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Categorías - Cafetería ITH</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/favicon/apple-touch-icon.png">
-    <link rel="manifest" href="../assets/images/favicon/site.webmanifest">
-    <meta name="theme-color" content="#0b265c">
+    <link href="../assets/images/favicon/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="../assets/images/favicon/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
+    <link href="../assets/images/favicon/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png" />
+    <link href="../assets/images/favicon/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
+    <link href="../assets/images/favicon/site.webmanifest" rel="manifest" />
+    <meta content="#0b265c" name="theme-color" />
 
     <script src="../assets/js/config/accesibilidad.init.js"></script>
 
     <script src="../assets/js/config/bootstrap.loader.js"></script>
-
-    <link rel="stylesheet" href="../assets/css/variables.css">
-    <link rel="stylesheet" href="../assets/css/main.css">
-    <link rel="stylesheet" href="../assets/css/components.css">
-    <link rel="stylesheet" href="../assets/css/accesibilidad.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    
+    <link href="../assets/css/variables.css" rel="stylesheet" />
+    <link href="../assets/css/main.css" rel="stylesheet" />
+    <link href="../assets/css/components.css" rel="stylesheet" />
+    <link href="../assets/css/accesibilidad.css" rel="stylesheet" />
+    <link href="../assets/css/dashboard.css" rel="stylesheet" />
 </head>
 
 <body class="d-flex flex-column min-vh-100">
@@ -30,23 +31,21 @@
     <div class="dash-wrapper">
         <div id="dash-sidebar"></div>
         <main class="dash-main flex-grow-1 p-4">
-
             <div class="position-relative d-flex align-items-center mb-4">
                 <h2 class="mb-0 w-100 text-center">
                     <i class="bi bi-tags me-2"></i>Categorías
                 </h2>
                 <div class="position-absolute end-0">
-                    <a href="subcategorias.html" class="btn btn-primary">
+                    <a class="btn btn-primary" href="subcategorias.html">
                         <i class="bi bi-tag me-1"></i>Gestionar Subcategorías
                     </a>
                 </div>
             </div>
-
             <div class="alert alert-info d-flex align-items-center mb-4">
                 <i class="bi bi-info-circle-fill me-2 fs-5"></i>
                 <div>Las categorías base son los <strong>3 tipos fijos</strong>: <strong>Platillo</strong>,
                     <strong>Bebida</strong> y <strong>Snack</strong>. Para organizar los productos usa las <a
-                        href="subcategorias.html" class="alert-link">Subcategorías</a>.
+                        class="alert-link" href="subcategorias.html">Subcategorías</a>.
                 </div>
             </div>
 
@@ -88,17 +87,15 @@
                         <table class="table table-hover align-middle">
                             <thead class="table-dark">
                                 <tr>
-                                    <th width="50">#</th>
-                                    <th>Nombre</th>
+                                    <th>Tipo</th>
                                     <th>Subcategorías</th>
-                                    <th>Fecha Registro</th>
                                     <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th width="150">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-categorias">
                                 <tr>
-                                    <td colspan="6" class="text-center py-4 text-muted">
+                                    <td class="text-center py-4 text-muted" colspan="4">
                                         <span class="spinner-border spinner-border-sm me-2"></span>Cargando...
                                     </td>
                                 </tr>
@@ -107,24 +104,45 @@
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
 
+    <!-- Modal Detalles: categorias -->
+    <div class="modal fade" id="detalleCatModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:var(--color-primario,#1E3A5F);color:#fff;">
+                    <h5 class="modal-title">
+                        <i class="bi bi-grid-3x3-gap me-2"></i>Detalle de Categoría
+                    </h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body" id="detalle-cat-body">
+                    <div class="text-center py-4">
+                        <span class="spinner-border text-primary"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../assets/js/config/api.config.js"></script>
+
     <script src="../assets/js/utils/auth.utils.js"></script>
     <script src="../assets/js/utils/toast.utils.js"></script>
     <script src="../assets/js/utils/format.utils.js"></script>
 
     <script src="../assets/js/components/dash-header.js"></script>
     <script src="../assets/js/components/dash-sidebar.js"></script>
-    <script src="../assets/js/services/productos.service.js"></script>
 
+    <script src="../assets/js/services/productos.service.js"></script>
     <script src="../assets/js/pages/dashboard/categorias.js"></script>
 
-    <link rel="stylesheet" href="../assets/css/notificaciones.panel.css">
+    <link href="../assets/css/notificaciones.panel.css" rel="stylesheet" />
     <script src="../assets/js/components/notificaciones.panel.js"></script>
-
     <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>
 

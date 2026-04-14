@@ -1,45 +1,41 @@
 <!DOCTYPE html>
+
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Inventario - Cafetería ITH</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="../assets/images/favicon/favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/favicon/favicon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/favicon/apple-touch-icon.png">
-    <link rel="manifest" href="../assets/images/favicon/site.webmanifest">
-    <meta name="theme-color" content="#0b265c">
+    <link href="../assets/images/favicon/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="../assets/images/favicon/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
+    <link href="../assets/images/favicon/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png" />
+    <link href="../assets/images/favicon/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
+    <link href="../assets/images/favicon/site.webmanifest" rel="manifest" />
+    <meta content="#0b265c" name="theme-color" />
 
     <!-- Accesibilidad -->
     <script src="../assets/js/config/accesibilidad.init.js"></script>
+    
     <script src="../assets/js/config/bootstrap.loader.js"></script>
-
-    <link rel="stylesheet" href="../assets/css/variables.css">
-    <link rel="stylesheet" href="../assets/css/main.css">
-    <link rel="stylesheet" href="../assets/css/components.css">
-    <link rel="stylesheet" href="../assets/css/accesibilidad.css">
-    <link rel="stylesheet" href="../assets/css/dashboard.css">
+    <link href="../assets/css/variables.css" rel="stylesheet" />
+    <link href="../assets/css/main.css" rel="stylesheet" />
+    <link href="../assets/css/components.css" rel="stylesheet" />
+    <link href="../assets/css/accesibilidad.css" rel="stylesheet" />
+    <link href="../assets/css/dashboard.css" rel="stylesheet" />
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-
     <div id="dash-header"></div>
-
     <div class="dash-wrapper">
         <div id="dash-sidebar"></div>
-
         <main class="dash-main flex-grow-1 p-4">
-
             <div class="position-relative d-flex align-items-center mb-4">
                 <h2 class="mb-0 w-100 text-center">
                     <i class="bi bi-clipboard-check me-2"></i>Inventario
                 </h2>
                 <div class="position-absolute end-0 d-flex align-items-center gap-2 flex-wrap justify-content-end">
-
                     <!-- Selector de período para exportar -->
                     <div class="d-flex align-items-center gap-1" id="filtro-exportar">
                         <div class="btn-group btn-group-sm" id="selector-periodo-export">
@@ -49,17 +45,19 @@
                                 <i class="bi bi-calendar-range"></i>
                             </button>
                         </div>
+
                         <!-- Rango personalizado — oculto por defecto -->
-                        <div id="rango-export" class="d-none d-flex align-items-center gap-1">
-                            <input type="date" id="export-desde" class="form-control form-control-sm" style="max-width:130px;">
+                        <div class="d-none d-flex align-items-center gap-1" id="rango-export">
+                            <input class="form-control form-control-sm" id="export-desde" style="max-width:130px;"
+                                type="date" />
                             <span class="text-muted small">—</span>
-                            <input type="date" id="export-hasta" class="form-control form-control-sm" style="max-width:130px;">
+                            <input class="form-control form-control-sm" id="export-hasta" style="max-width:130px;"
+                                type="date" />
                         </div>
                         <button class="btn btn-outline-success btn-sm" id="btn-exportar">
                             <i class="bi bi-file-excel me-1"></i>Excel
                         </button>
                     </div>
-
                     <button class="btn btn-primary btn-sm" id="btn-actualizar-inventario">
                         <i class="bi bi-arrow-clockwise me-1"></i>Actualizar
                     </button>
@@ -108,14 +106,14 @@
                     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <h5 class="mb-0"><i class="bi bi-table me-2"></i>Historial de Movimientos</h5>
                         <div class="d-flex gap-2 flex-wrap">
-                            <select id="filtro-stock" class="form-select form-select-sm" style="max-width:160px;">
+                            <select class="form-select form-select-sm" id="filtro-stock" style="max-width:160px;">
                                 <option value="">Todos</option>
                                 <option value="bajo">Stock bajo</option>
                                 <option value="sin">Sin stock</option>
                                 <option value="normal">Stock normal</option>
                             </select>
-                            <input type="text" id="buscador-inventario" class="form-control form-control-sm"
-                                placeholder="Buscar producto..." style="max-width:220px;">
+                            <input class="form-control form-control-sm" id="buscador-inventario"
+                                placeholder="Buscar producto..." style="max-width:220px;" type="text" />
                         </div>
                     </div>
                     <div class="table-responsive">
@@ -123,26 +121,21 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th>Producto</th>
-                                    <th>Código</th>
-                                    <th>Stock Anterior</th>
-                                    <th>Stock Nuevo</th>
+                                    <th>Stock</th>
                                     <th>Movimiento</th>
-                                    <th>Cantidad</th>
-                                    <th>Usuario</th>
-                                    <th>Observaciones</th>
                                     <th>Fecha</th>
+                                    <th width="80">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-inventario">
                                 <tr>
-                                    <td colspan="9" class="text-center py-4 text-muted">Cargando inventario...</td>
+                                    <td class="text-center py-4 text-muted" colspan="5">Cargando inventario...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
         </main>
     </div>
 
@@ -152,15 +145,15 @@
             <div class="modal-content">
                 <div class="modal-header bg-info text-white">
                     <h5 class="modal-title"><i class="bi bi-boxes me-2"></i>Ajustar Stock</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="stock-producto-id">
+                    <input id="stock-producto-id" type="hidden" />
                     <p>Producto: <strong id="stock-producto-nombre"></strong></p>
                     <p>Stock actual: <strong id="stock-actual"></strong></p>
                     <div class="mb-3">
                         <label class="form-label">Tipo de ajuste</label>
-                        <select id="stock-tipo" class="form-select">
+                        <select class="form-select" id="stock-tipo">
                             <option value="entrada">Entrada (agregar)</option>
                             <option value="salida">Salida (reducir)</option>
                             <option value="ajuste">Ajuste directo</option>
@@ -168,17 +161,17 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Cantidad *</label>
-                        <input type="number" id="stock-cantidad" class="form-control" min="1" placeholder="0">
+                        <input class="form-control" id="stock-cantidad" min="1" placeholder="0" type="number" />
                         <div class="invalid-feedback" id="stock-cantidad-error"></div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Motivo</label>
-                        <input type="text" id="stock-motivo" class="form-control" placeholder="Motivo del ajuste...">
+                        <input class="form-control" id="stock-motivo" placeholder="Motivo del ajuste..." type="text" />
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-info text-white" id="btn-confirmar-stock">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancelar</button>
+                    <button class="btn btn-info text-white" id="btn-confirmar-stock" type="button">
                         <i class="bi bi-check-circle me-1"></i>Aplicar Ajuste
                     </button>
                 </div>
@@ -186,22 +179,46 @@
         </div>
     </div>
 
+    <!-- Modal Detalles: inventario -->
+    <div class="modal fade" id="detalleInventarioModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:var(--color-primario,#1E3A5F);color:#fff;">
+                    <h5 class="modal-title">
+                        <i class="bi bi-clipboard-check me-2"></i>Detalle del Movimiento
+                    </h5>
+                    <button class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
+                </div>
+                <div class="modal-body" id="detalle-inventario-body">
+                    <div class="text-center py-4">
+                        <span class="spinner-border text-primary"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="../assets/js/config/api.config.js"></script>
+
     <script src="../assets/js/utils/auth.utils.js"></script>
     <script src="../assets/js/utils/toast.utils.js"></script>
     <script src="../assets/js/utils/format.utils.js"></script>
 
     <script src="../assets/js/components/dash-header.js"></script>
     <script src="../assets/js/components/dash-sidebar.js"></script>
+
     <script src="../assets/js/services/productos.service.js"></script>
     <script src="../assets/js/services/inventario.service.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="../assets/js/pages/dashboard/excel.export.js"></script>
     <script src="../assets/js/pages/dashboard/inventario.js"></script>
 
-    <link rel="stylesheet" href="../assets/css/notificaciones.panel.css">
+    <link href="../assets/css/notificaciones.panel.css" rel="stylesheet" />
     <script src="../assets/js/components/notificaciones.panel.js"></script>
-
     <script src="../assets/js/components/accesibilidad.panel.js"></script>
 </body>
 

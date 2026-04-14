@@ -99,21 +99,27 @@ function aplicarFiltrosYRenderizar() {
 function renderTabla(lista) {
     const tbody = document.getElementById('tabla-promociones');
     if (!lista.length) {
-        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-4 text-muted">
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">
             <i class="bi bi-search me-2"></i>No se encontraron promociones</td></tr>`;
         return;
     }
     tbody.innerHTML = lista.map(p => `
         <tr>
             <td class="fw-semibold">${p.titulo}</td>
-            <td>${FormatUtils.truncar(p.descripcion || '—', 50)}</td>
-            <td><span class="badge bg-warning text-dark">${p.porcentaje_descuento || 0}%</span></td>
-            <td class="text-center">${p.total_productos || 0}</td>
-            <td>${FormatUtils.fechaCorta(p.fecha_inicio)}</td>
-            <td>${FormatUtils.fechaCorta(p.fecha_fin)}</td>
-            <td>${FormatUtils.badgeEstado(p.activo === 'si', 'Activa', 'Inactiva')}</td>
+            <td><span class="badge bg-warning text-dark fs-6">${p.porcentaje_descuento || 0}% OFF</span></td>
+            <td class="text-center">
+                <span class="badge bg-secondary">${p.total_productos || 0} productos</span>
+            </td>
+            <td>
+                <small class="d-block">${FormatUtils.fechaCorta(p.fecha_inicio)}</small>
+                <small class="text-muted">${FormatUtils.fechaCorta(p.fecha_fin)}</small>
+            </td>
             <td>
                 <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-info" title="Ver detalles"
+                            data-id="${p.id_promocion}" onclick="abrirDetalleProm(this.dataset.id)">
+                        <i class="bi bi-eye"></i>
+                    </button>
                     <button class="btn btn-outline-warning" title="Editar"
                             onclick="abrirEditar(${p.id_promocion})">
                         <i class="bi bi-pencil"></i>
@@ -345,3 +351,30 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btn-actualizar-promocion')?.addEventListener('click', actualizarPromocion);
     document.getElementById('btn-confirmar-eliminar')?.addEventListener('click', eliminarPromocion);
 });
+
+window.abrirDetalleProm = function (id) {
+    const p = todasLasPromociones.find(x => String(x.id_promocion) === String(id));
+    if (!p) return;
+    const body = document.getElementById('detalle-promo-body');
+    const productos = (p.productos || []).map(prod =>
+        `<li class="list-group-item d-flex justify-content-between align-items-center">
+            ${prod.Nombre || prod.nombre || ''}
+            <span class="badge bg-primary">${FormatUtils.moneda(prod.PrecioVenta || prod.precio || 0, false)}</span>
+        </li>`
+    ).join('') || '<li class="list-group-item text-muted">Sin productos vinculados</li>';
+    body.innerHTML = `
+        <div class="row g-3">
+            <div class="col-12"><small class="text-muted d-block">Título</small><h5 class="fw-bold">${p.titulo}</h5></div>
+            <div class="col-12"><small class="text-muted d-block">Descripción</small><p>${p.descripcion || 'Sin descripción'}</p></div>
+            <div class="col-md-4"><small class="text-muted d-block">Descuento</small><span class="badge bg-warning text-dark fs-5">${p.porcentaje_descuento || 0}% OFF</span></div>
+            <div class="col-md-4"><small class="text-muted d-block">Estado</small>${FormatUtils.badgeEstado(p.activo === 'si', 'Activa', 'Inactiva')}</div>
+            <div class="col-md-4"><small class="text-muted d-block">Total productos</small><strong>${p.total_productos || 0}</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Fecha inicio</small><strong>${FormatUtils.fechaCorta(p.fecha_inicio)}</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Fecha fin</small><strong>${FormatUtils.fechaCorta(p.fecha_fin)}</strong></div>
+            <div class="col-12">
+                <small class="text-muted d-block mb-1">Productos incluidos</small>
+                <ul class="list-group list-group-flush">${productos}</ul>
+            </div>
+        </div>`;
+    new bootstrap.Modal(document.getElementById('detallePromocionModal')).show();
+};

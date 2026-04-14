@@ -107,18 +107,15 @@
                         <table class="table table-hover align-middle">
                             <thead class="table-dark">
                                 <tr>
-                                    <th width="55">ID</th>
                                     <th>Nombre</th>
                                     <th>Tipo</th>
                                     <th>Productos</th>
-                                    <th>Estado</th>
-                                    <th>Fecha</th>
                                     <th width="90">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-subcategorias">
                                 <tr>
-                                    <td colspan="7" class="text-center py-4 text-muted">
+                                    <td colspan="4" class="text-center py-4 text-muted">
                                         <span class="spinner-border spinner-border-sm me-2"></span>Cargando...
                                     </td>
                                 </tr>
@@ -215,7 +212,30 @@
         </div>
     </div>
 
+    <!-- Modal Detalles: subcategorias -->
+    <div class="modal fade" id="detalleSubcatModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:var(--color-primario,#1E3A5F);color:#fff;">
+                    <h5 class="modal-title">
+                        <i class="bi bi-diagram-2 me-2"></i>Detalle de Subcategoría
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="detalle-subcat-body">
+                    <div class="text-center py-4">
+                        <span class="spinner-border text-primary"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
+
     <script src="../assets/js/config/api.config.js"></script>
     <script src="../assets/js/utils/auth.utils.js"></script>
     <script src="../assets/js/utils/toast.utils.js"></script>

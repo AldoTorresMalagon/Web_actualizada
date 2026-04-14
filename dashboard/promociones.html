@@ -118,18 +118,15 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th>Título</th>
-                                    <th>Descripción</th>
                                     <th>Descuento</th>
                                     <th>Productos</th>
-                                    <th>Fecha Inicio</th>
-                                    <th>Fecha Fin</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th>Vigencia</th>
+                                    <th width="100">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-promociones">
                                 <tr>
-                                    <td colspan="8" class="text-center py-4 text-muted">Cargando promociones...</td>
+                                    <td colspan="5" class="text-center py-4 text-muted">Cargando promociones...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -287,6 +284,29 @@
         </div>
     </div>
 
+
+    <!-- Modal Detalles: promociones -->
+    <div class="modal fade" id="detallePromocionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:var(--color-primario,#1E3A5F);color:#fff;">
+                    <h5 class="modal-title">
+                        <i class="bi bi-tags me-2"></i>Detalle de la Promoción
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="detalle-promo-body">
+                    <div class="text-center py-4">
+                        <span class="spinner-border text-primary"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <script src="../assets/js/config/api.config.js"></script>
     <script src="../assets/js/utils/auth.utils.js"></script>
     <script src="../assets/js/utils/toast.utils.js"></script>

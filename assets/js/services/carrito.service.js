@@ -28,7 +28,7 @@ const CarritoService = {
         return data.data || [];
     },
 
-    /* GET /api/ventas/:id — detalle de una venta (devuelve {venta, detalle[]}) */
+    /* GET /api/ventas/:id — detalle de una venta */
     async getVentaById(id, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/ventas/${id}`, { headers });
         const data = await res.json();
@@ -36,7 +36,21 @@ const CarritoService = {
         return data.data;
     },
 
-    /* GET /api/ventas — todas (dashboard admin/trabajador) */
+    /*
+     * GET /api/ventas?page=N&limit=N — paginado del lado del servidor
+     * Devuelve { items, total, page, limit, totalPaginas }
+     */
+    async getVentasPaginadas(headers, page = 1, limit = 10) {
+        const res = await apiFetch(
+            `${API_CONFIG.BASE_URL}/ventas?page=${page}&limit=${limit}`,
+            { headers }
+        );
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Error al cargar ventas');
+        return data.data || { items: [], total: 0, page, limit, totalPaginas: 0 };
+    },
+
+    /* GET /api/ventas — todas sin paginar (solo para dashboard index KPIs) */
     async getTodasVentas(headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/ventas`, { headers });
         const data = await res.json();

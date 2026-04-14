@@ -1,58 +1,60 @@
 // Estado global
 const estado = {
-    desde:      null,
-    hasta:      null,
+    desde: null,
+    hasta: null,
     agrupacion: 'dia',
     diasPrediccion: 7,
-    datosPeriodo:   [],
-    datosTop:       [],
+    datosPeriodo: [],
+    datosTop: [],
     ventasIndividuales: [],   // ventas individuales para Excel detallado
     // Paginación tablas internas
-    detallePag:     1,
-    stockPag:       1,
+    detallePag: 1,
+    stockPag: 1,
 };
 const DETALLE_POR_PAG = 15;
-const STOCK_POR_PAG   = 10;
+const STOCK_POR_PAG = 10;
 
 // Instancias de gráficas
 const graficas = {
     ventasPeriodo: null,
-    distribucion:  null,
-    topProductos:  null,
-    horasPico:     null,
-    prediccion:    null,
+    distribucion: null,
+    topProductos: null,
+    horasPico: null,
+    prediccion: null,
 };
 
 // Colores consistentes para los tipos de producto y elementos del dashboard
 const COLORES = {
-    primario:   '#1E3A5F',
-    azul:       '#2E75B6',
-    verde:      '#198754',
-    naranja:    '#fd7e14',
-    rojo:       '#dc3545',
-    amarillo:   '#f59e0b',
-    info:       '#0dcaf0',
-    platillo:   '#198754',
-    bebida:     '#0dcaf0',
-    snack:      '#f59e0b',
+    primario: '#1E3A5F',
+    azul: '#2E75B6',
+    verde: '#198754',
+    naranja: '#fd7e14',
+    rojo: '#dc3545',
+    amarillo: '#f59e0b',
+    info: '#0dcaf0',
+    platillo: '#198754',
+    bebida: '#0dcaf0',
+    snack: '#f59e0b',
 };
 
 // Opciones base ApexCharts
 const opcionesBase = {
-    chart:   { fontFamily: 'Arial, sans-serif', toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false } } },
+    chart: { fontFamily: 'Arial, sans-serif', toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false } } },
     tooltip: { theme: 'light' },
-    grid:    { borderColor: '#f0f0f0' },
-    noData:  { text: 'Sin datos para el período', style: { fontSize: '14px', color: '#999' } },
+    grid: { borderColor: '#f0f0f0' },
+    noData: { text: 'Sin datos para el período', style: { fontSize: '14px', color: '#999' } },
 };
 
-// Helper: llamada autenticada a la API 
-async function apiFetch(url) {
-    const res = await fetch(`${API_CONFIG.BASE_URL}${url}`, {
+// apiFetch viene de auth.utils.js (detecta 401 automáticamente)
+// Wrapper local para adaptar la firma al módulo de reportes
+async function apiFetchReportes(url) {
+    const res = await apiFetch(`${API_CONFIG.BASE_URL}${url}`, {
         headers: AuthUtils.getHeaders(),
     });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Error en la API');
-    return data.data;
+    if (!res || !res.ok) throw new Error(`Error ${res?.status} en ${url}`);
+    const json = await res.json();          // parsear el body JSON
+    if (!json.success) throw new Error(json.message || 'Error en la API');
+    return json.data;                       // { success, message, data } → devolver data
 }
 
 // Helper: variación porcentual
@@ -65,16 +67,16 @@ function renderVariacion(valor, elementId, prefijo = '') {
         return;
     }
     const signo = valor >= 0 ? '▲' : '▼';
-    const clase  = valor > 0 ? 'positivo' : valor < 0 ? 'negativo' : 'neutro';
+    const clase = valor > 0 ? 'positivo' : valor < 0 ? 'negativo' : 'neutro';
     el.textContent = `${signo} ${Math.abs(valor)}% ${prefijo}vs período anterior`;
     el.className = `kpi-variacion ${clase} mt-1`;
 }
 
 // Calcular fechas según período seleccionado 
 function calcularFechas(periodo) {
-    const hoy   = new Date();
-    const pad   = n => String(n).padStart(2, '0');
-    const fmt   = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    const hoy = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
     // Agrupación recomendada según el rango de días del período
     // hoy/semana → día | mes/trimestre → día | año → mes
@@ -138,29 +140,29 @@ async function cargarTodo() {
 // KPIs
 async function cargarKPIs(qs) {
     try {
-        const d = await apiFetch(`/reportes/resumen${qs}`);
+        const d = await apiFetchReportes(`/reportes/resumen${qs}`);
 
-        document.getElementById('kpi-ventas').textContent    = d.actual.totalVentas;
-        document.getElementById('kpi-ingresos').textContent  = FormatUtils.moneda(d.actual.totalIngresos, false);
-        document.getElementById('kpi-ticket').textContent    = FormatUtils.moneda(d.actual.ticketPromedio, false);
-        document.getElementById('kpi-estrella').textContent  = d.productoEstrella?.Nombre || '—';
+        document.getElementById('kpi-ventas').textContent = d.actual.totalVentas;
+        document.getElementById('kpi-ingresos').textContent = FormatUtils.moneda(d.actual.totalIngresos, false);
+        document.getElementById('kpi-ticket').textContent = FormatUtils.moneda(d.actual.ticketPromedio, false);
+        document.getElementById('kpi-estrella').textContent = d.productoEstrella?.Nombre || '—';
         document.getElementById('kpi-cancelacion').textContent =
             `Tasa cancelación: ${d.actual.tasaCancelacion}%`;
 
         // Guardar KPIs en estado para exportación PDF/Excel
         estado._kpis = {
-            totalVentas:      d.actual.totalVentas,
-            completadas:      d.actual.completadas,
-            canceladas:       d.actual.canceladas,
-            totalIngresos:    d.actual.totalIngresos,
-            ticketPromedio:   d.actual.ticketPromedio,
-            tasaCancelacion:  d.actual.tasaCancelacion,
+            totalVentas: d.actual.totalVentas,
+            completadas: d.actual.completadas,
+            canceladas: d.actual.canceladas,
+            totalIngresos: d.actual.totalIngresos,
+            ticketPromedio: d.actual.ticketPromedio,
+            tasaCancelacion: d.actual.tasaCancelacion,
             productoEstrella: d.productoEstrella?.Nombre || null,
         };
 
-        renderVariacion(d.comparativa.ventas,   'kpi-ventas-var');
+        renderVariacion(d.comparativa.ventas, 'kpi-ventas-var');
         renderVariacion(d.comparativa.ingresos, 'kpi-ingresos-var');
-        renderVariacion(d.comparativa.ticket,   'kpi-ticket-var');
+        renderVariacion(d.comparativa.ticket, 'kpi-ticket-var');
     } catch (err) {
         console.error('KPIs:', err);
     }
@@ -169,28 +171,28 @@ async function cargarKPIs(qs) {
 // Gráfica de ventas en el período
 async function cargarVentasPeriodo(qs) {
     try {
-        const d = await apiFetch(`/reportes/ventas-periodo${qs}&agrupacion=${estado.agrupacion}`);
+        const d = await apiFetchReportes(`/reportes/ventas-periodo${qs}&agrupacion=${estado.agrupacion}`);
         estado.datosPeriodo = d.datos;
 
         const categorias = d.datos.map(r => r.fecha);
-        const ventas     = d.datos.map(r => r.ventasCompletadas);
-        const ingresos   = d.datos.map(r => r.ingresos);
+        const ventas = d.datos.map(r => r.ventasCompletadas);
+        const ingresos = d.datos.map(r => r.ingresos);
 
         const opciones = {
             ...opcionesBase,
-            chart:  { ...opcionesBase.chart, type: 'area', height: 280 },
+            chart: { ...opcionesBase.chart, type: 'area', height: 280 },
             series: [
                 { name: 'Ventas', data: ventas },
                 { name: 'Ingresos ($)', data: ingresos },
             ],
-            xaxis:  { categories: categorias, labels: { rotate: -30, style: { fontSize: '11px' } } },
-            yaxis:  [
+            xaxis: { categories: categorias, labels: { rotate: -30, style: { fontSize: '11px' } } },
+            yaxis: [
                 { title: { text: 'Ventas' }, labels: { formatter: v => Math.round(v) } },
                 { opposite: true, title: { text: 'Ingresos ($)' }, labels: { formatter: v => `$${v.toFixed(0)}` } },
             ],
-            colors:  [COLORES.azul, COLORES.verde],
-            stroke:  { curve: 'smooth', width: 2 },
-            fill:    { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.05 } },
+            colors: [COLORES.azul, COLORES.verde],
+            stroke: { curve: 'smooth', width: 2 },
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.05 } },
             markers: { size: d.datos.length <= 15 ? 4 : 0 },
             tooltip: { shared: true, intersect: false },
         };
@@ -212,25 +214,32 @@ async function cargarVentasPeriodo(qs) {
 // Gráfica distribución por tipo
 async function cargarDistribucion(qs) {
     try {
-        const d = await apiFetch(`/reportes/distribucion-tipo${qs}`);
+        const d = await apiFetchReportes(`/reportes/distribucion-tipo${qs}`);
 
-        const labels  = d.datos.map(r => r.tipo.charAt(0).toUpperCase() + r.tipo.slice(1));
+        const labels = d.datos.map(r => r.tipo.charAt(0).toUpperCase() + r.tipo.slice(1));
         const valores = d.datos.map(r => r.ingresos);
         const colores = d.datos.map(r => COLORES[r.tipo] || COLORES.azul);
 
         const opciones = {
             ...opcionesBase,
-            chart:  { ...opcionesBase.chart, type: 'donut', height: 240 },
+            chart: { ...opcionesBase.chart, type: 'donut', height: 240 },
             series: valores,
             labels,
             colors: colores,
             legend: { position: 'bottom' },
-            plotOptions: { pie: { donut: { size: '65%', labels: {
-                show: true,
-                total: { show: true, label: 'Total', formatter: w =>
-                    `$${w.globals.seriesTotals.reduce((a,b) => a+b, 0).toFixed(0)}`
-                },
-            } } } },
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '65%', labels: {
+                            show: true,
+                            total: {
+                                show: true, label: 'Total', formatter: w =>
+                                    `$${w.globals.seriesTotals.reduce((a, b) => a + b, 0).toFixed(0)}`
+                            },
+                        }
+                    }
+                }
+            },
             tooltip: { y: { formatter: v => `$${v.toFixed(2)}` } },
         };
 
@@ -249,7 +258,7 @@ async function cargarDistribucion(qs) {
 async function cargarTopProductos(qs, tipo = '') {
     try {
         const filtroTipo = tipo ? `&tipo=${tipo}` : '';
-        const d = await apiFetch(`/reportes/top-productos${qs}&limit=10${filtroTipo}`);
+        const d = await apiFetchReportes(`/reportes/top-productos${qs}&limit=10${filtroTipo}`);
         estado.datosTop = d.datos;
 
         // Poblar selector de producto en la sección de predicción
@@ -263,7 +272,7 @@ async function cargarTopProductos(qs, tipo = '') {
             if (valorActual) selProd.value = valorActual;
         }
 
-        const nombres  = d.datos.map(r => r.nombre.length > 22 ? r.nombre.slice(0,22)+'…' : r.nombre);
+        const nombres = d.datos.map(r => FormatUtils.truncar(r.nombre, 22));
         const unidades = d.datos.map(r => r.unidadesVendidas);
         const margenes = d.datos.map(r => r.margenPct);
 
@@ -271,10 +280,10 @@ async function cargarTopProductos(qs, tipo = '') {
         // Se usan barras verticales con dos series independientes
         const opciones = {
             ...opcionesBase,
-            chart:  { ...opcionesBase.chart, type: 'bar', height: 300 },
+            chart: { ...opcionesBase.chart, type: 'bar', height: 300 },
             series: [
                 { name: 'Unidades vendidas', data: unidades },
-                { name: 'Margen %',           data: margenes },
+                { name: 'Margen %', data: margenes },
             ],
             xaxis: {
                 categories: nombres,
@@ -282,12 +291,15 @@ async function cargarTopProductos(qs, tipo = '') {
             },
             yaxis: [
                 { title: { text: 'Unidades' }, labels: { formatter: v => Math.round(v) } },
-                { opposite: true, title: { text: 'Margen %' }, min: 0, max: 100,
-                  labels: { formatter: v => `${v.toFixed(0)}%` } },
+                {
+                    opposite: true, title: { text: 'Margen %' }, min: 0, max: 100,
+                    labels: { formatter: v => `${v.toFixed(0)}%` }
+                },
             ],
             plotOptions: { bar: { columnWidth: '55%', borderRadius: 4 } },
-            colors:  [COLORES.verde, COLORES.naranja],
-            tooltip: { shared: true, intersect: false,
+            colors: [COLORES.verde, COLORES.naranja],
+            tooltip: {
+                shared: true, intersect: false,
                 y: [
                     { formatter: v => `${Math.round(v)} uds` },
                     { formatter: v => `${v ? v.toFixed(1) : 0}%` },
@@ -299,7 +311,7 @@ async function cargarTopProductos(qs, tipo = '') {
         // Evento clic en barra → abrir reporte del producto
         opciones.chart.events = {
             dataPointSelection: (e, chart, config) => {
-                const idx  = config.dataPointIndex;
+                const idx = config.dataPointIndex;
                 const prod = d.datos[idx];
                 if (prod) abrirModalProducto(prod.idProducto, prod.nombre);
             },
@@ -319,22 +331,25 @@ async function cargarTopProductos(qs, tipo = '') {
 // Gráfica horas pico
 async function cargarHorasPico(qs) {
     try {
-        const d = await apiFetch(`/reportes/horas-pico${qs}`);
+        const d = await apiFetchReportes(`/reportes/horas-pico${qs}`);
 
-        const horas  = d.datos.map(r => r.etiqueta);
+        const horas = d.datos.map(r => r.etiqueta);
         const ventas = d.datos.map(r => r.ventas);
 
         const opciones = {
             ...opcionesBase,
-            chart:  { ...opcionesBase.chart, type: 'bar', height: 300 },
+            chart: { ...opcionesBase.chart, type: 'bar', height: 300 },
             series: [{ name: 'Ventas', data: ventas }],
-            xaxis:  { categories: horas, labels: { rotate: -45, style: { fontSize: '10px' } } },
+            xaxis: { categories: horas, labels: { rotate: -45, style: { fontSize: '10px' } } },
             colors: [COLORES.info],
             plotOptions: { bar: { borderRadius: 4 } },
-            annotations: { yaxis: [{ y: Math.max(...ventas) * 0.8,
-                borderColor: COLORES.rojo, strokeDashArray: 4,
-                label: { text: 'Hora pico: ' + d.horaPico, style: { color: '#fff', background: COLORES.rojo } }
-            }]},
+            annotations: {
+                yaxis: [{
+                    y: Math.max(...ventas) * 0.8,
+                    borderColor: COLORES.rojo, strokeDashArray: 4,
+                    label: { text: 'Hora pico: ' + d.horaPico, style: { color: '#fff', background: COLORES.rojo } }
+                }]
+            },
         };
 
         if (graficas.horasPico) {
@@ -351,7 +366,7 @@ async function cargarHorasPico(qs) {
 // Gráfica predicción
 async function cargarPrediccion(dias = estado.diasPrediccion) {
     try {
-        const d = await apiFetch(`/reportes/prediccion?dias=${dias}`);
+        const d = await apiFetchReportes(`/reportes/prediccion?dias=${dias}`);
 
         if (!d.suficienteDatos) {
             document.getElementById('chart-prediccion').innerHTML =
@@ -366,8 +381,8 @@ async function cargarPrediccion(dias = estado.diasPrediccion) {
         const ventasHist = d.historial.map(h => h.ventas);
         const fechasPred = d.prediccion.map(p => p.fecha);
         const ventasPred = d.prediccion.map(p => p.ventasEsperadas);
-        const ventasMin  = d.prediccion.map(p => p.ventasMin);
-        const ventasMax  = d.prediccion.map(p => p.ventasMax);
+        const ventasMin = d.prediccion.map(p => p.ventasMin);
+        const ventasMax = d.prediccion.map(p => p.ventasMax);
 
         // Serie rangeArea para la banda de confianza (min/max)
         // + línea de historial real + línea de predicción esperada
@@ -401,27 +416,33 @@ async function cargarPrediccion(dias = estado.diasPrediccion) {
                 },
             ],
             stroke: {
-                curve:     'smooth',
-                width:     [2.5, 2, 0, 0],
+                curve: 'smooth',
+                width: [2.5, 2, 0, 0],
                 dashArray: [0, 6, 0, 0],
             },
             fill: {
-                type:    ['solid', 'solid', 'solid', 'solid'],
+                type: ['solid', 'solid', 'solid', 'solid'],
                 opacity: [1, 1, 0.18, 1],
             },
             colors: [COLORES.azul, COLORES.naranja, COLORES.naranja, COLORES.blanco || '#ffffff'],
-            xaxis:  { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM' } },
-            yaxis:  { title: { text: 'Ventas estimadas' }, min: 0,
-                      labels: { formatter: v => Math.round(v) } },
-            legend: { position: 'top',
-                      customLegendItems: ['Historial real', 'Predicción esperada', 'Rango min/máx'] },
+            xaxis: { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM' } },
+            yaxis: {
+                title: { text: 'Ventas estimadas' }, min: 0,
+                labels: { formatter: v => Math.round(v) }
+            },
+            legend: {
+                position: 'top',
+                customLegendItems: ['Historial real', 'Predicción esperada', 'Rango min/máx']
+            },
             tooltip: {
                 shared: true,
                 x: { format: 'dd MMM yyyy' },
-                y: { formatter: (v, { seriesIndex }) => {
-                    if (seriesIndex === 3) return undefined; // ocultar serie invisible
-                    return `${Math.round(v)} ventas`;
-                }},
+                y: {
+                    formatter: (v, { seriesIndex }) => {
+                        if (seriesIndex === 3) return undefined; // ocultar serie invisible
+                        return `${Math.round(v)} ventas`;
+                    }
+                },
             },
             markers: { size: [0, 4, 0, 0] },
         };
@@ -433,7 +454,7 @@ async function cargarPrediccion(dias = estado.diasPrediccion) {
             graficas.prediccion.render();
         }
 
-        // Mostrar badge con el modelo utilizado
+        // ── Mostrar badge con el modelo utilizado ────────────────────────────
         const badgeEl = document.getElementById('badge-modelo-prediccion');
         if (badgeEl) {
             if (d.modeloLogistico) {
@@ -455,18 +476,18 @@ async function cargarPrediccion(dias = estado.diasPrediccion) {
             }
         }
 
-        // Actualizar aviso con el texto real de la API
+        // ── Actualizar aviso con el texto real de la API ─────────────────────
         const avisoEl = document.getElementById('prediccion-aviso');
         if (avisoEl && d.advertencia) {
             avisoEl.innerHTML = `<i class="bi bi-exclamation-triangle me-1"></i>${d.advertencia}`;
         }
 
-        // Mostrar parámetros del modelo logístico si aplica
-        const paramsEl  = document.getElementById('params-logistico');
+        // ── Mostrar parámetros del modelo logístico si aplica ────────────────
+        const paramsEl = document.getElementById('params-logistico');
         if (paramsEl) {
             if (d.modeloLogistico && d.parametrosLogistico) {
-                document.getElementById('param-r').textContent  = d.parametrosLogistico.r;
-                document.getElementById('param-K').textContent  = d.parametrosLogistico.K;
+                document.getElementById('param-r').textContent = d.parametrosLogistico.r;
+                document.getElementById('param-K').textContent = d.parametrosLogistico.K;
                 document.getElementById('param-P0').textContent = d.parametrosLogistico.P0;
                 paramsEl.style.display = 'flex';
             } else {
@@ -491,7 +512,7 @@ async function cargarPrediccionProducto(idProducto, nombreProducto, dias) {
 
     try {
         const qs = `?desde=${estado.desde}&hasta=${estado.hasta}`;
-        const d  = await apiFetch(`/reportes/producto/${idProducto}${qs}&dias=${dias}`);
+        const d = await apiFetchReportes(`/reportes/producto/${idProducto}${qs}&dias=${dias}`);
 
         if (!d.suficienteDatos || !d.prediccion.length) {
             document.getElementById('chart-prediccion').innerHTML =
@@ -530,16 +551,24 @@ async function cargarPrediccionProducto(idProducto, nombreProducto, dias) {
                 },
             ],
             stroke: { curve: 'smooth', width: [2.5, 2, 0, 0], dashArray: [0, 6, 0, 0] },
-            fill:   { type: ['solid','solid','solid','solid'], opacity: [1, 1, 0.18, 1] },
+            fill: { type: ['solid', 'solid', 'solid', 'solid'], opacity: [1, 1, 0.18, 1] },
             colors: [COLORES.verde, COLORES.naranja, COLORES.naranja, '#ffffff'],
-            xaxis:  { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM' } },
-            yaxis:  { title: { text: 'Unidades' }, min: 0,
-                      labels: { formatter: v => Math.round(v) } },
-            legend: { position: 'top',
-                      customLegendItems: ['Historial real', 'Predicción esperada', 'Rango min/máx'] },
-            tooltip: { shared: true, x: { format: 'dd MMM yyyy' },
-                y: { formatter: (v, { seriesIndex }) =>
-                    seriesIndex === 3 ? undefined : `${Math.round(v)} uds` } },
+            xaxis: { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM' } },
+            yaxis: {
+                title: { text: 'Unidades' }, min: 0,
+                labels: { formatter: v => Math.round(v) }
+            },
+            legend: {
+                position: 'top',
+                customLegendItems: ['Historial real', 'Predicción esperada', 'Rango min/máx']
+            },
+            tooltip: {
+                shared: true, x: { format: 'dd MMM yyyy' },
+                y: {
+                    formatter: (v, { seriesIndex }) =>
+                        seriesIndex === 3 ? undefined : `${Math.round(v)} uds`
+                }
+            },
             markers: { size: [0, 4, 0, 0] },
         };
 
@@ -549,21 +578,43 @@ async function cargarPrediccionProducto(idProducto, nombreProducto, dias) {
             graficas.prediccion = new ApexCharts(document.getElementById('chart-prediccion'), opciones);
             graficas.prediccion.render();
         }
+
+        // ── Badge: siempre Promedio Móvil para predicción por producto ────────
+        // El endpoint getReporteProducto solo usa PMP, nunca el Modelo Logístico
+        const badgeElProd = document.getElementById('badge-modelo-prediccion');
+        if (badgeElProd) {
+            const diasProd = d.ventasPeriodo?.length || 0;
+            badgeElProd.innerHTML =
+                `<span class="badge-modelo badge-modelo--movil">
+                    <i class="bi bi-bar-chart-line me-1"></i>
+                    Promedio Móvil Ponderado
+                    <span class="badge-modelo__detalle">+ tendencia lineal</span>
+                    ${diasProd > 0
+                    ? `<span class="badge-modelo__dias">${diasProd} días con ventas</span>`
+                    : ''}
+                </span>`;
+        }
+
+        // ── Ocultar parámetros logísticos (no aplican a productos individuales) ─
+        const paramsElProd = document.getElementById('params-logistico');
+        if (paramsElProd) paramsElProd.style.display = 'none';
+
     } catch (err) {
         console.error('Predicción producto:', err);
     }
 }
 
+
 // Abrir modal de detalle por producto
 async function abrirModalProducto(idProducto, nombreProducto) {
-    const modal      = new bootstrap.Modal(document.getElementById('modal-producto'));
-    const tituloEl   = document.getElementById('modal-producto-titulo');
-    const bodyEl     = document.getElementById('modal-producto-body');
-    const periodoEl  = document.getElementById('modal-producto-periodo');
+    const modal = new bootstrap.Modal(document.getElementById('modal-producto'));
+    const tituloEl = document.getElementById('modal-producto-titulo');
+    const bodyEl = document.getElementById('modal-producto-body');
+    const periodoEl = document.getElementById('modal-producto-periodo');
 
-    if (tituloEl)  tituloEl.textContent  = nombreProducto;
+    if (tituloEl) tituloEl.textContent = nombreProducto;
     if (periodoEl) periodoEl.textContent = `${estado.desde} → ${estado.hasta}`;
-    if (bodyEl)    bodyEl.innerHTML = `
+    if (bodyEl) bodyEl.innerHTML = `
         <div class="text-center py-4">
             <span class="spinner-border text-primary"></span>
             <p class="mt-2 text-muted">Cargando reporte de ${nombreProducto}...</p>
@@ -573,7 +624,7 @@ async function abrirModalProducto(idProducto, nombreProducto) {
 
     try {
         const qs = `?desde=${estado.desde}&hasta=${estado.hasta}&dias=${estado.diasPrediccion}`;
-        const d  = await apiFetch(`/reportes/producto/${idProducto}${qs}`);
+        const d = await apiFetchReportes(`/reportes/producto/${idProducto}${qs}`);
 
         // Indicador del modelo usado
         const modeloTag = d.prediccion?.length
@@ -653,13 +704,13 @@ async function abrirModalProducto(idProducto, nombreProducto) {
 
             const opcModal = {
                 ...opcionesBase,
-                chart:  { ...opcionesBase.chart, type: 'line', height: 220 },
+                chart: { ...opcionesBase.chart, type: 'line', height: 220 },
                 series,
                 stroke: { curve: 'smooth', width: pred.length ? [2.5, 2, 0] : [2.5], dashArray: pred.length ? [0, 6, 0] : [0] },
-                fill:   { type: 'solid', opacity: pred.length ? [1, 1, 0.15] : [1] },
+                fill: { type: 'solid', opacity: pred.length ? [1, 1, 0.15] : [1] },
                 colors: [COLORES.azul, COLORES.naranja, COLORES.naranja],
-                xaxis:  { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM' } },
-                yaxis:  { title: { text: 'Unidades' }, min: 0, labels: { formatter: v => Math.round(v) } },
+                xaxis: { type: 'datetime', labels: { datetimeUTC: false, format: 'dd MMM' } },
+                yaxis: { title: { text: 'Unidades' }, min: 0, labels: { formatter: v => Math.round(v) } },
                 legend: { show: pred.length > 0 },
                 markers: { size: [0, 4, 0] },
                 tooltip: { shared: true, x: { format: 'dd MMM yyyy' } },
@@ -687,7 +738,7 @@ async function abrirModalProducto(idProducto, nombreProducto) {
 async function cargarStockCritico() {
     const tbody = document.getElementById('tabla-stock-critico');
     try {
-        const d = await apiFetch('/reportes/stock-critico?umbral=5');
+        const d = await apiFetchReportes('/reportes/stock-critico?umbral=5');
         const items = d.stockBajo;
         estado._stockItems = items; // guardar para paginación
 
@@ -706,13 +757,13 @@ async function cargarStockCritico() {
 
 function renderTablaStock(items, pagina = 1) {
     estado.stockPag = pagina;
-    const tbody     = document.getElementById('tabla-stock-critico');
+    const tbody = document.getElementById('tabla-stock-critico');
     if (!tbody) return;
 
-    const total     = items.length;
+    const total = items.length;
     const totalPags = Math.ceil(total / STOCK_POR_PAG);
-    const inicio    = (pagina - 1) * STOCK_POR_PAG;
-    const pagItems  = items.slice(inicio, inicio + STOCK_POR_PAG);
+    const inicio = (pagina - 1) * STOCK_POR_PAG;
+    const pagItems = items.slice(inicio, inicio + STOCK_POR_PAG);
 
     tbody.innerHTML = pagItems.map(p => `
         <tr>
@@ -739,7 +790,7 @@ function renderPaginacionStock(items, totalPags) {
     if (!cont) return;
     if (totalPags <= 1) { cont.innerHTML = ''; return; }
 
-    const p   = estado.stockPag;
+    const p = estado.stockPag;
     const ini = (p - 1) * STOCK_POR_PAG + 1;
     const fin = Math.min(p * STOCK_POR_PAG, items.length);
     let btns = '';
@@ -762,7 +813,7 @@ function renderPaginacionStock(items, totalPags) {
         </div>`;
 }
 
-window.cambiarPagStock = function(n) {
+window.cambiarPagStock = function (n) {
     renderTablaStock(estado._stockItems || [], n);
 };
 
@@ -775,10 +826,10 @@ function renderTablaDetalle(datos, pagina = 1) {
         renderPaginacionDetalle(datos, 0);
         return;
     }
-    const total     = datos.length;
+    const total = datos.length;
     const totalPags = Math.ceil(total / DETALLE_POR_PAG);
-    const inicio    = (pagina - 1) * DETALLE_POR_PAG;
-    const pagData   = datos.slice(inicio, inicio + DETALLE_POR_PAG);
+    const inicio = (pagina - 1) * DETALLE_POR_PAG;
+    const pagData = datos.slice(inicio, inicio + DETALLE_POR_PAG);
 
     tbody.innerHTML = pagData.map(r => `
         <tr>
@@ -804,9 +855,9 @@ function renderPaginacionDetalle(datos, totalPags) {
     if (!cont) return;
     if (totalPags <= 1) { cont.innerHTML = ''; return; }
 
-    const p    = estado.detallePag;
-    const ini  = (p - 1) * DETALLE_POR_PAG + 1;
-    const fin  = Math.min(p * DETALLE_POR_PAG, datos.length);
+    const p = estado.detallePag;
+    const ini = (p - 1) * DETALLE_POR_PAG + 1;
+    const fin = Math.min(p * DETALLE_POR_PAG, datos.length);
     let btns = '';
     for (let i = 1; i <= totalPags; i++) {
         if (totalPags > 7 && i > 2 && i < totalPags - 1 && Math.abs(i - p) > 1) {
@@ -832,16 +883,17 @@ function renderPaginacionDetalle(datos, totalPags) {
         </div>`;
 }
 
-window.cambiarPagDetalle = function(n) {
+window.cambiarPagDetalle = function (n) {
     renderTablaDetalle(estado.datosPeriodo, n);
 };
 
+// Exportar Excel 
 // Exportar Excel — delegado a excel.export.js
 // Cargar ventas individuales del período para Excel detallado
 async function cargarVentasIndividuales(qs) {
     try {
         // Usa el endpoint de ventas con fechas — pide hasta 500 registros
-        const d = await apiFetch(`/ventas?limit=500`);
+        const d = await apiFetchReportes(`/ventas?limit=500`);
         const items = Array.isArray(d) ? d : (d.items || []);
 
         // Filtrar por el período actual
@@ -881,8 +933,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Período inicial: este mes (agrupación automática: día)
     const fechas = calcularFechas('mes');
-    estado.desde     = fechas.desde;
-    estado.hasta     = fechas.hasta;
+    estado.desde = fechas.desde;
+    estado.hasta = fechas.hasta;
     estado.agrupacion = fechas.agrupacion;
     sincronizarBtnAgrupacion(estado.agrupacion);
 
@@ -910,8 +962,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             rangoDiv.classList.add('d-none');
             const f = calcularFechas(periodo);
-            estado.desde      = f.desde;
-            estado.hasta      = f.hasta;
+            estado.desde = f.desde;
+            estado.hasta = f.hasta;
             estado.agrupacion = f.agrupacion;
             sincronizarBtnAgrupacion(estado.agrupacion);
             await cargarTodo();
@@ -936,7 +988,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Agrupación de ventas (día/semana/mes)
     document.querySelectorAll('[data-agrupacion]').forEach(btn => {
-        btn.addEventListener('click', async function() {
+        btn.addEventListener('click', async function () {
             document.querySelectorAll('[data-agrupacion]')
                 .forEach(b => b.classList.remove('active'));
             this.classList.add('active');
@@ -947,7 +999,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // Filtro tipo en top productos
-    document.getElementById('filtro-tipo-top')?.addEventListener('change', async function() {
+    document.getElementById('filtro-tipo-top')?.addEventListener('change', async function () {
         const qs = `?desde=${estado.desde}&hasta=${estado.hasta}`;
         await cargarTopProductos(qs, this.value);
     });
@@ -963,7 +1015,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Si hay un producto seleccionado, actualizar su predicción
             const selProd = document.getElementById('selector-producto-pred');
-            const idProd  = selProd?.value;
+            const idProd = selProd?.value;
             if (idProd) {
                 const nombre = selProd.options[selProd.selectedIndex]?.text || '';
                 await cargarPrediccionProducto(idProd, nombre, estado.diasPrediccion);
@@ -974,15 +1026,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Selector de producto para predicción individual
     document.getElementById('selector-producto-pred')
-        ?.addEventListener('change', async function() {
+        ?.addEventListener('change', async function () {
             const idProd = this.value;
             if (!idProd) {
-                // Volver a predicción general
-                const aviso = document.getElementById('prediccion-aviso');
-                if (aviso) aviso.innerHTML = `
-                    <i class="bi bi-info-circle me-1"></i>
-                    Los valores son estimados con base en el historial disponible.
-                    Períodos vacacionales o eventos especiales pueden alterar los resultados reales.`;
+                // Volver a predicción general — limpiar badge y params mientras carga
+                const badgeReset = document.getElementById('badge-modelo-prediccion');
+                if (badgeReset) badgeReset.innerHTML = '';
+                const paramsReset = document.getElementById('params-logistico');
+                if (paramsReset) paramsReset.style.display = 'none';
                 await cargarPrediccion(estado.diasPrediccion);
             } else {
                 const nombre = this.options[this.selectedIndex]?.text || '';
@@ -992,7 +1043,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Buscador en tabla detalle
     let debounce;
-    document.getElementById('buscador-detalle')?.addEventListener('input', function() {
+    document.getElementById('buscador-detalle')?.addEventListener('input', function () {
         clearTimeout(debounce);
         debounce = setTimeout(() => {
             const termino = this.value.toLowerCase();

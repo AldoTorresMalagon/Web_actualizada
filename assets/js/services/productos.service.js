@@ -2,7 +2,18 @@ const ProductosService = {
 
     /* PRODUCTOS */
 
-    /* GET /api/productos */
+    /* GET /api/productos?page=N&limit=N — paginado del lado del servidor */
+    async getAllPaginado(headers = {}, page = 1, limit = 10) {
+        const res = await apiFetch(
+            `${API_CONFIG.BASE_URL}/productos?page=${page}&limit=${limit}`,
+            { headers }
+        );
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Error al cargar productos');
+        return data.data || { items: [], total: 0, page, limit, totalPaginas: 0 };
+    },
+
+    /* GET /api/productos — todos sin paginar (búsqueda en modal de ventas) */
     async getAll(headers = {}) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/productos`, { headers });
         const data = await res.json();
@@ -26,7 +37,7 @@ const ProductosService = {
         return data.data || [];
     },
 
-    /* GET /api/productos/platillos/recientes (usa vista v_platillos_recientes) — más nuevos primero */
+    /* GET /api/productos/platillos/recientes */
     async getPlatillosRecientes() {
         const res = await fetch(`${API_CONFIG.BASE_URL}/productos/platillos/recientes`);
         const data = await res.json();
@@ -39,6 +50,14 @@ const ProductosService = {
         const res = await fetch(`${API_CONFIG.BASE_URL}/productos/bebidas`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Error al cargar bebidas');
+        return data.data || [];
+    },
+
+    /* GET /api/productos/snacks */
+    async getSnacks() {
+        const res = await fetch(`${API_CONFIG.BASE_URL}/productos/snacks`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || 'Error al cargar snacks');
         return data.data || [];
     },
 
@@ -79,7 +98,6 @@ const ProductosService = {
 
     /* CATEGORÍAS */
 
-    /* GET /api/categorias */
     async getCategorias(headers = {}) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/categorias`, { headers });
         const data = await res.json();
@@ -87,7 +105,6 @@ const ProductosService = {
         return data.data || [];
     },
 
-    /* POST /api/categorias — payload: { descripcion } */
     async crearCategoria(payload, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/categorias`, {
             method: 'POST',
@@ -99,7 +116,6 @@ const ProductosService = {
         return data;
     },
 
-    /* PUT /api/categorias/:id — payload: { descripcion } */
     async actualizarCategoria(id, payload, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/categorias/${id}`, {
             method: 'PUT',
@@ -111,7 +127,6 @@ const ProductosService = {
         return data;
     },
 
-    /* DELETE /api/categorias/:id */
     async eliminarCategoria(id, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/categorias/${id}`, {
             method: 'DELETE',
@@ -124,7 +139,6 @@ const ProductosService = {
 
     /* PROVEEDORES */
 
-    /* GET /api/proveedores */
     async getProveedores(headers = {}) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/proveedores`, { headers });
         const data = await res.json();
@@ -132,7 +146,6 @@ const ProductosService = {
         return data.data || [];
     },
 
-    /* POST /api/proveedores — payload: { nombre, distribuidora, correo, telefono, direccion } */
     async crearProveedor(payload, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/proveedores`, {
             method: 'POST',
@@ -144,7 +157,6 @@ const ProductosService = {
         return data;
     },
 
-    /* PUT /api/proveedores/:id */
     async actualizarProveedor(id, payload, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/proveedores/${id}`, {
             method: 'PUT',
@@ -156,7 +168,6 @@ const ProductosService = {
         return data;
     },
 
-    /* DELETE /api/proveedores/:id */
     async eliminarProveedor(id, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/proveedores/${id}`, {
             method: 'DELETE',
@@ -169,7 +180,6 @@ const ProductosService = {
 
     /* PROMOCIONES */
 
-    /* GET /api/promociones */
     async getPromociones(headers = {}) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/promociones`, { headers });
         const data = await res.json();
@@ -177,7 +187,6 @@ const ProductosService = {
         return data.data || [];
     },
 
-    /* GET /api/promociones/activas */
     async getPromocionesActivas() {
         const res = await fetch(`${API_CONFIG.BASE_URL}/promociones/activas`);
         const data = await res.json();
@@ -185,10 +194,6 @@ const ProductosService = {
         return data.data || [];
     },
 
-    /*
-     * POST /api/promociones
-     * payload: { titulo, descripcion, porcentajeDescuento, fechaInicio, fechaFin, imagen? }
-     */
     async crearPromocion(payload, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/promociones`, {
             method: 'POST',
@@ -197,11 +202,9 @@ const ProductosService = {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Error al crear promoción');
-        return data; // data.data.id contiene el id de la nueva promoción
+        return data;
     },
 
-    /*
-     * PUT /api/promociones/:id */
     async actualizarPromocion(id, payload, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/promociones/${id}`, {
             method: 'PUT',
@@ -213,7 +216,6 @@ const ProductosService = {
         return data;
     },
 
-    /* DELETE /api/promociones/:id */
     async eliminarPromocion(id, headers) {
         const res = await apiFetch(`${API_CONFIG.BASE_URL}/promociones/${id}`, {
             method: 'DELETE',
@@ -231,14 +233,14 @@ const SubcategoriasService = {
     async getSubcategorias(params = {}) {
         const qs = new URLSearchParams(params).toString();
         const url = `${API_CONFIG.BASE_URL}/subcategorias${qs ? '?' + qs : ''}`;
-        const res  = await apiFetch(url);
+        const res = await apiFetch(url);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Error al obtener subcategorías');
         return data.data || [];
     },
 
     async getSubcategoriaById(id) {
-        const res  = await apiFetch(`${API_CONFIG.BASE_URL}/subcategorias/${id}`);
+        const res = await apiFetch(`${API_CONFIG.BASE_URL}/subcategorias/${id}`);
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || 'Subcategoría no encontrada');
         return data.data;

@@ -76,20 +76,24 @@ function aplicarFiltrosYRenderizar() {
 function renderTabla(lista) {
     const tbody = document.getElementById('tabla-proveedores');
     if (!lista.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">
             <i class="bi bi-search me-2"></i>No se encontraron proveedores</td></tr>`;
         return;
     }
     tbody.innerHTML = lista.map(p => `
         <tr>
-            <td>${p.idProveedor}</td>
-            <td class="fw-semibold">${p.Nombre}</td>
-            <td>${p.Distribuidora || '—'}</td>
-            <td>${p.Telefono || '—'}</td>
-            <td>${p.Correo || '—'}</td>
-            <td>${p.Direccion || '—'}</td>
+            <td>
+                <div class="fw-semibold">${p.Distribuidora || '—'}</div>
+                <small class="text-muted">${p.Nombre}</small>
+            </td>
+            <td><a href="tel:${p.Telefono}" class="text-decoration-none">${p.Telefono || '—'}</a></td>
+            <td><a href="mailto:${p.Correo}" class="text-decoration-none">${p.Correo || '—'}</a></td>
             <td>
                 <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-info" title="Ver detalles"
+                            data-id="${p.idProveedor}" onclick="abrirDetalleProv(this.dataset.id)">
+                        <i class="bi bi-eye"></i>
+                    </button>
                     <button class="btn btn-outline-warning" title="Editar"
                             onclick="abrirEditar(${p.idProveedor})">
                         <i class="bi bi-pencil"></i>
@@ -263,3 +267,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btn-guardar-proveedor')?.addEventListener('click', guardarProveedor);
     document.getElementById('btn-actualizar-proveedor')?.addEventListener('click', actualizarProveedor);
 });
+
+window.abrirDetalleProv = function (id) {
+    const p = todosLosProveedores.find(x => String(x.idProveedor) === String(id));
+    if (!p) return;
+    const body = document.getElementById('detalle-proveedor-body');
+    body.innerHTML = `
+        <div class="row g-3">
+            <div class="col-md-6"><small class="text-muted d-block">Nombre</small><strong>${p.Nombre || '—'}</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Distribuidora</small><strong>${p.Distribuidora || '—'}</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Teléfono</small>
+                <a href="tel:${p.Telefono}" class="fw-semibold text-decoration-none">
+                    <i class="bi bi-telephone me-1 text-success"></i>${p.Telefono || '—'}
+                </a>
+            </div>
+            <div class="col-md-6"><small class="text-muted d-block">Correo</small>
+                <a href="mailto:${p.Correo}" class="fw-semibold text-decoration-none">
+                    <i class="bi bi-envelope me-1 text-primary"></i>${p.Correo || '—'}
+                </a>
+            </div>
+            <div class="col-12"><small class="text-muted d-block">Dirección</small>
+                <p class="mb-0"><i class="bi bi-geo-alt me-1 text-danger"></i>${p.Direccion || 'Sin dirección registrada'}</p>
+            </div>
+        </div>`;
+    new bootstrap.Modal(document.getElementById('detalleProveedorModal')).show();
+};

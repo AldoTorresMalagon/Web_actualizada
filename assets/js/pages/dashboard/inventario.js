@@ -54,10 +54,10 @@ function actualizarEstadisticas() {
     document.getElementById('stat-sin-stock').textContent = sinStock;
 
     // Movimientos Hoy — contar entradas del historial de hoy
-    const hoyStr = new Date().toLocaleDateString('es-MX', { year:'numeric', month:'2-digit', day:'2-digit' });
+    const hoyStr = new Date().toLocaleDateString('es-MX', { year: 'numeric', month: '2-digit', day: '2-digit' });
     const movHoy = (todosLosMovimientos || []).filter(m => {
         const fecha = new Date(m.fecha_movimiento);
-        return fecha.toLocaleDateString('es-MX', { year:'numeric', month:'2-digit', day:'2-digit' }) === hoyStr;
+        return fecha.toLocaleDateString('es-MX', { year: 'numeric', month: '2-digit', day: '2-digit' }) === hoyStr;
     }).length;
     if (document.getElementById('stat-movimientos-hoy'))
         document.getElementById('stat-movimientos-hoy').textContent = movHoy;
@@ -92,21 +92,26 @@ function aplicarFiltrosYRenderizar() {
 function renderTabla(lista) {
     const tbody = document.getElementById('tabla-inventario');
     if (!lista.length) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-4 text-muted">
             <i class="bi bi-search me-2"></i>No se encontraron registros</td></tr>`;
         return;
     }
-    tbody.innerHTML = lista.map(m => `
+    tbody.innerHTML = lista.map((m, i) => `
         <tr>
             <td class="fw-semibold">${m.producto || '—'}</td>
-            <td>${m.codigo || '—'}</td>
-            <td>${m.stock_anterior ?? '—'}</td>
-            <td class="${FormatUtils.claseStock(m.stock_nuevo)}">${m.stock_nuevo ?? 0}</td>
+            <td>
+                <span class="text-muted small">${m.stock_anterior ?? '—'}</span>
+                <i class="bi bi-arrow-right mx-1 text-muted"></i>
+                <strong class="${FormatUtils.claseStock(m.stock_nuevo)}">${m.stock_nuevo ?? 0}</strong>
+            </td>
             <td>${FormatUtils.badgeMovimiento(m.tipo_movimiento)}</td>
-            <td>${Math.abs(m.cantidad) || '—'}</td>
-            <td><small>${m.usuario || '—'}</small></td>
-            <td><small>${FormatUtils.truncar(m.observaciones || '—', 40)}</small></td>
             <td><small>${FormatUtils.fechaHora(m.fecha_movimiento)}</small></td>
+            <td>
+                <button class="btn btn-outline-info btn-sm" title="Ver detalles"
+                        data-idx="${i}" onclick="abrirDetalleInv(this.dataset.idx)">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </td>
         </tr>`).join('');
 }
 
@@ -215,9 +220,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Calcular fechas según período
     function calcularFechasExport(periodo) {
-        const hoy  = new Date();
-        const pad  = n => String(n).padStart(2, '0');
-        const fmt  = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+        const hoy = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
         switch (periodo) {
             case 'hoy': {
                 const f = fmt(hoy);
@@ -303,14 +308,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             { year: 'numeric', month: '2-digit', day: '2-digit' });
 
         const stats = {
-            total:     productos.length,
+            total: productos.length,
             stockBajo: productos.filter(p => (p.stock_nuevo || 0) > 0 && (p.stock_nuevo || 0) < 10).length,
-            sinStock:  productos.filter(p => (p.stock_nuevo || 0) <= 0).length,
-            movHoy:    movFiltrados.length, // en el export, es el total del período filtrado
-            periodo:   desde === hasta ? desde : `${desde} al ${hasta}`,
+            sinStock: productos.filter(p => (p.stock_nuevo || 0) <= 0).length,
+            movHoy: movFiltrados.length, // en el export, es el total del período filtrado
+            periodo: desde === hasta ? desde : `${desde} al ${hasta}`,
         };
 
         ExcelExport.generarInventario(movFiltrados, stats);
     });
     document.getElementById('btn-confirmar-stock')?.addEventListener('click', confirmarAjusteStock);
 });
+window.abrirDetalleInv = function (idx) {
+    const m = todosLosMovimientos[parseInt(idx)];
+    if (!m) return;
+    const body = document.getElementById('detalle-inventario-body');
+    body.innerHTML = `
+        <div class="row g-3">
+            <div class="col-md-6"><small class="text-muted d-block">Producto</small><strong>${m.producto || '—'}</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Código</small><strong>${m.codigo || '—'}</strong></div>
+            <div class="col-md-4"><small class="text-muted d-block">Stock anterior</small><strong>${m.stock_anterior ?? '—'}</strong></div>
+            <div class="col-md-4"><small class="text-muted d-block">Stock nuevo</small><strong class="${FormatUtils.claseStock(m.stock_nuevo)}">${m.stock_nuevo ?? 0}</strong></div>
+            <div class="col-md-4"><small class="text-muted d-block">Tipo movimiento</small>${FormatUtils.badgeMovimiento(m.tipo_movimiento)}</div>
+            <div class="col-md-4"><small class="text-muted d-block">Cantidad</small><strong>${Math.abs(m.cantidad) || '—'}</strong></div>
+            <div class="col-md-4"><small class="text-muted d-block">Usuario</small><strong>${m.usuario || '—'}</strong></div>
+            <div class="col-md-4"><small class="text-muted d-block">Fecha y hora</small><small>${FormatUtils.fechaHora(m.fecha_movimiento)}</small></div>
+            <div class="col-12"><small class="text-muted d-block">Observaciones</small><p class="mb-0">${m.observaciones || 'Sin observaciones'}</p></div>
+        </div>`;
+    new bootstrap.Modal(document.getElementById('detalleInventarioModal')).show();
+};

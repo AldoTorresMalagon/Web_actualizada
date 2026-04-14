@@ -93,13 +93,10 @@
                         <table class="table table-hover">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>#</th>
-                                    <th>Nombre</th>
                                     <th>Distribuidora</th>
                                     <th>Teléfono</th>
                                     <th>Correo</th>
-                                    <th>Dirección</th>
-                                    <th>Acciones</th>
+                                    <th width="90">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-proveedores">
@@ -223,6 +220,28 @@
                     <button type="button" class="btn btn-warning" id="btn-actualizar-proveedor">
                         <i class="bi bi-floppy me-1"></i>Actualizar
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detalles: proveedores -->
+    <div class="modal fade" id="detalleProveedorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:var(--color-primario,#1E3A5F);color:#fff;">
+                    <h5 class="modal-title">
+                        <i class="bi bi-truck me-2"></i>Detalle del Proveedor
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="detalle-proveedor-body">
+                    <div class="text-center py-4">
+                        <span class="spinner-border text-primary"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>

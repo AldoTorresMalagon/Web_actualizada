@@ -55,18 +55,23 @@
             para poder agregar productos a tu carrito.
         </div>
 
-        <!-- Barra de búsqueda y ordenamiento -->
+        <!-- Barra de búsqueda, filtros y ordenamiento -->
         <div class="row g-3 mb-4 align-items-center">
-            <div class="col-12 col-md-7">
+            <div class="col-12 col-md-5">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0">
                         <i class="bi bi-search text-muted"></i>
                     </span>
-                    <input type="text" id="buscador" class="form-control border-start-0"
-                        placeholder="Buscar productos..." autocomplete="off">
+                    <input type="text" id="buscador" class="form-control border-start-0" placeholder="Buscar snacks..."
+                        autocomplete="off">
                 </div>
             </div>
-            <div class="col-12 col-md-5">
+            <div class="col-12 col-sm-6 col-md-4">
+                <select id="filtro-subcategoria" class="form-select">
+                    <option value="">Todas las subcategorías</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
                 <select id="ordenamiento" class="form-select">
                     <option value="default">Ordenar por...</option>
                     <option value="nombre-asc">Nombre (A - Z)</option>

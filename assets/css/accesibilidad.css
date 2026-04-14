@@ -779,13 +779,6 @@ html.resaltar-focus *:focus-visible {
     box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.3) !important;
 }
 
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   ACCESIBILIDAD — Overrides específicos del Dashboard (/dashboard/*.html)
-   Estas reglas aplican los modos de accesibilidad a los componentes propios
-   del panel de administración: sidebar, header, stat-cards, badge-modelo, etc.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
 /* Modo oscuro — badge modelo */
 html.modo-oscuro .badge-modelo--logistico {
     background: #1e3a5f; color: #93c5fd; border-color: #2d5282;
@@ -843,13 +836,7 @@ html.modo-oscuro .params-logistico__desc   { color: #6b7280; }
 /* Badge de tipo en categorías */
 .badge-tipo { font-size: .85rem; padding: .4rem .75rem; }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   ACCESIBILIDAD — Overrides específicos del Dashboard
-   Movido desde accesibilidad.css (aplica solo a /dashboard/)
-   Las clases globales (modo oscuro base, panel flotante, fuente dislexia,
-   reducir movimiento, etc.) siguen en accesibilidad.css porque se usan en
-   todas las páginas, no solo en el dashboard.
-   ═══════════════════════════════════════════════════════════════════════════ */
+
 /* MODO OSCURO — Dashboard */
 
 /* Fondo general del dashboard */
@@ -1261,7 +1248,3 @@ html.alto-contraste .precio-descuento-card {
 html.alto-contraste .precio-original-card {
     color: #aaa !important;
 }
-
-/* PANEL DE NOTIFICACIONES — Compatibilidad con accesibilidad */
-
-/* Modo oscuro */

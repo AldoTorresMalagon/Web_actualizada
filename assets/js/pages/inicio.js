@@ -150,17 +150,17 @@ async function cargarDestacados() {
               <span class="destacado-categoria">${p.subcategoria || p.tipo || 'Producto'}</span>
               <h3 class="h6 fw-bold mb-1">${p.Nombre}</h3>
               ${p.Descripcion
-          ? `<p class="text-muted small mb-2 flex-grow-1">${p.Descripcion.substring(0, 60)}${p.Descripcion.length > 60 ? '…' : ''}</p>`
+          ? `<p class="text-muted small mb-2 flex-grow-1">${FormatUtils.truncar(p.Descripcion, 60)}</p>`
           : '<div class="flex-grow-1"></div>'
         }
               <div class="d-flex justify-content-between align-items-center mt-2">
                 ${mapaDescuentosInicio[p.idProducto]
-                ? `<div class="precio-original-card">$${precio}</div>
+          ? `<div class="precio-original-card">$${precio}</div>
                    <span class="precio-descuento-card fs-6">
                      $${(parseFloat(p.PrecioVenta) * (1 - mapaDescuentosInicio[p.idProducto].porcentaje / 100)).toFixed(2)}
                    </span>`
-                : `<span class="fw-bold text-primary fs-6">$${precio}</span>`
-              }
+          : `<span class="fw-bold text-primary fs-6">$${precio}</span>`
+        }
                 <a href="${getDetalleUrlInicio(p.idProducto, p.idCategoria)}"
                    class="btn btn-primary btn-sm"
                    onclick="event.stopPropagation()">
@@ -299,8 +299,8 @@ function actualizarCardAuth() {
   const cardAuth = document.getElementById('card-auth');
   if (!cardAuth) return;
 
-  const token = localStorage.getItem('token');
-  const user = JSON.parse(localStorage.getItem('user') || 'null');
+  const token = AuthUtils.getToken();
+  const user = AuthUtils.getUser();
 
   if (token && user) {
     cardAuth.innerHTML = `
@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // La API devuelve productos_ids como array de números
       (p.productos_ids || []).forEach(idProducto => {
         if (!mapaDescuentosInicio[idProducto] ||
-            p.porcentaje_descuento > mapaDescuentosInicio[idProducto].porcentaje) {
+          p.porcentaje_descuento > mapaDescuentosInicio[idProducto].porcentaje) {
           mapaDescuentosInicio[idProducto] = { porcentaje: p.porcentaje_descuento };
         }
       });

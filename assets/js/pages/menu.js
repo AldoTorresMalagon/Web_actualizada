@@ -4,7 +4,8 @@ const CATEGORY = window.PAGE_CATEGORY || 'productos';
 const ENDPOINT_MAP = {
     comidas: `${API_CONFIG.BASE_URL}/productos/platillos`,
     bebidas: `${API_CONFIG.BASE_URL}/productos/bebidas`,
-    productos: `${API_CONFIG.BASE_URL}/productos`
+    productos: `${API_CONFIG.BASE_URL}/productos/snacks`,
+    todos: `${API_CONFIG.BASE_URL}/productos`
 };
 
 const ENDPOINT = ENDPOINT_MAP[CATEGORY];
@@ -87,10 +88,10 @@ function renderTarjeta(p) {
           <div class="d-flex justify-content-between align-items-center mt-2">
             <div>
               ${desc
-                ? `<div><small class="text-muted text-decoration-line-through">$${precio}</small></div>
+            ? `<div><small class="text-muted text-decoration-line-through">$${precio}</small></div>
                    <span class="fw-bold text-success">$${precioDesc} <small class="text-muted fw-normal">MXN</small></span>`
-                : `<span class="fw-bold text-primary">$${precio} <small class="text-muted fw-normal">MXN</small></span>`
-              }
+            : `<span class="fw-bold text-primary">$${precio} <small class="text-muted fw-normal">MXN</small></span>`
+        }
             </div>
             <a href="${getDetalleUrl(p.idProducto, p.idCategoria)}"
                class="btn btn-outline-primary btn-sm">
@@ -177,11 +178,13 @@ function mostrarProductos(lista) {
 async function cargarProductos() {
     try {
         let productos = [];
-        if (CATEGORY === 'comidas')   productos = await ProductosService.getPlatillos();
+        if (CATEGORY === 'comidas') productos = await ProductosService.getPlatillos();
         else if (CATEGORY === 'bebidas') productos = await ProductosService.getBebidas();
+        else if (CATEGORY === 'productos') productos = await ProductosService.getSnacks();
         else productos = await ProductosService.getAll();
 
         todosLosProductos = productos;
+        poblarFiltroSubcategorias();   // llenar el select con las subcats reales
         mostrarProductos(todosLosProductos);
 
     } catch (err) {
@@ -198,8 +201,8 @@ async function cargarProductos() {
 /* Búsqueda y ordenamiento */
 function aplicarFiltros() {
     const termino = document.getElementById('buscador')?.value.toLowerCase().trim() || '';
-    const orden   = document.getElementById('ordenamiento')?.value || 'default';
-    const subcat  = document.getElementById('filtro-subcategoria')?.value || '';
+    const orden = document.getElementById('ordenamiento')?.value || 'default';
+    const subcat = document.getElementById('filtro-subcategoria')?.value || '';
 
     let resultado = todosLosProductos.filter(p => {
         const coincideTexto = p.Nombre.toLowerCase().includes(termino) ||
@@ -210,9 +213,9 @@ function aplicarFiltros() {
     });
 
     switch (orden) {
-        case 'nombre-asc':  resultado.sort((a, b) => a.Nombre.localeCompare(b.Nombre)); break;
+        case 'nombre-asc': resultado.sort((a, b) => a.Nombre.localeCompare(b.Nombre)); break;
         case 'nombre-desc': resultado.sort((a, b) => b.Nombre.localeCompare(a.Nombre)); break;
-        case 'precio-asc':  resultado.sort((a, b) => a.PrecioVenta - b.PrecioVenta); break;
+        case 'precio-asc': resultado.sort((a, b) => a.PrecioVenta - b.PrecioVenta); break;
         case 'precio-desc': resultado.sort((a, b) => b.PrecioVenta - a.PrecioVenta); break;
     }
 

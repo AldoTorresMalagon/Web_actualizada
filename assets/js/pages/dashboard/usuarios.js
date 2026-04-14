@@ -111,30 +111,35 @@ function aplicarFiltrosYRenderizar() {
 function renderTabla(lista) {
     const tbody = document.getElementById('tabla-usuarios');
     if (!lista.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-muted">
             <i class="bi bi-search me-2"></i>No se encontraron usuarios</td></tr>`;
         return;
     }
     /* rolBadge → FormatUtils.badgeRol */
     tbody.innerHTML = lista.map(u => {
         const nombre = FormatUtils.nombreCompleto(u.Nombre, u.ApellidoPaterno, u.ApellidoMaterno);
-        const estadoBadge = FormatUtils.badgeEstado(u.estado === 'activo');
         return `
         <tr>
-            <td>${u.intidusuario}</td>
             <td>
                 <div class="fw-semibold">${nombre}</div>
                 <small class="text-muted">${u.matricula || ''}</small>
             </td>
             <td>${u.Correo || '—'}</td>
-            <td>${u.nombre_usuario || '—'}</td>
             <td>${FormatUtils.badgeRol(u.rol)}</td>
-            <td>${u.carrera || '—'}</td>
-            <td>${estadoBadge}</td>
             <td>
-                <button class="btn btn-outline-warning btn-sm" title="Editar"
+                <button class="btn btn-outline-info btn-sm me-1" title="Ver detalles"
+                        data-id="${u.intidusuario}" onclick="abrirDetalleUsuario(this.dataset.id)">
+                    <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-outline-warning btn-sm me-1" title="Editar"
                         onclick="abrirEditar(${u.intidusuario})">
                     <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" title="Eliminar"
+                        data-id="${u.intidusuario}"
+                        data-nombre="${nombre.replace(/"/g, '&quot;')}"
+                        onclick="confirmarEliminar(this.dataset.id, this.dataset.nombre)">
+                    <i class="bi bi-trash"></i>
                 </button>
             </td>
         </tr>`;
@@ -185,6 +190,32 @@ async function guardarUsuario() {
 }
 
 /* Abrir edición */
+
+/* Eliminar usuario */
+window.confirmarEliminar = function (id, nombre) {
+    id = parseInt(id);
+    Toast.confirm({
+        titulo: 'Eliminar usuario',
+        msg: `¿Estás seguro de que deseas eliminar a <strong>${nombre}</strong>? Esta acción no se puede deshacer.`,
+        tipo: 'danger',
+        labelOk: 'Sí, eliminar',
+        labelNo: 'Cancelar',
+    }, async () => {
+        try {
+            const res = await apiFetch(`${API_CONFIG.BASE_URL}/usuarios/${id}`, {
+                method: 'DELETE',
+                headers: AuthUtils.getHeaders(),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Error al eliminar');
+            Toast.success('Usuario eliminado correctamente');
+            await cargarUsuarios();
+        } catch (err) {
+            Toast.error(err.message);
+        }
+    });
+};
+
 window.abrirEditar = async function (id) {
     // Limpiar contraseña del modal anterior
     const inputPwd = document.getElementById('editar-password');
@@ -304,20 +335,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Toggle visibilidad contraseña — modal Agregar
     document.getElementById('toggle-agregar-password')?.addEventListener('click', () => {
         const input = document.getElementById('agregar-password');
-        const ico   = document.getElementById('ico-agregar-password');
+        const ico = document.getElementById('ico-agregar-password');
         if (!input) return;
         const visible = input.type === 'text';
-        input.type    = visible ? 'password' : 'text';
+        input.type = visible ? 'password' : 'text';
         if (ico) ico.className = visible ? 'bi bi-eye' : 'bi bi-eye-slash';
     });
 
     // Toggle visibilidad contraseña — modal Editar
     document.getElementById('toggle-editar-password')?.addEventListener('click', () => {
         const input = document.getElementById('editar-password');
-        const ico   = document.getElementById('ico-editar-password');
+        const ico = document.getElementById('ico-editar-password');
         if (!input) return;
         const visible = input.type === 'text';
-        input.type    = visible ? 'password' : 'text';
+        input.type = visible ? 'password' : 'text';
         if (ico) ico.className = visible ? 'bi bi-eye' : 'bi bi-eye-slash';
     });
 
@@ -332,3 +363,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('btn-guardar-usuario')?.addEventListener('click', guardarUsuario);
     document.getElementById('btn-actualizar-usuario')?.addEventListener('click', actualizarUsuario);
 });
+
+window.abrirDetalleUsuario = function (id) {
+    const u = todosLosUsuarios.find(x => String(x.intidusuario) === String(id));
+    if (!u) return;
+    const nombre = FormatUtils.nombreCompleto(u.Nombre, u.ApellidoPaterno, u.ApellidoMaterno);
+    const body = document.getElementById('detalle-usuario-body');
+    body.innerHTML = `
+        <div class="row g-3">
+            <div class="col-md-2 text-center">
+                <i class="bi bi-person-circle" style="font-size:4rem;color:var(--color-primario,#1E3A5F);"></i>
+            </div>
+            <div class="col-md-10">
+                <h5 class="fw-bold mb-0">${nombre}</h5>
+                <div class="mt-1">${FormatUtils.badgeRol(u.rol)}</div>
+            </div>
+            <div class="col-md-6"><small class="text-muted d-block">ID</small><strong>#${u.intidusuario}</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Usuario</small><strong>@${u.nombre_usuario || '—'}</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Matrícula</small><strong>${u.matricula || '—'}</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Correo</small>
+                <a href="mailto:${u.Correo}" class="text-decoration-none">${u.Correo || '—'}</a>
+            </div>
+            <div class="col-md-6"><small class="text-muted d-block">Teléfono</small>
+                <a href="tel:${u.Telefono}" class="text-decoration-none">${u.Telefono || '—'}</a>
+            </div>
+            <div class="col-md-6"><small class="text-muted d-block">Carrera</small><strong>${u.carrera || '—'}</strong></div>
+            <div class="col-md-6"><small class="text-muted d-block">Estado</small>${FormatUtils.badgeEstado(u.estado === 'activo')}</div>
+            <div class="col-md-6"><small class="text-muted d-block">Fecha de registro</small><small>${FormatUtils.fechaCorta(u.fecha_registro)}</small></div>
+        </div>`;
+    new bootstrap.Modal(document.getElementById('detalleUsuarioModal')).show();
+};

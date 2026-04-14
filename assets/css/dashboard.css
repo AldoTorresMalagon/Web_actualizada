@@ -1,10 +1,3 @@
-/* dashboard.css — Estilos de diseño y layout del panel de administración.
-   Los overrides de accesibilidad (modo oscuro, alto contraste, etc.)
-   están en assets/css/accesibilidad.css.
-*/
-
-/* Layout base */
-
 /* Wrapper del layout principal — evita scroll de página completa */
 .dash-wrapper {
     height: calc(100vh - var(--header-height));
@@ -443,4 +436,3 @@
 .params-logistico__desc {
     color: #9ca3af; font-size: .75rem;
 }
-
